@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Simulation - Static Version</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a1a1a;
+            font-family: monospace;
+            color: white;
+            overflow: hidden;
+        }
+        
+        #container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #instructions {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            max-width: 300px;
+            z-index: 100;
+        }
+        
+        #status {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 100;
+        }
+        
+        .error {
+            color: #ff6b6b;
+        }
+        
+        .success {
+            color: #51cf66;
+        }
+        
+        .warning {
+            color: #ffd43b;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="status">
+            <h3 class="error">⚠️ Cricket Simulation Not Running</h3>
+            <p class="warning">Node.js development server required</p>
+            <p>Current status: <span class="error">Static HTML</span></p>
+        </div>
+        
+        <div id="instructions">
+            <h3 class="warning">🚀 Setup Required</h3>
+            <p><strong>To play the cricket game:</strong></p>
+            <ol>
+                <li>Install Node.js from <a href="https://nodejs.org" target="_blank" style="color: #51cf66;">nodejs.org</a></li>
+                <li>Open PowerShell in this folder</li>
+                <li>Run: <code style="background: #333; padding: 2px 4px;">npm install</code></li>
+                <li>Run: <code style="background: #333; padding: 2px 4px;">npm run dev</code></li>
+                <li>Open: <code style="background: #333; padding: 2px 4px;">http://localhost:3000</code></li>
+            </ol>
+            
+            <h4 class="success">🏏 Game Features</h4>
+            <ul style="font-size: 11px;">
+                <li>Full 3D cricket stadium</li>
+                <li>Interactive batting & bowling</li>
+                <li>Realistic ball physics</li>
+                <li>Animated players</li>
+                <li>Multiple camera views</li>
+                <li>Score tracking</li>
+            </ul>
+            
+            <h4 class="success">🎮 Controls (when running)</h4>
+            <div style="font-size: 10px;">
+                <p><strong>SPACEBAR</strong> - Bowl ball</p>
+                <p><strong>D,F,G,H,V</strong> - Batting shots</p>
+                <p><strong>T</strong> - Throw to keeper</p>
+                <p><strong>1-6</strong> - Camera views</p>
+                <p><strong>C</strong> - Toggle stadium</p>
+            </div>
+        </div>
+        
+        <div style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 18px;
+        ">
+            <h1 class="warning">🏏 Cricket Simulation</h1>
+            <p class="error">React/Three.js components require development server</p>
+            <p>Follow setup instructions ➤</p>
+            
+            <div style="margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.8); border-radius: 8px; display: inline-block;">
+                <h3 class="success">Quick Setup:</h3>
+                <ol style="text-align: left; font-size: 14px;">
+                    <li>Download & install <a href="https://nodejs.org" target="_blank" style="color: #51cf66;">Node.js LTS</a></li>
+                    <li>Restart PowerShell</li>
+                    <li>Run: <code style="background: #333; padding: 4px 8px; border-radius: 4px;">npm run dev</code></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Simple browser check
+        console.log('Cricket Simulation - Static Version');
+        console.log('Install Node.js and run "npm run dev" for full experience');
+        
+        // Check if opening from file:// protocol
+        if (window.location.protocol === 'file:') {
+            console.warn('Opening from file system. Need development server for React/Three.js');
+        }
+        
+        // Keyboard handler to show what keys are being pressed
+        document.addEventListener('keydown', function(event) {
+            console.log('Key pressed:', event.key, '- Install Node.js to enable cricket controls');
+            
+            if (event.key === ' ') {
+                alert('SPACEBAR: Bowl ball\n\nInstall Node.js and run "npm run dev" to play!');
+            }
+        });
+    </script>
+</body>
+</html>
