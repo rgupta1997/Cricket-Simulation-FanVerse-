@@ -3,10 +3,13 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import PlayerModel from './players/PlayerModel';
 import Lighting from './Lighting';
+import Navigation from './Navigation';
 
 const PlayerTest = () => {
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#1a1a1a' }}>
+      {/* Navigation */}
+      <Navigation />
       <Canvas
         shadows
         camera={{ position: [5, 5, 5], fov: 75 }}

@@ -17,8 +17,15 @@ import {
   AnimatedWicketKeeper, 
   AnimatedFielder 
 } from './players/AnimatedPlayers';
+import { 
+  CORE_PLAYER_POSITIONS, 
+  FIELDER_POSITIONS, 
+  UMPIRE_POSITIONS,
+  getAllPlayersArray
+} from '../constants/playerPositions';
+import { defaultPositionManager } from '../utils/positionManager';
 
-const CricketGame = ({ onGameStateChange }) => {
+const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEditorActive = false }) => {
   const [gameState, setGameState] = useState(createInitialGameState());
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedControl, setSelectedControl] = useState('bowling');
@@ -38,10 +45,11 @@ const CricketGame = ({ onGameStateChange }) => {
         selectedControl,
         isPlaying,
         selectedDirection: selectedShotDirection,
-        selectedShotType: selectedShotType
+        selectedShotType: selectedShotType,
+        shotAngle
       });
     }
-  }, [gameState, selectedControl, isPlaying, selectedShotDirection, selectedShotType, onGameStateChange]);
+  }, [gameState, selectedControl, isPlaying, selectedShotDirection, selectedShotType, shotAngle, onGameStateChange]);
 
   // Debug: Log when component mounts
   useEffect(() => {
@@ -292,8 +300,14 @@ const CricketGame = ({ onGameStateChange }) => {
     }
   }, []);
 
-  // Advanced 8-directional shot selection
+  // Advanced 8-directional shot selection - Only active when position editor is NOT open
   useEffect(() => {
+    // Skip shot direction handling if position editor is active
+    if (isPositionEditorActive) {
+      console.log('🔧 Position editor active - skipping shot direction updates');
+      return;
+    }
+
     const up = keysPressed.has('arrowup');
     const down = keysPressed.has('arrowdown');
     const left = keysPressed.has('arrowleft');
@@ -336,15 +350,20 @@ const CricketGame = ({ onGameStateChange }) => {
       newDirection: newDirection,
       newAngle: newAngle
     });
-  }, [keysPressed]);
+  }, [keysPressed, isPositionEditorActive]);
 
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (event) => {
       const key = event.key.toLowerCase();
       
-      // Add to pressed keys for directional detection
+      // Add to pressed keys for directional detection - but skip if position editor is active
       if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+        if (isPositionEditorActive) {
+          // Don't prevent default or handle arrow keys when position editor is active
+          console.log('🔧 Position editor active - ignoring arrow key for cricket game');
+          return;
+        }
         event.preventDefault();
         setKeysPressed(prev => new Set(prev).add(key));
         return;
@@ -417,6 +436,11 @@ const CricketGame = ({ onGameStateChange }) => {
     const handleKeyUp = (event) => {
       const key = event.key.toLowerCase();
       if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+        if (isPositionEditorActive) {
+          // Don't handle arrow key releases when position editor is active
+          console.log('🔧 Position editor active - ignoring arrow key release for cricket game');
+          return;
+        }
         event.preventDefault();
         setKeysPressed(prev => {
           const newSet = new Set(prev);
@@ -432,7 +456,7 @@ const CricketGame = ({ onGameStateChange }) => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [gameState, isPlaying, handleBowl, handleBat, handleThrowToKeeper]);
+  }, [gameState, isPlaying, handleBowl, handleBat, handleThrowToKeeper, isPositionEditorActive]);
 
   // Control updates
   const updateBowlingControls = useCallback((updates) => {
@@ -451,24 +475,25 @@ const CricketGame = ({ onGameStateChange }) => {
     }));
   }, []);
 
-  // Position umpires correctly
+  // Get dynamic positions from position manager (with fallback for safety)
+  const positions = currentPlayerPositions || {};
   const umpirePositions = {
-    bowlersEnd: [0, 0, 11], // Behind bowler's wicket (swapped)
-    point: [12, 0, -8] // Point position for right-handed batsman (swapped)
+    bowlersEnd: positions.umpire_bowlers_end?.position || UMPIRE_POSITIONS.BOWLERS_END.position,
+    point: positions.umpire_square_leg?.position || UMPIRE_POSITIONS.SQUARE_LEG_UMPIRE.position
   };
 
-  // Create fielder positions (field inverted)
+  // Create fielder positions from dynamic positions
   const fielderPositions = [
-    { position: [10, 0, -5], role: 'mid-off' },
-    { position: [-10, 0, -5], role: 'mid-on' },
-    { position: [15, 0, 0], role: 'cover' },
-    { position: [-15, 0, 0], role: 'mid-wicket' },
-    { position: [8, 0, 10], role: 'third-man' },
-    { position: [-8, 0, 10], role: 'fine-leg' },
-    { position: [12, 0, -8], role: 'point' },
-    { position: [-12, 0, -8], role: 'square-leg' },
-    { position: [5, 0, 15], role: 'long-off' },
-    { position: [-5, 0, 15], role: 'long-on' }
+    { position: positions.mid_off?.position || FIELDER_POSITIONS.MID_OFF.position, role: 'mid-off' },
+    { position: positions.mid_on?.position || FIELDER_POSITIONS.MID_ON.position, role: 'mid-on' },
+    { position: positions.cover?.position || FIELDER_POSITIONS.COVER.position, role: 'cover' },
+    { position: positions.mid_wicket?.position || FIELDER_POSITIONS.MID_WICKET.position, role: 'mid-wicket' },
+    { position: positions.third_man?.position || FIELDER_POSITIONS.THIRD_MAN.position, role: 'third-man' },
+    { position: positions.fine_leg?.position || FIELDER_POSITIONS.FINE_LEG.position, role: 'fine-leg' },
+    { position: positions.point?.position || FIELDER_POSITIONS.POINT.position, role: 'point' },
+    { position: positions.square_leg?.position || FIELDER_POSITIONS.SQUARE_LEG.position, role: 'square-leg' },
+    { position: positions.long_off?.position || FIELDER_POSITIONS.LONG_OFF.position, role: 'long-off' },
+    { position: positions.long_on?.position || FIELDER_POSITIONS.LONG_ON.position, role: 'long-on' }
   ];
 
   return (
@@ -477,7 +502,7 @@ const CricketGame = ({ onGameStateChange }) => {
       
       {/* Striker (on strike) */}
       <AnimatedBatsman
-        position={gameState.players.striker.position}
+        position={positions.striker?.position || gameState.players.striker.position}
         isStrike={true}
         animation={gameState.players.striker.animation}
         gameState={gameState}
@@ -488,7 +513,7 @@ const CricketGame = ({ onGameStateChange }) => {
       
       {/* Non-striker */}
       <AnimatedBatsman
-        position={gameState.players.nonStriker.position}
+        position={positions.non_striker?.position || gameState.players.nonStriker.position}
         isStrike={false}
         animation={gameState.players.nonStriker.animation}
         gameState={gameState}
@@ -496,7 +521,7 @@ const CricketGame = ({ onGameStateChange }) => {
       
       {/* Bowler */}
       <AnimatedBowler
-        position={gameState.players.bowler.position}
+        position={positions.bowler?.position || gameState.players.bowler.position}
         animation={gameState.players.bowler.animation}
         bowlingType={gameState.controls.bowling.type || 'fast'}
         gameState={gameState}
@@ -504,7 +529,7 @@ const CricketGame = ({ onGameStateChange }) => {
       
       {/* Wicket Keeper */}
       <AnimatedWicketKeeper
-        position={gameState.players.wicketKeeper.position}
+        position={positions.wicket_keeper?.position || gameState.players.wicketKeeper.position}
         animation={gameState.players.wicketKeeper.animation}
         gameState={gameState}
       />

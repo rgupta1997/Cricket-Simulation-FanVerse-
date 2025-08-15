@@ -106,7 +106,7 @@ const StadiumSeating = () => {
 };
 
 // Main Stadium component
-const Stadium = ({ onGameStateChange }) => {
+const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorActive = false }) => {
   const { field, pitch } = STADIUM_CONFIG;
   const [useCustomModel, setUseCustomModel] = useState(false);
   
@@ -179,6 +179,8 @@ const Stadium = ({ onGameStateChange }) => {
       <CricketGame 
         use3DModel={useCustomModel} 
         onGameStateChange={onGameStateChange}
+        currentPlayerPositions={currentPlayerPositions}
+        isPositionEditorActive={isPositionEditorActive}
       />
     </group>
   );
