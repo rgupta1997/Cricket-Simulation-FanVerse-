@@ -11,6 +11,14 @@ import {
   BALL_STATES
 } from './CricketGameState';
 import EnhancedBall from './players/EnhancedBall';
+import BowlingConfigPanel from './BowlingConfigPanel';
+import PitchMarkers from './PitchMarkers';
+import CoordinateDisplay from './CoordinateDisplay';
+import PitchGuideToggle from './PitchGuideToggle';
+import DeliveryInfo from './DeliveryInfo';
+import BallTrajectoryInfo from './BallTrajectoryInfo';
+import RightDockedPanel from './RightDockedPanel';
+import { useCameraControls } from '../hooks/useCameraControls';
 import { 
   AnimatedBatsman, 
   AnimatedBowler, 
@@ -46,20 +54,31 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
   const [keysPressed, setKeysPressed] = useState(new Set());
   const animationFrameRef = useRef();
 
-  // Notify parent of game state changes for UI
-  useEffect(() => {
-    if (onGameStateChange) {
-      onGameStateChange({
-        gameState,
-        selectedControl,
-        isPlaying,
-        selectedDirection: selectedShotDirection,
-        selectedShotType: selectedShotType,
-        shotAngle,
-        onBowlingControlChange: updateBowlingControls
-      });
-    }
-  }, [gameState, selectedControl, isPlaying, selectedShotDirection, selectedShotType, shotAngle, onGameStateChange]);
+  // Pitch guide visibility states
+  const [showPitchMarkers, setShowPitchMarkers] = useState(true);
+  const [showCoordinateDisplay, setShowCoordinateDisplay] = useState(true);
+  const [showPitchGrid, setShowPitchGrid] = useState(true);
+  const [useCompactUI, setUseCompactUI] = useState(true); // Toggle between full and compact UI
+  
+  // Camera controls integration
+  const { currentView, switchToView } = useCameraControls();
+
+
+
+  // Handler for updating bowling configuration from pitch analysis
+  const handleBowlingConfigUpdate = useCallback((newConfig) => {
+    setGameState(prevState => ({
+      ...prevState,
+      controls: {
+        ...prevState.controls,
+        bowling: {
+          ...prevState.controls.bowling,
+          ...newConfig
+        }
+      }
+    }));
+    console.log('🔧 Updated bowling config:', newConfig);
+  }, []);
 
   // Debug: Log when component mounts
   useEffect(() => {
@@ -77,75 +96,21 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       return;
     }
     
-    console.log('✅ Starting bowling action!');
+    console.log('✅ Starting bowling action with enhanced trajectory system!');
 
     const { controls } = gameState;
-    const { speed, line, length, pitch } = controls.bowling;
+    const bowlingControls = controls.bowling;
     
-    // Convert speed from km/h to m/s
-    const speedMS = (speed * 1000) / 3600;
+    // Calculate enhanced ball trajectory using pitch analysis
+    const trajectory = calculateBallTrajectory(bowlingControls);
     
-    // Calculate release height based on bowling speed and standard cricket dimensions
-    const releaseHeight = 2.0 + (speed - 100) * 0.01; // 2.0m base height + speed adjustment
-    
-    // Calculate release point side position based on line control
-    const releaseSide = line * 1.5; // -1.5 to 1.5 meters from center (pitch width is 3m)
-    
-    // Calculate target position based on length control
-    const pitchLength = STADIUM_CONFIG.pitch.length; // 22m standard cricket pitch length
-    const pitchWidth = STADIUM_CONFIG.pitch.width; // 3m standard cricket pitch width
-    
-    // Calculate bounce position on pitch based on length control
-    // length: -1 (full toss) to 1 (short)
-    const strikerEndZ = -11; // Striker's end position
-    const bowlerEndZ = 11; // Bowler's end position
-    const pitchHalfLength = pitchLength / 2;
-    
-    // Map length control to bounce position:
-    // 1 (full toss) -> no bounce (delivery straight to batsman)
-    // 0.5 -> very full (yorker) -> bounce 1-2m from batsman
-    // 0 -> good length -> bounce around 6-8m from batsman
-    // -0.5 -> short of good length -> bounce 10-12m from batsman
-    // -1 -> short -> bounce at half pitch
-    
-    let bounceZ;
-    if (length >= 0.8) {
-        // Full toss - no bounce, direct to batsman height
-        bounceZ = strikerEndZ;
-    } else {
-        // Calculate bounce position
-        // Map length from -1->0.8 to bounceZ positions from 11m->2m from batsman
-        const normalizedLength = (-length + 0.8) / 1.8; // Convert to 0->1 range and invert
-        const minBounceDistance = 2; // Minimum 2m from batsman for yorker
-        const maxBounceDistance = pitchHalfLength; // Maximum at half pitch for short ball
-        bounceZ = strikerEndZ + (minBounceDistance + (normalizedLength * (maxBounceDistance - minBounceDistance)));
-    }
-    
-    // Calculate horizontal position based on line
-    const targetX = line * (pitchWidth/2); // Horizontal movement within pitch width
-    
-    // Calculate initial velocity components
-    const releaseAngle = Math.atan2(releaseHeight, pitchLength);
-    const horizontalSpeed = speedMS * Math.cos(releaseAngle);
-    const verticalSpeed = speedMS * Math.sin(releaseAngle);
-    
-    // Add seam angle and pitch variation effects
-    const seamAngle = pitch * Math.PI / 4; // Convert -1 to 1 to radians
-    const pitchVariation = pitch * 0.5; // Additional sideways movement after bounce
-    
-    console.log('🎯 Bowling parameters:', {
-      speed: speedMS.toFixed(2) + ' m/s',
-      releaseHeight: releaseHeight.toFixed(2) + ' m',
-      releaseSide: releaseSide.toFixed(2) + ' m',
-      bouncePosition: bounceZ.toFixed(2) + ' m',
-      targetX: targetX.toFixed(2) + ' m',
-      seamAngle: (seamAngle * 180 / Math.PI).toFixed(2) + '°',
-      pitchEffect: pitchVariation.toFixed(2) + ' m',
-      type: length >= 0.8 ? 'Full Toss' : 
-            length >= 0.4 ? 'Yorker' :
-            length >= 0 ? 'Full Length' :
-            length >= -0.4 ? 'Good Length' :
-            length >= -0.8 ? 'Short of Good Length' : 'Short'
+    console.log('🎯 Enhanced Bowling Parameters:', {
+      velocity: bowlingControls.velocity + ' km/h',
+      releasePosition: trajectory.initial.position,
+      bouncePosition: trajectory.bounce.position,
+      finalPosition: trajectory.target.position,
+      totalFlightTime: trajectory.metadata.totalTime.toFixed(2) + ' s',
+      pitchAnalysis: trajectory.metadata.pitchAnalysis
     });
     
     // Start bowling animation
@@ -155,91 +120,24 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
 
     // Delay ball release for animation
     setTimeout(() => {
-      // Calculate trajectory for visualization
-      const trajectoryPoints = [];
-      if (length <= -0.8) {
-        // Full toss - straight line to batsman
-        trajectoryPoints.push([releaseSide, releaseHeight, bowlerEndZ]); // Release point
-        trajectoryPoints.push([targetX, BATSMAN_HEIGHT, strikerEndZ]); // Batsman height
-      } else {
-        // Normal delivery with bounce
-        trajectoryPoints.push([releaseSide, releaseHeight, bowlerEndZ]); // Release point
-        trajectoryPoints.push([targetX, 0, bounceZ]); // Bounce point
-        trajectoryPoints.push([targetX + pitchVariation, BATSMAN_HEIGHT, strikerEndZ]); // Final point with seam movement
-      }
-
-          // Calculate velocities for two-phase trajectory: release to bounce, and bounce to batsman
-    const bounceHeight = controls.bowling.bounceHeight || 0.5; // Get bounce height from controls
-    
-    // Time to reach bounce point
-    const timeToBounce = Math.sqrt(
-      Math.pow(bounceZ - bowlerEndZ, 2) + 
-      Math.pow(releaseHeight, 2)
-    ) / speedMS;
-
-    // Calculate required vertical velocity after bounce to reach desired height
-    const distanceToBatsman = Math.abs(strikerEndZ - bounceZ);
-    const timeToBatsman = Math.sqrt(2 * distanceToBatsman / speedMS);
-    // Calculate bounce height based on pitch characteristics and ball speed
-    const pitchBounce = bounceHeight; // 0 = dead pitch, 2 = normal, 4 = very bouncy
-    
-    // Normalize length from -1->1 to 0->1 range (0 = short, 1 = full)
-    const normalizedLength = (length + 1) / 2;
-    
-    // Base bounce height depends on length (fuller = lower base bounce)
-    const lengthFactor = (1 - normalizedLength); // 1 for short, 0 for full
-    const baseBounceHeight = BATSMAN_HEIGHT * (0.3 + (lengthFactor * 0.7)); // 0.3-1.0 × height
-    
-    // Speed factor (slower balls bounce relatively less)
-    const speedFactor = (speedMS / 25); // normalize to typical pace speed
-    
-    // Pitch bounce multiplier (exponential to simulate dramatic bounce on bouncy pitches)
-    const pitchBounceMultiplier = Math.pow(1.2, pitchBounce);
-    
-    // Combine all factors for final bounce height
-    const targetBounceHeight = baseBounceHeight * speedFactor * pitchBounceMultiplier;
-    
-    // Calculate velocities using projectile motion equations
-    const initialVelocityX = (targetX - releaseSide) / timeToBounce;
-    const initialVelocityY = (0 - releaseHeight) / timeToBounce - (GRAVITY * timeToBounce / 2);
-    const initialVelocityZ = (bounceZ - bowlerEndZ) / timeToBounce;
-    
-    // Calculate post-bounce velocities
-    const postBounceVy = Math.sqrt(-2 * GRAVITY * targetBounceHeight); // Velocity needed to reach target height
-    // Scale bounce energy retention with height (0.5-0.9)
-    const bounceSpeedMultiplier = 0.5 + (bounceHeight * 0.1); // Higher bounce = more retained energy
-
+      // Create ball data using enhanced trajectory calculation
       const ballData = {
-        position: [releaseSide, releaseHeight, bowlerEndZ], // Release position at bowler's end
-        velocity: [
-          initialVelocityX + pitchVariation * speedMS * 0.05, // Add seam effect
-          initialVelocityY,
-          initialVelocityZ
-        ],
+        position: trajectory.initial.position, // Release position from pitch analysis
+        velocity: trajectory.initial.velocity, // Initial velocity components
         isMoving: true,
-        seamAngle: seamAngle, // Add seam angle for spin effects
-        pitchEffect: pitchVariation, // Additional movement after bounce
-        bounceHeight: bounceHeight, // Store bounce height for physics calculations
+        bounceHeight: bowlingControls.bounceHeight || 0.5,
         trajectory: {
-          points: trajectoryPoints,
-          initial: {
-            position: [releaseSide, releaseHeight, bowlerEndZ],
-            velocity: [initialVelocityX, initialVelocityY, initialVelocityZ]
-          },
-          bounce: {
-            position: [targetX, 0, bounceZ],
-            velocity: [
-              initialVelocityX * bounceSpeedMultiplier + pitchVariation * speedMS * 0.1,
-              postBounceVy,
-              initialVelocityZ * bounceSpeedMultiplier
-            ],
-            height: targetBounceHeight,
-            effect: pitchVariation
-          },
-          target: {
-            position: [targetX + pitchVariation, BATSMAN_HEIGHT, strikerEndZ],
-            height: BATSMAN_HEIGHT
-          }
+          initial: trajectory.initial,
+          bounce: trajectory.bounce,
+          target: trajectory.target,
+          metadata: trajectory.metadata
+        },
+        // Store pitch analysis data for reference
+        pitchAnalysis: {
+          ball_axis: { x: bowlingControls.ball_axis_x, y: bowlingControls.ball_axis_y },
+          length_axis: { x: bowlingControls.length_axis_x, z: bowlingControls.length_axis_z },
+          line_axis: { x: bowlingControls.line_axis_x, z: bowlingControls.line_axis_z },
+          velocity: bowlingControls.velocity
         }
       };
       
@@ -644,6 +542,37 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     { position: positions.long_on?.position || FIELDER_POSITIONS.LONG_ON.position, role: 'long-on' }
   ];
 
+  // Pass UI state to parent for external rendering
+  React.useEffect(() => {
+    if (onGameStateChange) {
+      onGameStateChange({
+        gameState,
+        selectedControl,
+        isPlaying,
+        selectedDirection: selectedShotDirection,
+        selectedShotType: selectedShotType,
+        shotAngle,
+        onBowlingControlChange: updateBowlingControls,
+        // UI Control States for external panel
+        useCompactUI,
+        setUseCompactUI,
+        handleBowlingConfigUpdate,
+        showPitchMarkers,
+        setShowPitchMarkers,
+        showCoordinateDisplay,
+        setShowCoordinateDisplay,
+        showPitchGrid,
+        setShowPitchGrid,
+        currentView,
+        switchToView
+      });
+    }
+  }, [
+    gameState, selectedControl, isPlaying, selectedShotDirection, selectedShotType, shotAngle,
+    useCompactUI, showPitchMarkers, showCoordinateDisplay, showPitchGrid, currentView,
+    onGameStateChange
+  ]);
+
   return (
     <group>
       {/* Players */}
@@ -720,6 +649,16 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       {/* Wickets */}
       {/* <Wickets /> */}
       
+
+
+      {/* Pitch Markers for Release, Bounce, and Final Positions */}
+      {showPitchMarkers && (
+        <PitchMarkers 
+          bowlingControls={gameState.controls.bowling}
+          showCoordinates={false}
+          showGrid={showPitchGrid}
+        />
+      )}
 
     </group>
   );

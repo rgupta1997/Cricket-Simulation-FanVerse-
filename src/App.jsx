@@ -9,6 +9,7 @@ import UI from './components/UI';
 import GameUI from './components/GameUI';
 import Navigation from './components/Navigation';
 import PlayerPositionManager from './components/PlayerPositionManager';
+import RightDockedPanel from './components/RightDockedPanel';
 import { useCameraControls } from './hooks/useCameraControls';
 import { createInitialPositions } from './utils/functionalPositionManager';
 
@@ -45,6 +46,9 @@ const App = () => {
   
   // Game state for UI display
   const [gameData, setGameData] = React.useState(null);
+  
+  // Cricket UI Controls State
+  const [cricketUIData, setCricketUIData] = React.useState(null);
   
   // Position Editor State
   const [showPositionEditor, setShowPositionEditor] = React.useState(false);
@@ -89,6 +93,11 @@ const App = () => {
       currentPlayerPositions
     };
     setGameData(enhancedGameData);
+    
+    // Extract cricket UI controls if present
+    if (newGameData && newGameData.useCompactUI !== undefined) {
+      setCricketUIData(newGameData);
+    }
   }, [showPositionEditor, togglePositionEditor, currentPlayerPositions]);
 
   return (
@@ -113,6 +122,24 @@ const App = () => {
         onClose={handleClosePositionEditor}
         initialPositions={currentPlayerPositions}
       />
+
+      {/* Cricket Controls Panel - rendered outside Canvas */}
+      {cricketUIData && (
+        <RightDockedPanel
+          useCompactUI={cricketUIData.useCompactUI}
+          setUseCompactUI={cricketUIData.setUseCompactUI}
+          gameState={cricketUIData.gameState}
+          handleBowlingConfigUpdate={cricketUIData.handleBowlingConfigUpdate}
+          showPitchMarkers={cricketUIData.showPitchMarkers}
+          setShowPitchMarkers={cricketUIData.setShowPitchMarkers}
+          showCoordinateDisplay={cricketUIData.showCoordinateDisplay}
+          setShowCoordinateDisplay={cricketUIData.setShowCoordinateDisplay}
+          showPitchGrid={cricketUIData.showPitchGrid}
+          setShowPitchGrid={cricketUIData.setShowPitchGrid}
+          currentView={cricketUIData.currentView}
+          switchToView={cricketUIData.switchToView}
+        />
+      )}
       
       {/* 3D Canvas */}
       <Canvas

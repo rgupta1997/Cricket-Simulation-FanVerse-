@@ -1,0 +1,43 @@
+{
+  "pitch_analysis": {
+    "ball_axis": {
+      "x": 35.74,
+      "y": 18.40
+    },
+    "line_axis": {
+      "x": 39.04,
+      "y": 23.93
+    },
+    "length_axis": {
+      "x": 55.89,
+      "y": 8.07
+    },
+    "velocity": 133.5
+  },
+  "bowling_parameters": {
+    "velocity": 133.5,
+    "ball_axis_x": 35.74,
+    "ball_axis_y": 18.40,
+    "length_axis_x": 55.89,
+    "length_axis_z": 8.07,
+    "line_axis_x": 39.04,
+    "line_axis_z": 23.93
+  },
+  "pitch_coordinates": {
+    "release_position": {
+      "x": 39.04,
+      "z": 23.93,
+      "description": "Bowler release position coordinates"
+    },
+    "bounce_position": {
+      "x": 55.89,
+      "z": 8.07,
+      "description": "Where ball pitches on the pitch"
+    },
+    "final_position": {
+      "x": 35.74,
+      "y": 18.40,
+      "description": "Where ball ends up after bouncing"
+    }
+  }
+}

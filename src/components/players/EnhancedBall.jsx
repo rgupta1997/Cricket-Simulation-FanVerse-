@@ -15,6 +15,12 @@ const EnhancedBall = ({
   const [trail, setTrail] = useState([]);
   const [bounceCount, setBounceCount] = useState(0);
   
+  // Direct coordinate movement state
+  const [currentWaypoint, setCurrentWaypoint] = useState(0); // 0=release, 1=bounce, 2=final
+  const [trajectoryProgress, setTrajectoryProgress] = useState(0); // 0-1 between waypoints
+  const [physicsMode, setPhysicsMode] = useState(false); // Enable physics after reaching final
+  const [trajectoryStartTime, setTrajectoryStartTime] = useState(null);
+  
   const { currentBall, ballState } = gameState;
   const { position, velocity, isMoving } = currentBall;
 
@@ -25,32 +31,121 @@ const EnhancedBall = ({
   const GROUND_LEVEL = 0.07; // Ball radius
   const SPIN_FACTOR = 2.5; // Ball spin multiplier
 
+  // Reset trajectory state when ball starts moving
+  useEffect(() => {
+    if (isMoving && !trajectoryStartTime) {
+      setCurrentWaypoint(0);
+      setTrajectoryProgress(0);
+      setPhysicsMode(false);
+      setTrajectoryStartTime(Date.now());
+      setBounceCount(0);
+      console.log('🎯 Starting direct coordinate trajectory mode');
+    } else if (!isMoving) {
+      setTrajectoryStartTime(null);
+      setPhysicsMode(false);
+    }
+  }, [isMoving, trajectoryStartTime]);
+
   useFrame((state, delta) => {
-    if (!ballRef.current) return;
+    if (!ballRef.current || !isMoving) return;
     
     const ball = ballRef.current;
+    const trajectory = currentBall.trajectory;
+    const useDirectCoordinates = trajectory?.metadata?.useDirectCoordinates;
     
-    // Always update ball position from game state
-    if (position) {
-      const pos = Array.isArray(position) ? position : [position.x || 0, position.y || 0.5, position.z || 0];
-      ball.position.set(...pos);
+    // Check if we should use direct coordinate movement or physics
+    if (useDirectCoordinates && !physicsMode) {
+      // DIRECT COORDINATE MODE - Ball follows exact path through specified coordinates
+      const waypoints = [
+        new Vector3(...trajectory.initial.position),   // Release
+        new Vector3(...trajectory.bounce.position),    // Bounce  
+        new Vector3(...trajectory.target.position)     // Final
+      ];
+      
+      if (currentWaypoint < waypoints.length - 1) {
+        // Move between current waypoint and next waypoint
+        const startPoint = waypoints[currentWaypoint];
+        const endPoint = waypoints[currentWaypoint + 1];
+        
+        // Calculate movement speed based on distance and desired timing
+        const distance = startPoint.distanceTo(endPoint);
+        const segmentDuration = currentWaypoint === 0 ? 1.0 : 0.8; // Release->Bounce: 1s, Bounce->Final: 0.8s
+        const moveSpeed = 1 / segmentDuration; // Progress per second
+        
+        // Update progress
+        setTrajectoryProgress(prev => {
+          const newProgress = prev + (moveSpeed * delta);
+          
+          if (newProgress >= 1.0) {
+            // Reached next waypoint
+            console.log(`🎯 Reached waypoint ${currentWaypoint + 1}:`, endPoint.toArray());
+            
+            if (currentWaypoint === 0) {
+              // Reached bounce point
+              if (onBounce) {
+                onBounce({
+                  position: endPoint.toArray(),
+                  velocity: trajectory.bounce.velocity,
+                  bounceCount: 1,
+                  bounceHeight: currentBall.bounceHeight || 0.5
+                });
+              }
+              setBounceCount(1);
+            } else if (currentWaypoint === 1) {
+              // Reached final point - enable physics mode
+              console.log('🎯 Reached final coordinate, enabling physics mode');
+              setPhysicsMode(true);
+              
+              if (onReachTarget) {
+                onReachTarget({
+                  target: 'final_coordinate',
+                  position: endPoint.toArray(),
+                  velocity: [0, 0, 0], // Ball stops at final coordinate
+                  distance: 0
+                });
+              }
+            }
+            
+            setCurrentWaypoint(prev => prev + 1);
+            return 0; // Reset progress for next segment
+          }
+          
+          return newProgress;
+        });
+        
+        // Interpolate position between waypoints
+        const currentPos = startPoint.clone().lerp(endPoint, trajectoryProgress);
+        ball.position.copy(currentPos);
+        
+        // Update trail
+        setTrail(prev => {
+          const newTrail = [...prev, currentPos.clone()];
+          return newTrail.slice(-20);
+        });
+        
+        // Log progress occasionally  
+        if (Math.random() < 0.1) {
+          console.log(`🎯 Direct coordinate movement - Waypoint: ${currentWaypoint}, Progress: ${(trajectoryProgress * 100).toFixed(1)}%, Pos:`, currentPos.toArray());
+        }
+        
+        return; // Skip physics when in direct coordinate mode
+      }
     }
     
-    // Debug logging with distance to striker
-    if (isMoving && Math.random() < 0.05) { // Reduced frequency
-      const strikerPos = new Vector3(0, 0, -9); // Striker centered at stumps
-      const ballPos = new Vector3(...(Array.isArray(position) ? position : [position.x || 0, position.y || 0.5, position.z || 0]));
-      const distanceToStriker = ballPos.distanceTo(strikerPos);
-      console.log('🏃 Ball Physics - Pos:', position, 'Distance to striker:', distanceToStriker.toFixed(2), 'State:', ballState);
-    }
-    
-    if (!isMoving || !velocity) return;
+    // PHYSICS MODE or NON-DIRECT COORDINATE MODE
+    if (!position || !velocity) return;
 
     const currentPos = new Vector3(...(Array.isArray(position) ? position : [position.x || 0, position.y || 0.5, position.z || 0]));
     const currentVel = new Vector3(...(Array.isArray(velocity) ? velocity : [velocity.x || 0, velocity.y || 0, velocity.z || 0]));
+    
+    // Apply physics only in physics mode or for non-direct coordinates
+    if (physicsMode || !useDirectCoordinates) {
+      console.log('⚙️ Physics mode active');
+      ball.position.copy(currentPos);
+    }
 
-    // Apply physics for all moving states
-    if (isMoving && (ballState === 'bowling' || ballState === 'hit' || ballState === 'returning')) {
+    // Apply physics for all moving states (only when physics mode is enabled)
+    if (isMoving && (ballState === 'bowling' || ballState === 'hit' || ballState === 'returning') && (physicsMode || !useDirectCoordinates)) {
       // Apply gravity
       currentVel.y += GRAVITY * delta;
       
@@ -64,17 +159,25 @@ const EnhancedBall = ({
       if (currentPos.y <= GROUND_LEVEL && currentVel.y < 0) {
         currentPos.y = GROUND_LEVEL;
         
-        // Get bounce parameters from game state
+        // Get bounce parameters from game state (enhanced system)
         const bounceHeight = currentBall.bounceHeight || 0.5;
         const bounceData = currentBall.trajectory?.bounce;
+        const pitchAnalysis = currentBall.pitchAnalysis;
         
         if (bounceData && bounceCount === 0) {
-          // First bounce - use pre-calculated bounce velocity
+          // First bounce - use pre-calculated bounce velocity from pitch analysis
           currentVel.set(
             bounceData.velocity[0],
             bounceData.velocity[1],
             bounceData.velocity[2]
           );
+          
+          // Log enhanced bounce details
+          if (pitchAnalysis) {
+            console.log('🎯 Enhanced bounce at:', currentPos.toArray(), 
+              'Analysis data:', pitchAnalysis,
+              'Target:', bounceData.position);
+          }
         } else {
           // Subsequent bounces use physics based on pitch characteristics
           const pitchBounce = bounceHeight; // 0 = dead pitch, 2 = normal, 4 = very bouncy
@@ -121,19 +224,21 @@ const EnhancedBall = ({
         });
       }
       
-      // Check for batsman interaction when ball is near
-      const batsmanPos = new Vector3(0, 0, -9); // Striker in front of stumps
-      const distanceToBatsman = currentPos.distanceTo(batsmanPos);
-      
-      if (distanceToBatsman < 4 && ballState === 'bowling') {
-        console.log('🏏 Ball near batsman! Distance:', distanceToBatsman, 'Ball pos:', currentPos.toArray(), 'Striker pos:', batsmanPos.toArray());
-        if (onReachTarget) {
-          onReachTarget({
-            target: 'batsman',
-            position: currentPos.toArray(),
-            velocity: currentVel.toArray(),
-            distance: distanceToBatsman
-          });
+      // Check for batsman interaction when ball is near (only in physics mode)
+      if (physicsMode || !useDirectCoordinates) {
+        const batsmanPos = new Vector3(0, 0, -10); // Striker at wicket
+        const distanceToBatsman = currentPos.distanceTo(batsmanPos);
+        
+        if (distanceToBatsman < 4 && ballState === 'bowling') {
+          console.log('🏏 Ball near batsman! Distance:', distanceToBatsman, 'Ball pos:', currentPos.toArray(), 'Striker pos:', batsmanPos.toArray());
+          if (onReachTarget) {
+            onReachTarget({
+              target: 'batsman',
+              position: currentPos.toArray(),
+              velocity: currentVel.toArray(),
+              distance: distanceToBatsman
+            });
+          }
         }
       }
       
@@ -146,11 +251,13 @@ const EnhancedBall = ({
       ball.rotation.y += currentVel.x * delta * SPIN_FACTOR * 0.5; // Side spin
       ball.rotation.z += currentVel.z * delta * SPIN_FACTOR * 0.3; // Drift spin
 
-      // Update trail
-      setTrail(prev => {
-        const newTrail = [...prev, currentPos.clone()];
-        return newTrail.slice(-20); // Keep last 20 positions
-      });
+      // Update trail (only in physics mode to avoid duplicate trail updates)
+      if (physicsMode || !useDirectCoordinates) {
+        setTrail(prev => {
+          const newTrail = [...prev, currentPos.clone()];
+          return newTrail.slice(-20); // Keep last 20 positions
+        });
+      }
 
       // Check if ball has stopped moving (auto-reset to keeper)
       if (currentVel.length() < 0.1 && currentPos.y <= GROUND_LEVEL + 0.1) {
@@ -223,7 +330,7 @@ const EnhancedBall = ({
     
     // Ball reaching batsman (for bowling)
     if (ballState === 'bowling') {
-      const batsmanPos = new Vector3(0, 0, -9); // Striker position
+      const batsmanPos = new Vector3(0, 0, -10); // Striker position at wicket
       const distance = ballPos.distanceTo(batsmanPos);
       
       console.log('🎯 Ball distance to striker:', distance.toFixed(2), 'Ball pos:', ballPos.toArray());
@@ -257,12 +364,14 @@ const EnhancedBall = ({
     // Actual trail
     const trailPoints = trail.map(pos => [pos.x, pos.y, pos.z]);
     
-    // Predicted trajectory from bounce data
+    // Enhanced predicted trajectory from pitch analysis
     const bounceData = currentBall.trajectory?.bounce;
+    const targetData = currentBall.trajectory?.target;
+    const pitchAnalysis = currentBall.pitchAnalysis;
     const predictedPoints = [];
     
     if (bounceData && bounceCount === 0) {
-      // Add predicted path after bounce
+      // Add predicted path after bounce using enhanced trajectory data
       const steps = 20;
       const timeStep = 0.05;
       let pos = new Vector3(...bounceData.position);
@@ -272,6 +381,13 @@ const EnhancedBall = ({
         predictedPoints.push([pos.x, pos.y, pos.z]);
         pos.add(vel.clone().multiplyScalar(timeStep));
         vel.y += GRAVITY * timeStep;
+        
+        // If we have target data, guide trajectory toward it for accuracy
+        if (targetData && i > steps / 2) {
+          const targetPos = new Vector3(...targetData.position);
+          const direction = targetPos.clone().sub(pos).normalize();
+          vel.add(direction.multiplyScalar(0.1)); // Slight course correction
+        }
       }
     }
     

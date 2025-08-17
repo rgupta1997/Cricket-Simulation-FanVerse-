@@ -97,11 +97,32 @@ export const createInitialGameState = () => ({
   },
   controls: {
     bowling: {
-      speed: 120,
+      velocity: 133.5,  // Ball velocity in km/h from pitch analysis
+      ball_axis_x: 35.74,  // Final ball position x-coordinate
+      ball_axis_y: 18.40,  // Final ball position y-coordinate (height/bounce)
+      length_axis_x: 55.89,  // Bounce position x-coordinate on pitch
+      length_axis_z: 8.07,   // Bounce position z-coordinate on pitch
+      line_axis_x: 39.04,    // Bowler release position x-coordinate
+      line_axis_z: 23.93,    // Bowler release position z-coordinate
+      bounceHeight: 0.5,     // 0 to 1, controls how high the ball bounces relative to batsman height
+      
+      // Direct 3D World Coordinates (X, Y, Z)
+      useDirectCoordinates: false,  // Toggle between pitch analysis and direct coordinates
+      release_x: 0.0,      // Direct release X coordinate (meters)
+      release_y: 2.0,      // Direct release Y coordinate (meters)
+      release_z: 11.0,     // Direct release Z coordinate (meters)
+      bounce_x: 0.0,       // Direct bounce X coordinate (meters)
+      bounce_y: 0.0,       // Direct bounce Y coordinate (meters)
+      bounce_z: 5.0,       // Direct bounce Z coordinate (meters)
+      final_x: 0.0,        // Direct final X coordinate (meters)
+      final_y: 1.2,        // Direct final Y coordinate (meters)
+      final_z: -10.0,      // Direct final Z coordinate (meters - at wicket)
+      
+      // Legacy parameters for backward compatibility
+      speed: 133.5,
       line: 0,
       length: 0,
-      pitch: 0,
-      bounceHeight: 0.5  // 0 to 1, controls how high the ball bounces relative to batsman height
+      pitch: 0
     },
     batting: {
       footwork: 'front',
@@ -317,34 +338,120 @@ export const updateGameState = (currentState, action) => {
   }
 };
 
-// Ball physics calculations
-export const calculateBallTrajectory = (bowlingSpeed, line, length, pitch) => {
-  const speedMS = (bowlingSpeed * 1000) / 3600; // Convert km/h to m/s
+// Enhanced ball physics calculations based on pitch analysis or direct coordinates
+export const calculateBallTrajectory = (bowlingControls) => {
+  const { 
+    velocity, 
+    ball_axis_x, 
+    ball_axis_y, 
+    length_axis_x, 
+    length_axis_z, 
+    line_axis_x, 
+    line_axis_z,
+    useDirectCoordinates,
+    release_x,
+    release_y,
+    release_z,
+    bounce_x,
+    bounce_y,
+    bounce_z,
+    final_x,
+    final_y,
+    final_z
+  } = bowlingControls;
+  
+  const speedMS = (velocity * 1000) / 3600; // Convert km/h to m/s
   const gravity = -9.81;
   
-  // Line is already in range -1 to 1
-  const targetX = line * 2; // Scale up for more pronounced movement
+  let releaseX, releaseY, releaseZ, bounceX, bounceY, bounceZ, finalX, finalY, finalZ;
   
-  // Length is in range -1 to 1, convert to appropriate pitch length
-  const targetZ = 6 + (length * 3); // 3-9 meters from batsman
-  const pitchDistance = 20; // Distance from bowler to batsman
+  if (useDirectCoordinates) {
+    // Use direct 3D world coordinates
+    releaseX = release_x;
+    releaseY = release_y;
+    releaseZ = release_z;
+    bounceX = bounce_x;
+    bounceY = bounce_y;
+    bounceZ = bounce_z;
+    finalX = final_x;
+    finalY = final_y;
+    finalZ = final_z;
+  } else {
+    // Convert pitch analysis coordinates to 3D world coordinates
+    // Assuming the pitch analysis coordinates are in a normalized 0-100 range
+    // and need to be mapped to real world cricket pitch dimensions
+    
+    const PITCH_LENGTH = 22; // Standard cricket pitch length in meters
+    const PITCH_WIDTH = 3.66; // Standard cricket pitch width in meters
+    const CONVERSION_FACTOR = 0.22; // Convert analysis units to meters
+    const WICKET_POSITION = -10; // Static Z position for final ball position (at striker's wicket)
+    
+    // Release position (where bowler releases the ball)
+    releaseX = (line_axis_x - 50) * CONVERSION_FACTOR; // Center around pitch middle
+    releaseY = 2.0; // Standard bowling release height
+    releaseZ = 11; // Bowler's end of the pitch
+    
+    // Bounce position (where ball hits the pitch)
+    bounceX = (length_axis_x - 50) * CONVERSION_FACTOR;
+    bounceY = 0; // Ground level
+    bounceZ = 11 - (length_axis_z * CONVERSION_FACTOR); // Distance from bowler end
+    
+    // Final position (where ball reaches after bounce)
+    finalX = (ball_axis_x - 50) * CONVERSION_FACTOR;
+    finalY = ball_axis_y * 0.05; // Convert to meters (height is changeable)
+    finalZ = WICKET_POSITION; // Static position at the wicket (striker's end)
+  }
   
-  // Calculate initial velocity components
-  const angle = Math.atan2(0.5, pitchDistance); // Ball release height to bounce point
-  const initialVelocityZ = speedMS * Math.cos(angle);
-  const initialVelocityY = speedMS * Math.sin(angle);
-  const initialVelocityX = (targetX / pitchDistance) * speedMS;
+  // Calculate velocity components for release to bounce
+  const releaseDistance = Math.sqrt(
+    Math.pow(bounceX - releaseX, 2) + 
+    Math.pow(bounceZ - releaseZ, 2)
+  );
+  const timeToBouncephase1 = releaseDistance / speedMS;
+  
+  // Initial velocity from release to bounce
+  const initialVelocityX = (bounceX - releaseX) / timeToBouncephase1;
+  const initialVelocityZ = (bounceZ - releaseZ) / timeToBouncephase1;
+  const initialVelocityY = (releaseY + 0.5 * gravity * timeToBouncephase1 * timeToBouncephase1) / timeToBouncephase1;
+  
+  // Bounce velocity (after hitting the pitch)
+  const bounceDistance = Math.sqrt(
+    Math.pow(finalX - bounceX, 2) + 
+    Math.pow(finalZ - bounceZ, 2)
+  );
+  const timeToBatsman = bounceDistance / (speedMS * 0.7); // Ball slows down after bounce
+  
+  const bounceVelocityX = (finalX - bounceX) / timeToBatsman;
+  const bounceVelocityZ = (finalZ - bounceZ) / timeToBatsman;
+  const bounceVelocityY = (finalY - 0.5 * gravity * timeToBatsman * timeToBatsman) / timeToBatsman;
   
   return {
     initial: {
-      position: [0, 2, -15], // Bowler's release point
+      position: [releaseX, releaseY, releaseZ],
       velocity: [initialVelocityX, initialVelocityY, initialVelocityZ]
     },
-    target: {
-      position: [targetX, 0, targetZ]
+    bounce: {
+      position: [bounceX, bounceY, bounceZ],
+      velocity: [bounceVelocityX, bounceVelocityY, bounceVelocityZ]
     },
-    bouncePoint: {
-      position: [targetX * 0.7, 0, targetZ]
+    target: {
+      position: [finalX, finalY, finalZ]
+    },
+    metadata: {
+      totalTime: timeToBouncephase1 + timeToBatsman,
+      bounceTime: timeToBouncephase1,
+      speedMS: speedMS,
+      useDirectCoordinates: useDirectCoordinates,
+      pitchAnalysis: {
+        ball_axis: { x: ball_axis_x, y: ball_axis_y },
+        length_axis: { x: length_axis_x, z: length_axis_z },
+        line_axis: { x: line_axis_x, z: line_axis_z }
+      },
+      directCoordinates: {
+        release: { x: release_x, y: release_y, z: release_z },
+        bounce: { x: bounce_x, y: bounce_y, z: bounce_z },
+        final: { x: final_x, y: final_y, z: final_z }
+      }
     }
   };
 };

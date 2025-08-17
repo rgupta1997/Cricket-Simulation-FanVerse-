@@ -6,13 +6,9 @@ const getCameraViewByKey = (key) => {
   return Object.values(CAMERA_VIEWS).find(view => view.key === key) || CAMERA_VIEWS.CENTER;
 };
 
-// Pure function to handle keyboard event
+// Pure function to handle keyboard event - DISABLED for camera hotkeys
 const handleKeyboardInput = (event, currentView, setCameraView) => {
-  const newView = getCameraViewByKey(event.key);
-  if (newView && newView !== currentView) {
-    setCameraView(newView);
-    return true;
-  }
+  // Camera hotkeys (1-6) are now disabled - use buttons instead
   return false;
 };
 
@@ -32,17 +28,11 @@ export const useCameraControls = () => {
     }
   }, [setCameraView]);
 
-  // Effect for keyboard handling
+  // Effect for keyboard handling - DISABLED
+  // Camera hotkeys (1-6) have been removed - use visual buttons instead
   useEffect(() => {
-    const handleKeyDown = (event) => {
-      handleKeyboardInput(event, currentView, setCameraView);
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
+    // No keyboard event listeners for camera controls
+    // Users should use the camera control buttons in the accordion interface
   }, [currentView, setCameraView]);
 
   return {
