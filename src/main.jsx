@@ -6,6 +6,7 @@ import App from './App.jsx';
 import PlayerTest from './components/PlayerTest';
 import PlayerBoneViewer from './components/PlayerBoneViewer';
 import WebApp from './components/WebApp';
+import PlayerAnimation from './components/PlayerAnimation';
 import './index.css';
 
 const router = createBrowserRouter([
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
   {
     path: "/bones",
     element: <PlayerBoneViewer />,
+  },
+  {
+    path: "/player-animation",
+    element: <PlayerAnimation />,
   },
 ]);
 

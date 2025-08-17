@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unknown-property */
+/* eslint-disable no-unused-vars */
 import React, { useEffect } from 'react';
 import { useLoader } from '@react-three/fiber';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -8,7 +10,7 @@ const StadiumModel = ({ visible = true }) => {
   useEffect(() => {
     if (gltf) {
       // Adjust model scale and position if needed
-      gltf.scene.scale.set(1, 1, 1);
+      gltf.scene.scale.set(2.5, 2.5, 2.5);
       gltf.scene.position.set(0, 0, 0);
       
       // Rotate stadium to the right (90 degrees clockwise)

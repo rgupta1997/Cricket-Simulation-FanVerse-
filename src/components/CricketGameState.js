@@ -97,9 +97,11 @@ export const createInitialGameState = () => ({
   },
   controls: {
     bowling: {
-      speed: 80,
-      line: 'middle',
-      length: 'good'
+      speed: 120,
+      line: 0,
+      length: 0,
+      pitch: 0,
+      bounceHeight: 0.5  // 0 to 1, controls how high the ball bounces relative to batsman height
     },
     batting: {
       footwork: 'front',
@@ -320,25 +322,11 @@ export const calculateBallTrajectory = (bowlingSpeed, line, length, pitch) => {
   const speedMS = (bowlingSpeed * 1000) / 3600; // Convert km/h to m/s
   const gravity = -9.81;
   
-  // Convert line to X position (-1 to 1, where 0 is middle)
-  const lineMap = {
-    'wide_off': 0.8,
-    'off': 0.4,
-    'middle': 0,
-    'leg': -0.4,
-    'wide_leg': -0.8
-  };
+  // Line is already in range -1 to 1
+  const targetX = line * 2; // Scale up for more pronounced movement
   
-  // Convert length to Z position
-  const lengthMap = {
-    'full': 8,
-    'good': 6,
-    'short': 3,
-    'bouncer': 1
-  };
-  
-  const targetX = lineMap[line] || 0;
-  const targetZ = lengthMap[length] || 6;
+  // Length is in range -1 to 1, convert to appropriate pitch length
+  const targetZ = 6 + (length * 3); // 3-9 meters from batsman
   const pitchDistance = 20; // Distance from bowler to batsman
   
   // Calculate initial velocity components

@@ -1,6 +1,7 @@
+/* eslint-disable react/no-unknown-property */
 import React from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Stats, OrbitControls } from '@react-three/drei';
+import { Stats } from '@react-three/drei';
 import Stadium from './components/Stadium';
 import Lighting from './components/Lighting';
 import CricketCamera from './components/Camera';
@@ -121,7 +122,6 @@ const App = () => {
           alpha: false,
           powerPreference: "high-performance"
         }}
-        camera={{ position: currentView.position, fov: currentView.fov }}
         onCreated={({ gl }) => {
           gl.setClearColor('#1a1a1a');
           gl.shadowMap.enabled = true;
