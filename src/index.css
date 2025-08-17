@@ -3,9 +3,9 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: light;
+  color: #000000;
+  background-color: #f9fafb;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -82,4 +82,51 @@ body {
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+/* Cricket App Scrollbar Styles */
+.cricket-app ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.cricket-app ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.cricket-app ::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.cricket-app ::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.cricket-app ::-webkit-scrollbar-corner {
+  background: #f1f1f1;
+}
+
+/* Smooth scrolling for the cricket app */
+.cricket-app {
+  scroll-behavior: smooth;
+  color-scheme: light !important;
+  color: #000000 !important;
+}
+
+.cricket-app * {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+  color: inherit !important;
+}
+
+/* Force black text for cricket app tables */
+.cricket-app table,
+.cricket-app table *,
+.cricket-app td,
+.cricket-app th,
+.cricket-app span,
+.cricket-app div {
+  color: #000000 !important;
 }

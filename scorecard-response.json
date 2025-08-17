@@ -1,0 +1,2163 @@
+{
+  "Timestamp": "08/16/2025T18:50:58.515+05:30",
+  "Matchdetail": {
+    "Awards": [
+      {
+        "Player_Id": "10085",
+        "Player_Name": "Glenn Maxwell",
+        "Team_Id": "1",
+        "Team_Name": "Australia",
+        "Award_Type": 1,
+        "Inning_Detail": [
+          {
+            "Inn_no": "First",
+            "Wickets": "0",
+            "Balls_Bowled": "12",
+            "Overs_Bowled": "2",
+            "Runs_Conceded": "15"
+          },
+          {
+            "Inn_no": "Second",
+            "Runs": "62",
+            "Balls": "36",
+            "Fours": "8",
+            "Sixes": "2"
+          }
+        ],
+        "Runs": "62",
+        "Balls": "36",
+        "Fours": "8",
+        "Sixes": "2",
+        "Wickets": "0",
+        "Balls_Bowled": "12",
+        "Overs_Bowled": "2",
+        "Runs_Conceded": "15"
+      },
+      {
+        "Player_Id": "67402",
+        "Player_Name": "Tim David",
+        "Team_Id": "1",
+        "Team_Name": "Australia",
+        "Award_Type": 2
+      }
+    ],
+    "Team_Home": "1",
+    "Team_Away": "7",
+    "Match": {
+      "Livecoverage": "yes",
+      "Id": "258915",
+      "Code": "ausa08162025258915",
+      "League": "icc",
+      "League_Id": "1",
+      "Number": "3rd T20I",
+      "Type": "T20",
+      "Date": "8/16/2025",
+      "Time": "19:15",
+      "Revised_time_utc": "",
+      "Offset": "+10:00",
+      "Group": "",
+      "Coverage_level_id": "8",
+      "Coverage_level": "Live Scorecard, Ball-by-Ball and Commentary",
+      "Match_ordinal": "3",
+      "Daynight": "yes",
+      "Comp_type_id": "3",
+      "End_date": "8/16/2025",
+      "End_time": "22:54",
+      "Upcoming": false,
+      "Live": false,
+      "Recent": true,
+      "StartDate": "8/16/2025T09:15+00:00",
+      "is_provisional_date": false,
+      "is_provisional_time": false,
+      "match_in_progress": true,
+      "is_rescheduled": false,
+      "first_ball_bowled": true
+    },
+    "Series": {
+      "Id": "12550",
+      "Name": "South Africa in Australia, 3 T20I Series, 2025",
+      "Series_short_display_name": "SA in AUS, 3 T20Is, 2025",
+      "Series_start_date": "8/10/2025",
+      "Series_end_date": "8/16/2025",
+      "Series_end_date_ist": "8/16/2025",
+      "Series_end_date_gmt": "8/16/2025",
+      "Series_start_date_ist": "8/10/2025",
+      "Series_start_date_gmt": "8/10/2025",
+      "Series_type": "Series",
+      "Status": "Australia won the 3 T20I series 2-1",
+      "Tour": "9181",
+      "Tour_Name": "South Africa tour of Australia, 2025",
+      "Has_standings": "false",
+      "Is_series_lastmatch": true,
+      "Calendar_file_name": "calendar_new",
+      "Streaming_platform": [
+        {
+          "Channel_name": "JioHotstar"
+        }
+      ],
+      "Broadcasting_platform": [
+        {
+          "Channel_name": "Star Sports"
+        }
+      ],
+      "is_provisional_date": false,
+      "Series_match_count": 3,
+      "Series_completed": true
+    },
+    "Venue": {
+      "Id": "26",
+      "Name": "Cazaly's Stadium, Cairns",
+      "Country": "Australia",
+      "City": "Cairns",
+      "Latitude": "-16.935629",
+      "Longitude": "145.748988",
+      "Venue_Weather": {
+        "Weather_Id": "15",
+        "Weather": "Clear",
+        "Description": "clear sky",
+        "Humidity": "82%",
+        "Temperature": "16.65C",
+        "Visibility": "10000 meter",
+        "Wind_Speed": "2.47 meter/sec",
+        "Rain": ""
+      },
+      "Pitch_Detail": {
+        "Pitch_Suited_For_Id": "1",
+        "Pitch_Suited_For": "Batting friendly",
+        "Pitch_Surface_Id": "3",
+        "Pitch_Surface": "Dry"
+      },
+      "Neutralvenue": "false"
+    },
+    "Officials": {
+      "Umpires": "Donovan Koch (AUS), Phillip Gillespie (AUS) and Shawn Craig (AUS)",
+      "Referee": "Andy Pycroft (ZIM)",
+      "Referee_Id": "2430",
+      "Umpire1_Name": "Donovan Koch (AUS)",
+      "Umpire2_Name": "Phillip Gillespie (AUS)",
+      "Umpire3_Name": "Shawn Craig (AUS)",
+      "Umpire1_Id": "39903",
+      "Umpire2_Id": "88033",
+      "Umpire3_Id": "16404"
+    },
+    "Weather": "Clear",
+    "Tosswonby": "1",
+    "Toss_elected_to": "field",
+    "Status": "Match Ended",
+    "Status_Id": "114",
+    "Match_display_status": "Result",
+    "Player_Match": "Glenn Maxwell",
+    "Player_Match_Id": "10085",
+    "Player_Match_TeamId": "1",
+    "Player_Series": "Tim David",
+    "Player_Series_Id": "67402",
+    "Player_Series_TeamId": "1",
+    "Player_Series_Team": "Australia",
+    "Result": "Australia beat South Africa by 2 wickets",
+    "Winningteam": "1",
+    "Winmargin": "2 wickets",
+    "Equation": "Australia beat South Africa by 2 wickets",
+    "Raw_matchresult": "w",
+    "Raw_margin_value": "2",
+    "Raw_result_extras": "",
+    "Required_Runrate": "",
+    "Required_Rpb": "",
+    "Verification_Completed": true,
+    "Lineup_status": 2,
+    "Verification_Completed_Until": {
+      "Inning_no": "2",
+      "Overs": "20"
+    }
+  },
+  "Nuggets": [],
+  "Innings": [
+    {
+      "Number": "First",
+      "Battingteam": "7",
+      "Bowlingteam": "1",
+      "Total": "172",
+      "Wickets": "7",
+      "Overs": "20.0",
+      "Total_Balls_Bowled": "120",
+      "AllotedBalls": "120",
+      "Runrate": "8.60",
+      "Runsperball": "1.43",
+      "Byes": "1",
+      "Legbyes": "1",
+      "Wides": "2",
+      "Noballs": "0",
+      "Penalty": "0",
+      "AllottedOvers": "20",
+      "Batsmen": [
+        {
+          "Batsman": "64219",
+          "Runs": "1",
+          "Balls": "3",
+          "Fours": "0",
+          "Sixes": "0",
+          "Dots": "2",
+          "Strikerate": "33.33",
+          "Dismissal": "caught",
+          "Howout": "c Cameron Green b Josh Hazlewood",
+          "Howout_short": "c C Green b J Hazlewood",
+          "Bowler": "4255",
+          "Fielder": "66870",
+          "RunScoredInLastBalls": {},
+          "Number": 1,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "64941",
+          "Runs": "13",
+          "Balls": "13",
+          "Fours": "2",
+          "Sixes": "0",
+          "Dots": "6",
+          "Strikerate": "100",
+          "Dismissal": "caught",
+          "Howout": "c Josh Inglis b Adam Zampa",
+          "Howout_short": "c J Inglis b A Zampa",
+          "Bowler": "58913",
+          "Fielder": "65893",
+          "RunScoredInLastBalls": {
+            "10": "11"
+          },
+          "Number": 2,
+          "DismissalType": "caught wicket keeper",
+          "DismissalId": "cwk"
+        },
+        {
+          "Batsman": "109249",
+          "Runs": "24",
+          "Balls": "15",
+          "Fours": "5",
+          "Sixes": "0",
+          "Dots": "6",
+          "Strikerate": "160",
+          "Dismissal": "caught",
+          "Howout": "c Aaron Hardie b Nathan Ellis",
+          "Howout_short": "c A Hardie b N Ellis",
+          "Bowler": "70324",
+          "Fielder": "68072",
+          "RunScoredInLastBalls": {
+            "10": "15"
+          },
+          "Number": 3,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "84562",
+          "Runs": "53",
+          "Balls": "26",
+          "Fours": "1",
+          "Sixes": "6",
+          "Dots": "7",
+          "Strikerate": "203.84",
+          "Dismissal": "caught",
+          "Howout": "c Glenn Maxwell b Nathan Ellis",
+          "Howout_short": "c G Maxwell b N Ellis",
+          "Bowler": "70324",
+          "Fielder": "10085",
+          "RunScoredInLastBalls": {
+            "10": "29",
+            "20": "45"
+          },
+          "Number": 4,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "74761",
+          "Runs": "25",
+          "Balls": "23",
+          "Fours": "2",
+          "Sixes": "0",
+          "Dots": "6",
+          "Strikerate": "108.69",
+          "Dismissal": "bowled",
+          "Howout": "b Adam Zampa",
+          "Howout_short": "b A Zampa",
+          "Bowler": "58913",
+          "Fielder": "",
+          "RunScoredInLastBalls": {
+            "10": "7",
+            "20": "22"
+          },
+          "Number": 5,
+          "DismissalType": "bowled",
+          "DismissalId": "b"
+        },
+        {
+          "Batsman": "12518",
+          "Runs": "38",
+          "Balls": "26",
+          "Fours": "3",
+          "Sixes": "0",
+          "Dots": "4",
+          "Strikerate": "146.15",
+          "Dismissal": "not out",
+          "Howout": "not out",
+          "Howout_short": "not out",
+          "Bowler": "",
+          "Fielder": "",
+          "RunScoredInLastBalls": {
+            "10": "14",
+            "20": "30"
+          },
+          "Number": 6,
+          "DismissalType": "not out",
+          "DismissalId": "no"
+        },
+        {
+          "Batsman": "63605",
+          "Runs": "1",
+          "Balls": "4",
+          "Fours": "0",
+          "Sixes": "0",
+          "Dots": "3",
+          "Strikerate": "25",
+          "Dismissal": "caught",
+          "Howout": "c Nathan Ellis b Josh Hazlewood",
+          "Howout_short": "c N Ellis b J Hazlewood",
+          "Bowler": "4255",
+          "Fielder": "70324",
+          "RunScoredInLastBalls": {},
+          "Number": 7,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "63717",
+          "Runs": "9",
+          "Balls": "8",
+          "Fours": "1",
+          "Sixes": "0",
+          "Dots": "3",
+          "Strikerate": "112.50",
+          "Dismissal": "caught",
+          "Howout": "c Josh Hazlewood b Nathan Ellis",
+          "Howout_short": "c J Hazlewood b N Ellis",
+          "Bowler": "70324",
+          "Fielder": "4255",
+          "RunScoredInLastBalls": {},
+          "Number": 8,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "63611",
+          "Runs": "4",
+          "Balls": "2",
+          "Fours": "1",
+          "Sixes": "0",
+          "Dots": "1",
+          "Strikerate": "200",
+          "Dismissal": "not out",
+          "Howout": "not out",
+          "Howout_short": "not out",
+          "Bowler": "",
+          "Fielder": "",
+          "RunScoredInLastBalls": {},
+          "Number": 9,
+          "DismissalType": "not out",
+          "DismissalId": "no"
+        },
+        {
+          "Batsman": "90908",
+          "Runs": "",
+          "Balls": "",
+          "Fours": "",
+          "Sixes": "",
+          "Dots": "",
+          "Strikerate": "",
+          "Dismissal": "",
+          "Howout": "",
+          "Howout_short": "",
+          "Bowler": "",
+          "Fielder": "",
+          "Number": 10,
+          "DismissalType": "",
+          "DismissalId": ""
+        },
+        {
+          "Batsman": "64225",
+          "Runs": "",
+          "Balls": "",
+          "Fours": "",
+          "Sixes": "",
+          "Dots": "",
+          "Strikerate": "",
+          "Dismissal": "",
+          "Howout": "",
+          "Howout_short": "",
+          "Bowler": "",
+          "Fielder": "",
+          "Number": 11,
+          "DismissalType": "",
+          "DismissalId": ""
+        }
+      ],
+      "Partnership_Current": {
+        "Runs": "7",
+        "Balls": "4",
+        "ExtraRuns": "2",
+        "Batsmen": [
+          {
+            "Batsman": "12518",
+            "Runs": "1",
+            "Balls": "2"
+          },
+          {
+            "Batsman": "63611",
+            "Runs": "4",
+            "Balls": "2"
+          }
+        ],
+        "ForWicket": 8
+      },
+      "Bowlers": [
+        {
+          "Bowler": "4255",
+          "Overs": "4",
+          "Balls_Bowled": "24",
+          "Maidens": "0",
+          "Runs": "30",
+          "Wickets": "2",
+          "Fours": "3",
+          "Sixes": "1",
+          "Economyrate": "7.50",
+          "Runsperball": "1.25",
+          "Noballs": "0",
+          "Wides": "0",
+          "Dots": "9",
+          "RungivenInLastBalls": {
+            "10": "12",
+            "20": "28"
+          },
+          "Number": 1,
+          "Hattrick_Count": 0,
+          "Avg_Speed": 136.45
+        },
+        {
+          "Bowler": "68072",
+          "Overs": "2",
+          "Balls_Bowled": "12",
+          "Maidens": "0",
+          "Runs": "33",
+          "Wickets": "0",
+          "Fours": "1",
+          "Sixes": "4",
+          "Economyrate": "16.50",
+          "Runsperball": "2.75",
+          "Noballs": "0",
+          "Wides": "1",
+          "Dots": "4",
+          "RungivenInLastBalls": {
+            "10": "28"
+          },
+          "Number": 2,
+          "Hattrick_Count": 0,
+          "Avg_Speed": 129.02
+        },
+        {
+          "Bowler": "64473",
+          "Overs": "4",
+          "Balls_Bowled": "24",
+          "Maidens": "0",
+          "Runs": "37",
+          "Wickets": "0",
+          "Fours": "4",
+          "Sixes": "1",
+          "Economyrate": "9.25",
+          "Runsperball": "1.54",
+          "Noballs": "0",
+          "Wides": "0",
+          "Dots": "8",
+          "RungivenInLastBalls": {
+            "10": "13",
+            "20": "29"
+          },
+          "Number": 3,
+          "Hattrick_Count": 0,
+          "Avg_Speed": 125.85
+        },
+        {
+          "Bowler": "70324",
+          "Overs": "4",
+          "Balls_Bowled": "24",
+          "Maidens": "0",
+          "Runs": "31",
+          "Wickets": "3",
+          "Fours": "4",
+          "Sixes": "0",
+          "Economyrate": "7.75",
+          "Runsperball": "1.29",
+          "Noballs": "0",
+          "Wides": "1",
+          "Dots": "8",
+          "RungivenInLastBalls": {
+            "10": "13",
+            "20": "26"
+          },
+          "Number": 4,
+          "Hattrick_Count": 0,
+          "Avg_Speed": 129.56
+        },
+        {
+          "Bowler": "58913",
+          "Overs": "4",
+          "Balls_Bowled": "24",
+          "Maidens": "0",
+          "Runs": "24",
+          "Wickets": "2",
+          "Fours": "2",
+          "Sixes": "0",
+          "Economyrate": "6.00",
+          "Runsperball": "1.00",
+          "Noballs": "0",
+          "Wides": "0",
+          "Dots": "7",
+          "RungivenInLastBalls": {
+            "10": "7",
+            "20": "21"
+          },
+          "Number": 5,
+          "Hattrick_Count": 0,
+          "Avg_Speed": 88.17
+        },
+        {
+          "Bowler": "10085",
+          "Overs": "2",
+          "Balls_Bowled": "12",
+          "Maidens": "0",
+          "Runs": "15",
+          "Wickets": "0",
+          "Fours": "1",
+          "Sixes": "0",
+          "Economyrate": "7.50",
+          "Runsperball": "1.25",
+          "Noballs": "0",
+          "Wides": "0",
+          "Dots": "2",
+          "RungivenInLastBalls": {
+            "10": "12"
+          },
+          "Number": 6,
+          "Hattrick_Count": 0,
+          "Avg_Speed": 90.99
+        }
+      ],
+      "FallofWickets": [
+        {
+          "Batsman": "64219",
+          "Score": "2",
+          "Overs": "0.5",
+          "Wicket_No": 1,
+          "Review_status_id": 0,
+          "Ball_number": "5"
+        },
+        {
+          "Batsman": "109249",
+          "Score": "32",
+          "Overs": "4.2",
+          "Wicket_No": 2,
+          "Review_status_id": 0,
+          "Ball_number": "26"
+        },
+        {
+          "Batsman": "64941",
+          "Score": "49",
+          "Overs": "6.5",
+          "Wicket_No": 3,
+          "Review_status_id": 0,
+          "Ball_number": "41"
+        },
+        {
+          "Batsman": "84562",
+          "Score": "110",
+          "Overs": "11.4",
+          "Wicket_No": 4,
+          "Review_status_id": 0,
+          "Ball_number": "70"
+        },
+        {
+          "Batsman": "74761",
+          "Score": "137",
+          "Overs": "15.4",
+          "Wicket_No": 5,
+          "Review_status_id": 0,
+          "Ball_number": "94"
+        },
+        {
+          "Batsman": "63605",
+          "Score": "138",
+          "Overs": "16.2",
+          "Wicket_No": 6,
+          "Review_status_id": 0,
+          "Ball_number": "98"
+        },
+        {
+          "Batsman": "63717",
+          "Score": "165",
+          "Overs": "19.2",
+          "Wicket_No": 7,
+          "Review_status_id": 0,
+          "Ball_number": "116"
+        }
+      ],
+      "Partnerships": [
+        {
+          "Runs": "2",
+          "Balls": "5",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "64219",
+              "Runs": "1",
+              "Balls": "3"
+            },
+            {
+              "Batsman": "64941",
+              "Runs": "1",
+              "Balls": "2"
+            }
+          ],
+          "ForWicket": 1
+        },
+        {
+          "Runs": "30",
+          "Balls": "21",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "109249",
+              "Runs": "24",
+              "Balls": "15"
+            },
+            {
+              "Batsman": "64941",
+              "Runs": "6",
+              "Balls": "6"
+            }
+          ],
+          "ForWicket": 2
+        },
+        {
+          "Runs": "17",
+          "Balls": "15",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "84562",
+              "Runs": "11",
+              "Balls": "10"
+            },
+            {
+              "Batsman": "64941",
+              "Runs": "6",
+              "Balls": "5"
+            }
+          ],
+          "ForWicket": 3
+        },
+        {
+          "Runs": "61",
+          "Balls": "29",
+          "ExtraRuns": "1",
+          "Batsmen": [
+            {
+              "Batsman": "84562",
+              "Runs": "42",
+              "Balls": "16"
+            },
+            {
+              "Batsman": "74761",
+              "Runs": "18",
+              "Balls": "13"
+            }
+          ],
+          "ForWicket": 4
+        },
+        {
+          "Runs": "27",
+          "Balls": "24",
+          "ExtraRuns": "1",
+          "Batsmen": [
+            {
+              "Batsman": "12518",
+              "Runs": "19",
+              "Balls": "14"
+            },
+            {
+              "Batsman": "74761",
+              "Runs": "7",
+              "Balls": "10"
+            }
+          ],
+          "ForWicket": 5
+        },
+        {
+          "Runs": "1",
+          "Balls": "4",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "12518",
+              "Runs": "0",
+              "Balls": "0"
+            },
+            {
+              "Batsman": "63605",
+              "Runs": "1",
+              "Balls": "4"
+            }
+          ],
+          "ForWicket": 6
+        },
+        {
+          "Runs": "27",
+          "Balls": "18",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "12518",
+              "Runs": "18",
+              "Balls": "10"
+            },
+            {
+              "Batsman": "63717",
+              "Runs": "9",
+              "Balls": "8"
+            }
+          ],
+          "ForWicket": 7
+        },
+        {
+          "Runs": "7",
+          "Balls": "4",
+          "ExtraRuns": "2",
+          "Batsmen": [
+            {
+              "Batsman": "12518",
+              "Runs": "1",
+              "Balls": "2"
+            },
+            {
+              "Batsman": "63611",
+              "Runs": "4",
+              "Balls": "2"
+            }
+          ],
+          "ForWicket": 8
+        }
+      ],
+      "PowerPlay": {
+        "PP1": "1-6"
+      },
+      "PowerPlayDetails": [
+        {
+          "Name": "PP1",
+          "Overs": "1-6",
+          "Runs": "46",
+          "Wickets": "2"
+        }
+      ],
+      "LastOvers": {
+        "5": {
+          "Score": "38",
+          "Wicket": "3",
+          "Runrate": "7.60"
+        },
+        "10": {
+          "Score": "76",
+          "Wicket": "4",
+          "Runrate": "7.60"
+        }
+      },
+      "StatusId": 4,
+      "ReviewDetails": {
+        "Batting_review_count": 2,
+        "Bowling_review_count": 2,
+        "Reviews": []
+      },
+      "StartTimeStamp": "2025-08-16T14:46:40.000+0:00",
+      "OverNo": "20",
+      "BallNo": "7",
+      "Best_Performers": {
+        "Batsmen": [
+          {
+            "Player_Id": "84562",
+            "Player_Name": "Dewald Brevis",
+            "Team_Id": "7",
+            "Team_Name": "South Africa",
+            "Runs": "53",
+            "Balls": "26",
+            "Fours": "1",
+            "Sixes": "6",
+            "Strikerate": "203.84"
+          },
+          {
+            "Player_Id": "12518",
+            "Player_Name": "Rassie van der Dussen",
+            "Team_Id": "7",
+            "Team_Name": "South Africa",
+            "Runs": "38",
+            "Balls": "26",
+            "Fours": "3",
+            "Sixes": "0",
+            "Strikerate": "146.15"
+          }
+        ],
+        "Bowlers": [
+          {
+            "Player_Id": "70324",
+            "Player_Name": "Nathan Ellis",
+            "Team_Id": "1",
+            "Team_Name": "Australia",
+            "Wickets": "3",
+            "Balls_Bowled": "24",
+            "Economyrate": "7.75",
+            "Overs": "4",
+            "Runs": "31",
+            "Fours": "4",
+            "Sixes": "0"
+          },
+          {
+            "Player_Id": "58913",
+            "Player_Name": "Adam Zampa",
+            "Team_Id": "1",
+            "Team_Name": "Australia",
+            "Wickets": "2",
+            "Balls_Bowled": "24",
+            "Economyrate": "6.00",
+            "Overs": "4",
+            "Runs": "24",
+            "Fours": "2",
+            "Sixes": "0"
+          }
+        ]
+      }
+    },
+    {
+      "Number": "Second",
+      "Battingteam": "1",
+      "Bowlingteam": "7",
+      "Total": "173",
+      "Wickets": "8",
+      "Overs": "19.5",
+      "Total_Balls_Bowled": "119",
+      "AllotedBalls": "120",
+      "Runrate": "8.72",
+      "Runsperball": "1.45",
+      "Byes": "0",
+      "Legbyes": "5",
+      "Wides": "4",
+      "Noballs": "1",
+      "Penalty": "0",
+      "AllottedOvers": "20",
+      "Target": "173",
+      "Batsmen": [
+        {
+          "Batsman": "10094",
+          "Runs": "54",
+          "Balls": "37",
+          "Fours": "3",
+          "Sixes": "5",
+          "Dots": "20",
+          "Strikerate": "145.94",
+          "Dismissal": "caught",
+          "Howout": "c Lhuan-dre Pretorius b Kwena Maphaka",
+          "Howout_short": "c L Pretorius b K Maphaka",
+          "Bowler": "90908",
+          "Fielder": "109249",
+          "RunScoredInLastBalls": {
+            "10": "18",
+            "20": "30",
+            "30": "46"
+          },
+          "Number": 1,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "62023",
+          "Runs": "19",
+          "Balls": "18",
+          "Fours": "3",
+          "Sixes": "0",
+          "Dots": "9",
+          "Strikerate": "105.55",
+          "Dismissal": "caught",
+          "Howout": "c Lungi Ngidi b Aiden Markram",
+          "Howout_short": "c L Ngidi b A Markram",
+          "Bowler": "64219",
+          "Fielder": "64225",
+          "RunScoredInLastBalls": {
+            "10": "8"
+          },
+          "Number": 2,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "65893",
+          "Runs": "0",
+          "Balls": "1",
+          "Fours": "0",
+          "Sixes": "0",
+          "Dots": "1",
+          "Strikerate": "0",
+          "Dismissal": "bowled",
+          "Howout": "b Corbin Bosch",
+          "Howout_short": "b C Bosch",
+          "Bowler": "63605",
+          "Fielder": "",
+          "RunScoredInLastBalls": {},
+          "Number": 3,
+          "DismissalType": "bowled",
+          "DismissalId": "b"
+        },
+        {
+          "Batsman": "66870",
+          "Runs": "9",
+          "Balls": "8",
+          "Fours": "1",
+          "Sixes": "0",
+          "Dots": "3",
+          "Strikerate": "112.50",
+          "Dismissal": "caught",
+          "Howout": "c Dewald Brevis b Kwena Maphaka",
+          "Howout_short": "c D Brevis b K Maphaka",
+          "Bowler": "90908",
+          "Fielder": "84562",
+          "RunScoredInLastBalls": {},
+          "Number": 4,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "67402",
+          "Runs": "17",
+          "Balls": "9",
+          "Fours": "1",
+          "Sixes": "1",
+          "Dots": "1",
+          "Strikerate": "188.88",
+          "Dismissal": "caught",
+          "Howout": "c & b Kagiso Rabada",
+          "Howout_short": "c & b K Rabada",
+          "Bowler": "63611",
+          "Fielder": "63611",
+          "RunScoredInLastBalls": {},
+          "Number": 5,
+          "DismissalType": "caught & bowled",
+          "DismissalId": "cbb"
+        },
+        {
+          "Batsman": "10085",
+          "Runs": "62",
+          "Balls": "36",
+          "Fours": "8",
+          "Sixes": "2",
+          "Dots": "13",
+          "Strikerate": "172.22",
+          "Dismissal": "not out",
+          "Howout": "not out",
+          "Howout_short": "not out",
+          "Bowler": "",
+          "Fielder": "",
+          "RunScoredInLastBalls": {
+            "10": "23",
+            "20": "33",
+            "30": "46"
+          },
+          "Number": 6,
+          "DismissalType": "not out",
+          "DismissalId": "no"
+        },
+        {
+          "Batsman": "68072",
+          "Runs": "1",
+          "Balls": "2",
+          "Fours": "0",
+          "Sixes": "0",
+          "Dots": "1",
+          "Strikerate": "50",
+          "Dismissal": "caught",
+          "Howout": "c Corbin Bosch b Kagiso Rabada",
+          "Howout_short": "c C Bosch b K Rabada",
+          "Bowler": "63611",
+          "Fielder": "63605",
+          "RunScoredInLastBalls": {},
+          "Number": 7,
+          "DismissalType": "caught",
+          "DismissalId": "ct"
+        },
+        {
+          "Batsman": "64473",
+          "Runs": "1",
+          "Balls": "6",
+          "Fours": "0",
+          "Sixes": "0",
+          "Dots": "5",
+          "Strikerate": "16.66",
+          "Dismissal": "bowled",
+          "Howout": "b Corbin Bosch",
+          "Howout_short": "b C Bosch",
+          "Bowler": "63605",
+          "Fielder": "",
+          "RunScoredInLastBalls": {},
+          "Number": 8,
+          "DismissalType": "bowled",
+          "DismissalId": "b"
+        },
+        {
+          "Batsman": "70324",
+          "Runs": "0",
+          "Balls": "1",
+          "Fours": "0",
+          "Sixes": "0",
+          "Dots": "1",
+          "Strikerate": "0",
+          "Dismissal": "caught",
+          "Howout": "c Ryan Rickelton b Corbin Bosch",
+          "Howout_short": "c R Rickelton b C Bosch",
+          "Bowler": "63605",
+          "Fielder": "64941",
+          "RunScoredInLastBalls": {},
+          "Number": 9,
+          "DismissalType": "caught wicket keeper",
+          "DismissalId": "cwk"
+        },
+        {
+          "Batsman": "58913",
+          "Runs": "0",
+          "Balls": "2",
+          "Fours": "0",
+          "Sixes": "0",
+          "Dots": "2",
+          "Strikerate": "0",
+          "Dismissal": "not out",
+          "Howout": "not out",
+          "Howout_short": "not out",
+          "Bowler": "",
+          "Fielder": "",
+          "RunScoredInLastBalls": {},
+          "Number": 10,
+          "DismissalType": "not out",
+          "DismissalId": "no"
+        },
+        {
+          "Batsman": "4255",
+          "Runs": "",
+          "Balls": "",
+          "Fours": "",
+          "Sixes": "",
+          "Dots": "",
+          "Strikerate": "",
+          "Dismissal": "",
+          "Howout": "",
+          "Howout_short": "",
+          "Bowler": "",
+          "Fielder": "",
+          "Number": 11,
+          "DismissalType": "",
+          "DismissalId": ""
+        }
+      ],
+      "Partnership_Current": {
+        "Runs": "10",
+        "Balls": "7",
+        "ExtraRuns": "0",
+        "Batsmen": [
+          {
+            "Batsman": "58913",
+            "Runs": "0",
+            "Balls": "2"
+          },
+          {
+            "Batsman": "10085",
+            "Runs": "10",
+            "Balls": "5"
+          }
+        ],
+        "ForWicket": 9,
+        "Runrate": "8.57",
+        "Runsperball": "1.42"
+      },
+      "Bowlers": [
+        {
+          "Bowler": "63611",
+          "Overs": "4",
+          "Balls_Bowled": "24",
+          "Maidens": "0",
+          "Runs": "32",
+          "Wickets": "2",
+          "Fours": "1",
+          "Sixes": "3",
+          "Economyrate": "8.00",
+          "Runsperball": "1.33",
+          "Noballs": "1",
+          "Wides": "2",
+          "Dots": "14",
+          "RungivenInLastBalls": {
+            "10": "16",
+            "20": "31"
+          },
+          "Number": 1,
+          "Hattrick_Count": 0,
+          "Avg_Speed": 131.37
+        },
+        {
+          "Bowler": "64219",
+          "Overs": "2",
+          "Balls_Bowled": "12",
+          "Maidens": "0",
+          "Runs": "6",
+          "Wickets": "1",
+          "Fours": "0",
+          "Sixes": "0",
+          "Economyrate": "3.00",
+          "Runsperball": "0.50",
+          "Noballs": "0",
+          "Wides": "0",
+          "Dots": "7",
+          "RungivenInLastBalls": {
+            "10": "6"
+          },
+          "Number": 2,
+          "Hattrick_Count": 0,
+          "Avg_Speed": 95.28
+        },
+        {
+          "Bowler": "64225",
+          "Overs": "3.5",
+          "Balls_Bowled": "23",
+          "Maidens": "0",
+          "Runs": "34",
+          "Wickets": "0",
+          "Fours": "4",
+          "Sixes": "1",
+          "Economyrate": "8.86",
+          "Runsperball": "1.47",
+          "Noballs": "0",
+          "Wides": "0",
+          "Dots": "10",
+          "RungivenInLastBalls": {
+            "10": "18",
+            "20": "32"
+          },
+          "Number": 3,
+          "Hattrick_Count": 0,
+          "Avg_Speed": 117.27
+        },
+        {
+          "Bowler": "90908",
+          "Overs": "3",
+          "Balls_Bowled": "18",
+          "Maidens": "0",
+          "Runs": "36",
+          "Wickets": "2",
+          "Fours": "6",
+          "Sixes": "1",
+          "Economyrate": "12.00",
+          "Runsperball": "2.00",
+          "Noballs": "0",
+          "Wides": "0",
+          "Dots": "6",
+          "RungivenInLastBalls": {
+            "10": "20"
+          },
+          "Number": 4,
+          "Hattrick_Count": 0,
+          "Avg_Speed": 135.34
+        },
+        {
+          "Bowler": "63717",
+          "Overs": "3",
+          "Balls_Bowled": "18",
+          "Maidens": "0",
+          "Runs": "34",
+          "Wickets": "0",
+          "Fours": "3",
+          "Sixes": "2",
+          "Economyrate": "11.33",
+          "Runsperball": "1.88",
+          "Noballs": "0",
+          "Wides": "1",
+          "Dots": "6",
+          "RungivenInLastBalls": {
+            "10": "16"
+          },
+          "Number": 5,
+          "Hattrick_Count": 0,
+          "Avg_Speed": 84.84
+        },
+        {
+          "Bowler": "63605",
+          "Overs": "4",
+          "Balls_Bowled": "24",
+          "Maidens": "1",
+          "Runs": "26",
+          "Wickets": "3",
+          "Fours": "2",
+          "Sixes": "1",
+          "Economyrate": "6.50",
+          "Runsperball": "1.08",
+          "Noballs": "0",
+          "Wides": "1",
+          "Dots": "12",
+          "RungivenInLastBalls": {
+            "10": "3",
+            "20": "21"
+          },
+          "Number": 6,
+          "Hattrick_Count": 0,
+          "Avg_Speed": 134.06
+        }
+      ],
+      "FallofWickets": [
+        {
+          "Batsman": "62023",
+          "Score": "66",
+          "Overs": "8",
+          "Wicket_No": 1,
+          "Review_status_id": 0,
+          "Ball_number": "48"
+        },
+        {
+          "Batsman": "65893",
+          "Score": "71",
+          "Overs": "8.4",
+          "Wicket_No": 2,
+          "Review_status_id": 0,
+          "Ball_number": "52"
+        },
+        {
+          "Batsman": "10094",
+          "Score": "83",
+          "Overs": "10.2",
+          "Wicket_No": 3,
+          "Review_status_id": 0,
+          "Ball_number": "62"
+        },
+        {
+          "Batsman": "66870",
+          "Score": "88",
+          "Overs": "10.5",
+          "Wicket_No": 4,
+          "Review_status_id": 0,
+          "Ball_number": "65"
+        },
+        {
+          "Batsman": "67402",
+          "Score": "120",
+          "Overs": "13.1",
+          "Wicket_No": 5,
+          "Review_status_id": 0,
+          "Ball_number": "79"
+        },
+        {
+          "Batsman": "68072",
+          "Score": "122",
+          "Overs": "13.5",
+          "Wicket_No": 6,
+          "Review_status_id": 0,
+          "Ball_number": "83"
+        },
+        {
+          "Batsman": "64473",
+          "Score": "163",
+          "Overs": "18.3",
+          "Wicket_No": 7,
+          "Review_status_id": 0,
+          "Ball_number": "111"
+        },
+        {
+          "Batsman": "70324",
+          "Score": "163",
+          "Overs": "18.4",
+          "Wicket_No": 8,
+          "Review_status_id": 0,
+          "Ball_number": "112"
+        }
+      ],
+      "Partnerships": [
+        {
+          "Runs": "66",
+          "Balls": "48",
+          "ExtraRuns": "4",
+          "Batsmen": [
+            {
+              "Batsman": "10094",
+              "Runs": "43",
+              "Balls": "30"
+            },
+            {
+              "Batsman": "62023",
+              "Runs": "19",
+              "Balls": "18"
+            }
+          ],
+          "ForWicket": 1
+        },
+        {
+          "Runs": "5",
+          "Balls": "4",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "10094",
+              "Runs": "5",
+              "Balls": "3"
+            },
+            {
+              "Batsman": "65893",
+              "Runs": "0",
+              "Balls": "1"
+            }
+          ],
+          "ForWicket": 2
+        },
+        {
+          "Runs": "12",
+          "Balls": "10",
+          "ExtraRuns": "1",
+          "Batsmen": [
+            {
+              "Batsman": "10094",
+              "Runs": "6",
+              "Balls": "4"
+            },
+            {
+              "Batsman": "66870",
+              "Runs": "5",
+              "Balls": "6"
+            }
+          ],
+          "ForWicket": 3
+        },
+        {
+          "Runs": "5",
+          "Balls": "3",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "67402",
+              "Runs": "1",
+              "Balls": "1"
+            },
+            {
+              "Batsman": "66870",
+              "Runs": "4",
+              "Balls": "2"
+            }
+          ],
+          "ForWicket": 4
+        },
+        {
+          "Runs": "32",
+          "Balls": "14",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "67402",
+              "Runs": "16",
+              "Balls": "8"
+            },
+            {
+              "Batsman": "10085",
+              "Runs": "16",
+              "Balls": "6"
+            }
+          ],
+          "ForWicket": 5
+        },
+        {
+          "Runs": "2",
+          "Balls": "4",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "68072",
+              "Runs": "1",
+              "Balls": "2"
+            },
+            {
+              "Batsman": "10085",
+              "Runs": "1",
+              "Balls": "2"
+            }
+          ],
+          "ForWicket": 6
+        },
+        {
+          "Runs": "41",
+          "Balls": "29",
+          "ExtraRuns": "5",
+          "Batsmen": [
+            {
+              "Batsman": "64473",
+              "Runs": "1",
+              "Balls": "6"
+            },
+            {
+              "Batsman": "10085",
+              "Runs": "35",
+              "Balls": "23"
+            }
+          ],
+          "ForWicket": 7
+        },
+        {
+          "Runs": "0",
+          "Balls": "1",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "70324",
+              "Runs": "0",
+              "Balls": "1"
+            },
+            {
+              "Batsman": "10085",
+              "Runs": "0",
+              "Balls": "0"
+            }
+          ],
+          "ForWicket": 8
+        },
+        {
+          "Runs": "10",
+          "Balls": "7",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "58913",
+              "Runs": "0",
+              "Balls": "2"
+            },
+            {
+              "Batsman": "10085",
+              "Runs": "10",
+              "Balls": "5"
+            }
+          ],
+          "ForWicket": 9,
+          "Runrate": "8.57",
+          "Runsperball": "1.42"
+        }
+      ],
+      "PowerPlay": {
+        "PP1": "1-6"
+      },
+      "PowerPlayDetails": [
+        {
+          "Name": "PP1",
+          "Overs": "1-6",
+          "Runs": "52",
+          "Wickets": "0"
+        }
+      ],
+      "LastOvers": {
+        "5": {
+          "Score": "40",
+          "Wicket": "2",
+          "Runrate": "8.27"
+        },
+        "10": {
+          "Score": "91",
+          "Wicket": "6",
+          "Runrate": "9.25"
+        }
+      },
+      "StatusId": 4,
+      "ReviewDetails": {
+        "Batting_review_count": 2,
+        "Bowling_review_count": 2,
+        "Reviews": []
+      },
+      "StartTimeStamp": "2025-08-16T16:48:51.000+0:00",
+      "At_this_stage": "168/7",
+      "OverNo": "20",
+      "BallNo": "5",
+      "Best_Performers": {
+        "Batsmen": [
+          {
+            "Player_Id": "10085",
+            "Player_Name": "Glenn Maxwell",
+            "Team_Id": "1",
+            "Team_Name": "Australia",
+            "Runs": "62",
+            "Balls": "36",
+            "Fours": "8",
+            "Sixes": "2",
+            "Strikerate": "172.22"
+          },
+          {
+            "Player_Id": "10094",
+            "Player_Name": "Mitchell Marsh",
+            "Team_Id": "1",
+            "Team_Name": "Australia",
+            "Runs": "54",
+            "Balls": "37",
+            "Fours": "3",
+            "Sixes": "5",
+            "Strikerate": "145.94"
+          }
+        ],
+        "Bowlers": [
+          {
+            "Player_Id": "63605",
+            "Player_Name": "Corbin Bosch",
+            "Team_Id": "7",
+            "Team_Name": "South Africa",
+            "Wickets": "3",
+            "Balls_Bowled": "24",
+            "Economyrate": "6.50",
+            "Overs": "4",
+            "Runs": "26",
+            "Fours": "2",
+            "Sixes": "1"
+          },
+          {
+            "Player_Id": "63611",
+            "Player_Name": "Kagiso Rabada",
+            "Team_Id": "7",
+            "Team_Name": "South Africa",
+            "Wickets": "2",
+            "Balls_Bowled": "24",
+            "Economyrate": "8.00",
+            "Overs": "4",
+            "Runs": "32",
+            "Fours": "1",
+            "Sixes": "3"
+          }
+        ]
+      }
+    }
+  ],
+  "Teams": {
+    "1": {
+      "Name_Full": "Australia",
+      "Name_Short": "AUS",
+      "Players": {
+        "4255": {
+          "Position": "11",
+          "Name_Full": "Josh Hazlewood",
+          "Name_Short": "J Hazlewood",
+          "Skill": "2",
+          "Skill_Name": "Bowler",
+          "Role": "Bowler",
+          "Confirm_XI": true,
+          "Matches": "55",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "9.66",
+            "Strikerate": "103.57",
+            "Runs": "29"
+          },
+          "Bowling": {
+            "Style": "RFM",
+            "Average": "21.83",
+            "Economyrate": "7.60",
+            "Wickets": "73"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 1,
+          "nationality": "Australia"
+        },
+        "10085": {
+          "Position": "5",
+          "Name_Full": "Glenn Maxwell",
+          "Name_Short": "G Maxwell",
+          "Skill": "3",
+          "Skill_Name": "All-Rounder",
+          "Role": "All-Rounder",
+          "Confirm_XI": true,
+          "Matches": "124",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "29.51",
+            "Strikerate": "156",
+            "Runs": "2833"
+          },
+          "Bowling": {
+            "Style": "OB",
+            "Average": "30.04",
+            "Economyrate": "8.17",
+            "Wickets": "49"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 1,
+          "nationality": "Australia"
+        },
+        "10094": {
+          "Position": "1",
+          "Name_Full": "Mitchell Marsh",
+          "Name_Short": "M Marsh",
+          "Iscaptain": true,
+          "Skill": "3",
+          "Skill_Name": "Batsman",
+          "Role": "Batsman",
+          "Confirm_XI": true,
+          "Matches": "73",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "30.49",
+            "Strikerate": "135.97",
+            "Runs": "1799"
+          },
+          "Bowling": {
+            "Style": "RM",
+            "Average": "22.76",
+            "Economyrate": "7.74",
+            "Wickets": "17"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 1,
+          "nationality": "Australia"
+        },
+        "58913": {
+          "Position": "10",
+          "Name_Full": "Adam Zampa",
+          "Name_Short": "A Zampa",
+          "Skill": "2",
+          "Skill_Name": "Bowler",
+          "Role": "Bowler",
+          "Confirm_XI": true,
+          "Matches": "103",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "4.92",
+            "Strikerate": "85.18",
+            "Runs": "69"
+          },
+          "Bowling": {
+            "Style": "LBG",
+            "Average": "21.11",
+            "Economyrate": "7.34",
+            "Wickets": "130"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 1,
+          "nationality": "Australia"
+        },
+        "62023": {
+          "Position": "2",
+          "Name_Full": "Travis Head",
+          "Name_Short": "T Head",
+          "Skill": "1",
+          "Skill_Name": "Batsman",
+          "Role": "Batter",
+          "Confirm_XI": true,
+          "Matches": "41",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "31.08",
+            "Strikerate": "156.72",
+            "Runs": "1119"
+          },
+          "Bowling": {
+            "Style": "OB",
+            "Average": "56",
+            "Economyrate": "9.33",
+            "Wickets": "1"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 1,
+          "nationality": "Australia"
+        },
+        "64473": {
+          "Position": "8",
+          "Name_Full": "Ben Dwarshuis",
+          "Name_Short": "B Dwarshuis",
+          "Skill": "2",
+          "Skill_Name": "Bowler",
+          "Role": "Bowler",
+          "Confirm_XI": true,
+          "Matches": "10",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "7.50",
+            "Strikerate": "78.94",
+            "Runs": "45"
+          },
+          "Bowling": {
+            "Style": "LFM",
+            "Average": "19.94",
+            "Economyrate": "9.20",
+            "Wickets": "18"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 1,
+          "nationality": "Australia"
+        },
+        "65893": {
+          "Position": "6",
+          "Name_Full": "Josh Inglis",
+          "Name_Short": "J Inglis",
+          "Iskeeper": true,
+          "Skill": "4",
+          "Skill_Name": "Wicket Keeper",
+          "Role": "Wicket Keeper",
+          "Confirm_XI": true,
+          "Matches": "36",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "30.27",
+            "Strikerate": "164.41",
+            "Runs": "878"
+          },
+          "Bowling": {
+            "Style": "",
+            "Average": "0",
+            "Economyrate": "0",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 1,
+          "nationality": "Australia"
+        },
+        "66870": {
+          "Position": "3",
+          "Name_Full": "Cameron Green",
+          "Name_Short": "C Green",
+          "Skill": "3",
+          "Skill_Name": "Batsman",
+          "Role": "Batsman",
+          "Confirm_XI": true,
+          "Matches": "21",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "32.56",
+            "Strikerate": "160.30",
+            "Runs": "521"
+          },
+          "Bowling": {
+            "Style": "RFM",
+            "Average": "23.25",
+            "Economyrate": "8.90",
+            "Wickets": "12"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 1,
+          "nationality": "Australia"
+        },
+        "67402": {
+          "Position": "4",
+          "Name_Full": "Tim David",
+          "Name_Short": "T David",
+          "Skill": "1",
+          "Skill_Name": "Batsman",
+          "Role": "Batter",
+          "Confirm_XI": true,
+          "Matches": "60",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "37.07",
+            "Strikerate": "168.71",
+            "Runs": "1483"
+          },
+          "Bowling": {
+            "Style": "OB",
+            "Average": "51",
+            "Economyrate": "9.32",
+            "Wickets": "5"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 1,
+          "nationality": "Australia"
+        },
+        "68072": {
+          "Position": "7",
+          "Name_Full": "Aaron Hardie",
+          "Name_Short": "A Hardie",
+          "Skill": "3",
+          "Skill_Name": "All-Rounder",
+          "Role": "All-Rounder",
+          "Confirm_XI": true,
+          "Matches": "16",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "22.50",
+            "Strikerate": "126.76",
+            "Runs": "180"
+          },
+          "Bowling": {
+            "Style": "RMF",
+            "Average": "26.61",
+            "Economyrate": "8.65",
+            "Wickets": "13"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 1,
+          "nationality": "Australia"
+        },
+        "70324": {
+          "Position": "9",
+          "Name_Full": "Nathan Ellis",
+          "Name_Short": "N Ellis",
+          "Skill": "2",
+          "Skill_Name": "Bowler",
+          "Role": "Bowler",
+          "Confirm_XI": true,
+          "Matches": "27",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "6",
+            "Strikerate": "60",
+            "Runs": "30"
+          },
+          "Bowling": {
+            "Style": "RFM",
+            "Average": "18.80",
+            "Economyrate": "7.84",
+            "Wickets": "41"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 1,
+          "nationality": "Australia"
+        }
+      }
+    },
+    "7": {
+      "Name_Full": "South Africa",
+      "Name_Short": "SA",
+      "Players": {
+        "12518": {
+          "Position": "6",
+          "Name_Full": "Rassie van der Dussen",
+          "Name_Short": "van der Dussen",
+          "Skill": "1",
+          "Skill_Name": "Batsman",
+          "Role": "Batter",
+          "Confirm_XI": true,
+          "Matches": "57",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "33.47",
+            "Strikerate": "128.75",
+            "Runs": "1406"
+          },
+          "Bowling": {
+            "Style": "LB",
+            "Average": "0",
+            "Economyrate": "0",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 7,
+          "nationality": "South Africa"
+        },
+        "63605": {
+          "Position": "7",
+          "Name_Full": "Corbin Bosch",
+          "Name_Short": "C Bosch",
+          "Skill": "3",
+          "Skill_Name": "All-Rounder",
+          "Role": "All-Rounder",
+          "Confirm_XI": true,
+          "Matches": "7",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "9.25",
+            "Strikerate": "115.62",
+            "Runs": "37"
+          },
+          "Bowling": {
+            "Style": "RFM",
+            "Average": "26.62",
+            "Economyrate": "8.19",
+            "Wickets": "8"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 7,
+          "nationality": "South Africa"
+        },
+        "63611": {
+          "Position": "9",
+          "Name_Full": "Kagiso Rabada",
+          "Name_Short": "K Rabada",
+          "Skill": "2",
+          "Skill_Name": "Bowler",
+          "Role": "Bowler",
+          "Confirm_XI": true,
+          "Matches": "68",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "15.90",
+            "Strikerate": "114.37",
+            "Runs": "175"
+          },
+          "Bowling": {
+            "Style": "RF",
+            "Average": "26.44",
+            "Economyrate": "8.26",
+            "Wickets": "76"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 7,
+          "nationality": "South Africa"
+        },
+        "63717": {
+          "Position": "8",
+          "Name_Full": "Senuran Muthusamy",
+          "Name_Short": "S Muthusamy",
+          "Skill": "3",
+          "Skill_Name": "Bowler",
+          "Role": "Bowler",
+          "Confirm_XI": true,
+          "Matches": "5",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "6",
+            "Strikerate": "104.34",
+            "Runs": "24"
+          },
+          "Bowling": {
+            "Style": "SLO",
+            "Average": "25.60",
+            "Economyrate": "7.11",
+            "Wickets": "5"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 7,
+          "nationality": "South Africa"
+        },
+        "64219": {
+          "Position": "1",
+          "Name_Full": "Aiden Markram",
+          "Name_Short": "A Markram",
+          "Iscaptain": true,
+          "Skill": "3",
+          "Skill_Name": "All-Rounder",
+          "Role": "All-Rounder",
+          "Confirm_XI": true,
+          "Matches": "60",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "29.12",
+            "Strikerate": "143.82",
+            "Runs": "1398"
+          },
+          "Bowling": {
+            "Style": "OB",
+            "Average": "33.46",
+            "Economyrate": "8.36",
+            "Wickets": "15"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 7,
+          "nationality": "South Africa"
+        },
+        "64225": {
+          "Position": "11",
+          "Name_Full": "Lungi Ngidi",
+          "Name_Short": "L Ngidi",
+          "Skill": "2",
+          "Skill_Name": "Bowler",
+          "Role": "Bowler",
+          "Confirm_XI": true,
+          "Matches": "50",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "8.20",
+            "Strikerate": "77.35",
+            "Runs": "41"
+          },
+          "Bowling": {
+            "Style": "RFM",
+            "Average": "21.45",
+            "Economyrate": "8.92",
+            "Wickets": "70"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 7,
+          "nationality": "South Africa"
+        },
+        "64941": {
+          "Position": "2",
+          "Name_Full": "Ryan Rickelton",
+          "Name_Short": "R Rickelton",
+          "Iskeeper": true,
+          "Skill": "4",
+          "Skill_Name": "Wicket Keeper",
+          "Role": "Wicket Keeper",
+          "Confirm_XI": true,
+          "Matches": "16",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "22.56",
+            "Strikerate": "132.23",
+            "Runs": "361"
+          },
+          "Bowling": {
+            "Style": "",
+            "Average": "0",
+            "Economyrate": "0",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 7,
+          "nationality": "South Africa"
+        },
+        "74761": {
+          "Position": "5",
+          "Name_Full": "Tristan Stubbs",
+          "Name_Short": "T Stubbs",
+          "Skill": "4",
+          "Skill_Name": "Batsman",
+          "Role": "Batsman",
+          "Confirm_XI": true,
+          "Matches": "38",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "29.34",
+            "Strikerate": "134.09",
+            "Runs": "763"
+          },
+          "Bowling": {
+            "Style": "OB",
+            "Average": "0",
+            "Economyrate": "20.50",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 7,
+          "nationality": "South Africa"
+        },
+        "84562": {
+          "Position": "4",
+          "Name_Full": "Dewald Brevis",
+          "Name_Short": "D Brevis",
+          "Skill": "3",
+          "Skill_Name": "Batsman",
+          "Role": "Batsman",
+          "Confirm_XI": true,
+          "Matches": "10",
+          "Batting": {
+            "Style": "RHB",
+            "Average": "39.75",
+            "Strikerate": "191.56",
+            "Runs": "318"
+          },
+          "Bowling": {
+            "Style": "LB",
+            "Average": "0",
+            "Economyrate": "0",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 7,
+          "nationality": "South Africa"
+        },
+        "90908": {
+          "Position": "10",
+          "Name_Full": "Kwena Maphaka",
+          "Name_Short": "K Maphaka",
+          "Skill": "2",
+          "Skill_Name": "Bowler",
+          "Role": "Bowler",
+          "Confirm_XI": true,
+          "Matches": "11",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "19",
+            "Strikerate": "82.60",
+            "Runs": "19"
+          },
+          "Bowling": {
+            "Style": "LF",
+            "Average": "24.86",
+            "Economyrate": "9.64",
+            "Wickets": "15"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 7,
+          "nationality": "South Africa"
+        },
+        "109249": {
+          "Position": "3",
+          "Name_Full": "Lhuan-dre Pretorius",
+          "Name_Short": "L Pretorius",
+          "Skill": "4",
+          "Skill_Name": "Wicket Keeper",
+          "Role": "Wicket Keeper",
+          "Confirm_XI": true,
+          "Matches": "8",
+          "Batting": {
+            "Style": "LHB",
+            "Average": "16.37",
+            "Strikerate": "131",
+            "Runs": "131"
+          },
+          "Bowling": {
+            "Style": "",
+            "Average": "0",
+            "Economyrate": "0",
+            "Wickets": "0"
+          },
+          "status_id": 12,
+          "status": "Available",
+          "nationality_id": 7,
+          "nationality": "South Africa"
+        }
+      }
+    }
+  },
+  "Notes": {
+    "1": [
+      "Mandatory Power play (1-6): South Africa 46/2",
+      "South Africa 50/3 in 6.6 overs",
+      "D Brevis maiden T20I fifty: 50 runs in 22 balls (1x4) (6x6)",
+      "South Africa 100/3 in 10.1 overs",
+      "4th wkt Partnership: 50 off 20 balls between D Brevis (39) and T Stubbs (11)",
+      "South Africa 150/6 in 17.4 overs",
+      "Innings Break: South Africa 172/7 in 20.0 overs"
+    ],
+    "2": [
+      "Australia 52/0 in 5.6 overs",
+      "Mandatory Power play (1-6): Australia 52/0",
+      "1st wkt Partnership: 50 off 36 balls between M Marsh (30) and T Head (18)",
+      "M Marsh 10th T20I fifty: 53 runs in 35 balls (3x4) (5x6)",
+      "Australia 103/4 in 11.5 overs",
+      "Australia 153/6 in 17.1 overs",
+      "G Maxwell 12th T20I fifty: 50 runs in 30 balls (6x4) (2x6)"
+    ]
+  },
+  "Matchequation": {
+    "Team1_id": 1,
+    "Team2_id": 7,
+    "Team1_name": "Australia",
+    "Team2_Name": "South Africa",
+    "Wickets": 2,
+    "Raw_eq_type": 13,
+    "Equation": "Australia beat South Africa by 2 wickets",
+    "Eq_type": "match_ended"
+  },
+  "SerialNumber": 446
+}

@@ -1,0 +1,84 @@
+{
+  "teams": [
+    {
+      "id": "rcb",
+      "name": "Royal Challengers Bengaluru",
+      "shortName": "RCB",
+      "primaryColor": "#e63946",
+      "secondaryColor": "#ffffff",
+      "logoUrl": "/logos/rcb.png"
+    },
+    {
+      "id": "mi",
+      "name": "Mumbai Indians",
+      "shortName": "MI",
+      "primaryColor": "#005fcc",
+      "secondaryColor": "#fdb913",
+      "logoUrl": "/logos/mi.png"
+    },
+    {
+      "id": "pbks",
+      "name": "Punjab Kings",
+      "shortName": "PBKS",
+      "primaryColor": "#ed1c24",
+      "secondaryColor": "#ffffff",
+      "logoUrl": "/logos/pbks.png"
+    },
+    {
+      "id": "kkr",
+      "name": "Kolkata Knight Riders",
+      "shortName": "KKR",
+      "primaryColor": "#430d58",
+      "secondaryColor": "#edb234",
+      "logoUrl": "/logos/kkr.png"
+    },
+    {
+      "id": "gt",
+      "name": "Gujarat Titans",
+      "shortName": "GT",
+      "primaryColor": "#1c1c1c",
+      "secondaryColor": "#e8b842",
+      "logoUrl": "/logos/gt.png"
+    },
+    {
+      "id": "dc",
+      "name": "Delhi Capitals",
+      "shortName": "DC",
+      "primaryColor": "#17479e",
+      "secondaryColor": "#e63946",
+      "logoUrl": "/logos/dc.png"
+    },
+    {
+      "id": "srh",
+      "name": "Sunrisers Hyderabad",
+      "shortName": "SRH",
+      "primaryColor": "#ff9933",
+      "secondaryColor": "#000000",
+      "logoUrl": "/logos/srh.png"
+    },
+    {
+      "id": "lsg",
+      "name": "Lucknow Super Giants",
+      "shortName": "LSG",
+      "primaryColor": "#41bdd5",
+      "secondaryColor": "#ea1628",
+      "logoUrl": "/logos/lsg.png"
+    },
+    {
+      "id": "rr",
+      "name": "Rajasthan Royals",
+      "shortName": "RR",
+      "primaryColor": "#ea1a8e",
+      "secondaryColor": "#1a479e",
+      "logoUrl": "/logos/rr.png"
+    },
+    {
+      "id": "csk",
+      "name": "Chennai Super Kings",
+      "shortName": "CSK",
+      "primaryColor": "#ffff00",
+      "secondaryColor": "#0066ff",
+      "logoUrl": "/logos/csk.png"
+    }
+  ]
+}

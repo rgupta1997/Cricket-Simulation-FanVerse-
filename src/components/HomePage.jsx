@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 const HomePage = () => {
@@ -85,6 +86,7 @@ const HomePage = () => {
               Cricket Simulator
             </Link>
           </li>
+
           <li>
             <Link 
               to="/player"

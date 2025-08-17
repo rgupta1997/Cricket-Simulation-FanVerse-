@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Match IDs</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .match-item { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .match-item strong { color: #333; }
+        .match-id { color: #007bff; font-weight: bold; }
+        .match-type { color: #666; font-size: 0.9em; }
+        .loading { text-align: center; padding: 20px; }
+        .error { color: red; padding: 10px; background: #ffe6e6; border-radius: 5px; }
+        .success { color: green; padding: 10px; background: #e6ffe6; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .api-test { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #007bff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏏 Cricket Match ID Debugger</h1>
+        <p>This page helps debug match ID issues between fixtures and match details.</p>
+        
+        <div class="api-test">
+            <h3>🔧 API Tests</h3>
+            <button onclick="testFixturesAPI()">Test Fixtures API</button>
+            <button onclick="testScorecardAPI()">Test Sample Scorecard API</button>
+            <button onclick="testCommentaryAPI()">Test Sample Commentary API</button>
+            <button onclick="testSpecificMatchFile()">🎯 Test Specific Match: ausa08162025258915</button>
+        </div>
+        
+        <div id="status" class="loading">Click "Test Fixtures API" to start debugging...</div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const CUSTOM_API_BASE = 'https://videoscorecard.sportz.io';
+        const SPORTZ_BASE_URL = '/api/sportz'; // Using Vite proxy to avoid CORS
+        
+        // Note: This debug page should be served through the Vite dev server (http://localhost:3000)
+        // to use the proxy. Direct file:// access won't work with the proxy.
+        
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = type;
+            statusDiv.innerHTML = message;
+        }
+        
+        function displayResults(html) {
+            document.getElementById('results').innerHTML = html;
+        }
+        
+        async function testFixturesAPI() {
+            try {
+                updateStatus('🔄 Fetching fixtures from API...', 'loading');
+                
+                const body = JSON.stringify({
+                    start_date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    sport_id: 1,
+                    op_type: "1"
+                });
+                
+                const response = await fetch(`${CUSTOM_API_BASE}/api/FillEvents`, {
+                    method: 'POST',
+                    headers: { "Content-Type": "application/json" },
+                    body: body
+                });
+                
+                const data = await response.json();
+                const events = data.events || [];
+                const filteredEvents = events.filter(event => event.coverage_id === "8");
+                
+                updateStatus(`✅ Found ${filteredEvents.length} matches with coverage_id 8`, 'success');
+                
+                let html = '<h3>📋 Fixtures Data</h3>';
+                filteredEvents.slice(0, 10).forEach((event, index) => {
+                    html += `
+                        <div class="match-item">
+                            <strong>${event.match_name || 'Unknown Match'}</strong><br>
+                            <span class="match-id">Match ID: ${event.match_id} (${typeof event.match_id})</span><br>
+                            <span class="match-type">File: ${event.match_file_name || 'No file'}</span><br>
+                            <span class="match-type">Status: ${event.match_status} (ID: ${event.match_status_id})</span><br>
+                            <span class="match-type">Coverage: ${event.coverage_id}</span>
+                            ${event.match_file_name ? 
+                                `<br><button onclick="testSpecificMatch('${event.match_file_name}', '${event.match_id}')">Test This Match</button>` 
+                                : ''
+                            }
+                        </div>
+                    `;
+                });
+                
+                if (filteredEvents.length === 0) {
+                    html += '<div class="error">❌ No matches found with coverage_id 8</div>';
+                }
+                
+                displayResults(html);
+                
+            } catch (error) {
+                updateStatus(`❌ Error: ${error.message}`, 'error');
+                console.error('Fixtures API Error:', error);
+            }
+        }
+        
+        async function testSpecificMatch(matchFile, matchId) {
+            try {
+                updateStatus(`🔄 Testing match: ${matchFile}`, 'loading');
+                console.log('Testing match with ID:', matchId, 'Type:', typeof matchId);
+                
+                // Test scorecard API
+                const scorecardResponse = await fetch(`${SPORTZ_BASE_URL}/${matchFile}.json`);
+                const scorecardData = await scorecardResponse.json();
+                
+                // Test commentary API
+                const commentaryResponse = await fetch(`${SPORTZ_BASE_URL}/${matchFile}_commentary_all_1.json`);
+                const commentaryData = await commentaryResponse.json();
+                
+                updateStatus(`✅ Successfully fetched data for ${matchFile}`, 'success');
+                
+                let html = `
+                    <h3>🎯 Match Test Results for ID: ${matchId}</h3>
+                    <div class="match-item">
+                        <strong>📊 Scorecard API Response:</strong><br>
+                        Status: ${scorecardResponse.status}<br>
+                        Title: ${scorecardData.title || 'No title'}<br>
+                        Date: ${scorecardData.date_start_ist || 'No date'}<br>
+                        Team 1: ${scorecardData.team1?.name || 'Unknown'}<br>
+                        Team 2: ${scorecardData.team2?.name || 'Unknown'}<br>
+                        Innings: ${scorecardData.innings?.length || 0} innings
+                    </div>
+                    <div class="match-item">
+                        <strong>💬 Commentary API Response:</strong><br>
+                        Status: ${commentaryResponse.status}<br>
+                        Commentary Items: ${commentaryData.commentary?.length || 0}<br>
+                    </div>
+                `;
+                
+                displayResults(html);
+                
+            } catch (error) {
+                updateStatus(`❌ Error testing match ${matchFile}: ${error.message}`, 'error');
+                console.error('Match test error:', error);
+            }
+        }
+        
+        async function testScorecardAPI() {
+            try {
+                updateStatus('🔄 Testing sample scorecard API...', 'loading');
+                
+                // This will likely fail, but helps us understand the API structure
+                const response = await fetch(`${SPORTZ_BASE_URL}/sample_match.json`);
+                const data = await response.json();
+                
+                updateStatus('✅ Scorecard API test completed', 'success');
+                displayResults(`<pre>${JSON.stringify(data, null, 2)}</pre>`);
+                
+            } catch (error) {
+                updateStatus(`📝 Scorecard API test (expected to fail): ${error.message}`, 'info');
+                displayResults('<div class="match-item">This test is expected to fail unless you have a valid match file name. Use the "Test Fixtures API" button first to get real match files.</div>');
+            }
+        }
+        
+        async function testCommentaryAPI() {
+            try {
+                updateStatus('🔄 Testing sample commentary API...', 'loading');
+                
+                // This will likely fail, but helps us understand the API structure
+                const response = await fetch(`${SPORTZ_BASE_URL}/sample_match_commentary_all_1.json`);
+                const data = await response.json();
+                
+                updateStatus('✅ Commentary API test completed', 'success');
+                displayResults(`<pre>${JSON.stringify(data, null, 2)}</pre>`);
+                
+            } catch (error) {
+                updateStatus(`📝 Commentary API test (expected to fail): ${error.message}`, 'info');
+                displayResults('<div class="match-item">This test is expected to fail unless you have a valid match file name. Use the "Test Fixtures API" button first to get real match files.</div>');
+            }
+        }
+        
+        // Test the specific match file provided by user
+        async function testSpecificMatchFile() {
+            const matchFile = 'ausa08162025258915';
+            
+            try {
+                updateStatus(`🎯 Testing specific match: ${matchFile}`, 'loading');
+                
+                // Test scorecard API
+                const scorecardResponse = await fetch(`${SPORTZ_BASE_URL}/${matchFile}.json`);
+                
+                if (!scorecardResponse.ok) {
+                    throw new Error(`Scorecard API failed: ${scorecardResponse.status}`);
+                }
+                
+                const scorecardData = await scorecardResponse.json();
+                
+                console.log('🏏 Scorecard Data:', scorecardData);
+                
+                // Test commentary APIs
+                const inningsCount = scorecardData.innings?.length || 2;
+                const commentaryResults = {};
+                
+                for (let inning = 1; inning <= inningsCount; inning++) {
+                    try {
+                        const commentaryResponse = await fetch(`${SPORTZ_BASE_URL}/${matchFile}_commentary_all_${inning}.json`);
+                        
+                        if (commentaryResponse.ok) {
+                            const commentaryData = await commentaryResponse.json();
+                            commentaryResults[inning] = commentaryData;
+                            console.log(`💬 Commentary Inning ${inning}:`, commentaryData);
+                        } else {
+                            console.warn(`Commentary for inning ${inning} failed:`, commentaryResponse.status);
+                            commentaryResults[inning] = null;
+                        }
+                    } catch (error) {
+                        console.warn(`Commentary for inning ${inning} error:`, error);
+                        commentaryResults[inning] = null;
+                    }
+                }
+                
+                updateStatus(`✅ Successfully tested match: ${matchFile}`, 'success');
+                
+                // Display comprehensive results
+                let html = `
+                    <h3>🎯 Specific Match Test: ${matchFile}</h3>
+                    
+                    <div class="match-item">
+                        <strong>📊 Scorecard Data:</strong><br>
+                        Title: ${scorecardData.title || 'No title'}<br>
+                        Date: ${scorecardData.date_start_ist || 'No date'}<br>
+                        Venue: ${scorecardData.venue?.name || 'No venue'}<br>
+                        Team 1: ${scorecardData.team1?.name || 'Unknown'}<br>
+                        Team 2: ${scorecardData.team2?.name || 'Unknown'}<br>
+                        Innings: ${scorecardData.innings?.length || 0} innings
+                    </div>
+                `;
+                
+                if (scorecardData.innings) {
+                    scorecardData.innings.forEach((inning, index) => {
+                        html += `
+                            <div class="match-item">
+                                <strong>📈 Inning ${index + 1}:</strong><br>
+                                Batting Team: ${inning.batting_team?.name || 'Unknown'}<br>
+                                Runs: ${inning.runs || 0}<br>
+                                Wickets: ${inning.wickets || 0}<br>
+                                Overs: ${inning.overs || '0.0'}
+                            </div>
+                        `;
+                    });
+                }
+                
+                // Show commentary results
+                Object.keys(commentaryResults).forEach(inning => {
+                    const commentaryData = commentaryResults[inning];
+                    
+                    if (commentaryData && commentaryData.commentary) {
+                        const commentary = commentaryData.commentary;
+                        const latest = commentary[0]; // First entry is latest (desc order)
+                        
+                        html += `
+                            <div class="match-item">
+                                <strong>💬 Commentary Inning ${inning}:</strong><br>
+                                Total Items: ${commentary.length}<br>
+                                ${latest ? `
+                                    <strong>Latest Ball:</strong><br>
+                                    Over: ${latest.over_number || latest.over || 'N/A'}<br>
+                                    Ball: ${latest.ball_number || latest.ball || 'N/A'}<br>
+                                    Runs: ${latest.runs || latest.runs_scored || 0}<br>
+                                    Striker: ${latest.striker?.name || latest.batsman?.name || 'Unknown'}<br>
+                                    Non-Striker: ${latest.non_striker?.name || 'Unknown'}<br>
+                                    Bowler: ${latest.bowler?.name || 'Unknown'}<br>
+                                    Commentary: ${(latest.commentary_text || latest.commentary || 'No commentary').substring(0, 100)}...
+                                ` : 'No commentary data'}
+                            </div>
+                        `;
+                    } else {
+                        html += `
+                            <div class="match-item">
+                                <strong>💬 Commentary Inning ${inning}:</strong><br>
+                                ❌ Failed to fetch or no data
+                            </div>
+                        `;
+                    }
+                });
+                
+                displayResults(html);
+                
+            } catch (error) {
+                updateStatus(`❌ Error testing match ${matchFile}: ${error.message}`, 'error');
+                console.error('Specific match test error:', error);
+            }
+        }
+
+        // Auto-run fixtures test on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(testFixturesAPI, 1000);
+        });
+    </script>
+</body>
+</html>

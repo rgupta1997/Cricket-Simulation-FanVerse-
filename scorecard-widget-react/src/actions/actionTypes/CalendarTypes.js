@@ -1,0 +1,6 @@
+export const TOGGLE_BTN_TEXT = "TOGGLE_BTN_TEXT";
+export const GET_NEXT = "GET_NEXT";
+export const GET_PREVIOUS = "GET_PREVIOUS";
+export const SETDATES = "SETDATES";
+export const GETEVENTS = "GETEVENTS";
+export const UPDATESEARCHTERM = "UPDATESEARCHTERM";

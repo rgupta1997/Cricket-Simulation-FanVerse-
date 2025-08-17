@@ -1,0 +1,106 @@
+{
+  "pointsTable": {
+    "ipl2025": [
+      {
+        "rank": 1,
+        "teamId": "pbks",
+        "played": 14,
+        "won": 9,
+        "lost": 4,
+        "noResult": 1,
+        "points": 19,
+        "nrr": 0.372
+      },
+      {
+        "rank": 2,
+        "teamId": "rcb",
+        "played": 14,
+        "won": 9,
+        "lost": 4,
+        "noResult": 1,
+        "points": 19,
+        "nrr": 0.301
+      },
+      {
+        "rank": 3,
+        "teamId": "gt",
+        "played": 14,
+        "won": 9,
+        "lost": 5,
+        "noResult": 0,
+        "points": 18,
+        "nrr": 0.254
+      },
+      {
+        "rank": 4,
+        "teamId": "mi",
+        "played": 14,
+        "won": 8,
+        "lost": 6,
+        "noResult": 0,
+        "points": 16,
+        "nrr": 1.142
+      },
+      {
+        "rank": 5,
+        "teamId": "dc",
+        "played": 14,
+        "won": 7,
+        "lost": 6,
+        "noResult": 1,
+        "points": 15,
+        "nrr": 0.011
+      },
+      {
+        "rank": 6,
+        "teamId": "srh",
+        "played": 14,
+        "won": 6,
+        "lost": 7,
+        "noResult": 1,
+        "points": 13,
+        "nrr": -0.241
+      },
+      {
+        "rank": 7,
+        "teamId": "lsg",
+        "played": 14,
+        "won": 6,
+        "lost": 8,
+        "noResult": 0,
+        "points": 12,
+        "nrr": -0.376
+      },
+      {
+        "rank": 8,
+        "teamId": "kkr",
+        "played": 14,
+        "won": 5,
+        "lost": 7,
+        "noResult": 2,
+        "points": 12,
+        "nrr": -0.305
+      },
+      {
+        "rank": 9,
+        "teamId": "rr",
+        "played": 14,
+        "won": 4,
+        "lost": 10,
+        "noResult": 0,
+        "points": 8,
+        "nrr": -0.549
+      },
+      {
+        "rank": 10,
+        "teamId": "csk",
+        "played": 14,
+        "won": 4,
+        "lost": 10,
+        "noResult": 0,
+        "points": 8,
+        "nrr": -0.647
+      }
+    ]
+  }
+}
