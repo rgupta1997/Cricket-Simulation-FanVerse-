@@ -10,7 +10,8 @@ const Navigation = () => {
     { path: '/simulator', label: 'Cricket Simulator', description: 'Main cricket simulation game' },
     { path: '/webapp', label: 'Web App', description: 'Web-based cricket management platform' },
     { path: '/player', label: 'Player Test', description: 'Basic player model test' },
-    { path: '/bones', label: 'Bone Viewer', description: 'Player skeleton visualization' }
+    { path: '/bones', label: 'Bone Viewer', description: 'Player skeleton visualization' },
+    { path: '/player-animation', label: 'Player Animation', description: 'Babylon.js player model viewer' }
   ];
 
   const navStyle = {

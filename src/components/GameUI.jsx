@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 
 // Game UI Component (HTML overlay) - renders outside Canvas
@@ -279,10 +280,120 @@ const GameUI = ({
             {selectedControl === 'bowling' && (
               <div>
                 <h4 style={{ margin: '6px 0 4px 0', fontSize: '11px', color: '#FFC107' }}>Bowling Controls</h4>
-                <div style={{ marginBottom: '2px' }}>Speed: {controls.bowling.speed} km/h</div>
-                <div style={{ marginBottom: '2px' }}>Line: {controls.bowling.line}</div>
-                <div style={{ marginBottom: '2px' }}>Length: {controls.bowling.length}</div>
-                <div style={{ marginBottom: '2px' }}><span style={{ fontWeight: 'bold' }}>SPACEBAR</span> - Bowl</div>
+                
+                {/* Speed Control */}
+                <div style={{ marginBottom: '10px' }}>
+                  <label style={{ display: 'block', marginBottom: '2px', color: '#888' }}>Speed (km/h)</label>
+                  <input 
+                    type="range" 
+                    min="100" 
+                    max="150" 
+                    value={controls.bowling.speed} 
+                    onChange={(e) => gameData.onBowlingControlChange?.('speed', parseInt(e.target.value))}
+                    style={{
+                      width: '100%',
+                      accentColor: '#4CAF50'
+                    }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#888' }}>
+                    <span>100</span>
+                    <span>{controls.bowling.speed}</span>
+                    <span>150</span>
+                  </div>
+                </div>
+
+                {/* Line Control */}
+                <div style={{ marginBottom: '10px' }}>
+                  <label style={{ display: 'block', marginBottom: '2px', color: '#888' }}>Line</label>
+                  <input 
+                    type="range" 
+                    min="-1" 
+                    max="1" 
+                    step="0.1"
+                    value={controls.bowling.line} 
+                    onChange={(e) => gameData.onBowlingControlChange?.('line', parseFloat(e.target.value))}
+                    style={{
+                      width: '100%',
+                      accentColor: '#4CAF50'
+                    }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#888' }}>
+                    <span>Off</span>
+                    <span>{controls.bowling.line.toFixed(1)}</span>
+                    <span>Leg</span>
+                  </div>
+                </div>
+
+                {/* Length Control */}
+                <div style={{ marginBottom: '10px' }}>
+                  <label style={{ display: 'block', marginBottom: '2px', color: '#888' }}>Length</label>
+                  <input 
+                    type="range" 
+                    min="-1" 
+                    max="1" 
+                    step="0.1"
+                    value={controls.bowling.length} 
+                    onChange={(e) => gameData.onBowlingControlChange?.('length', parseFloat(e.target.value))}
+                    style={{
+                      width: '100%',
+                      accentColor: '#4CAF50'
+                    }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#888' }}>
+                    <span>Short</span>
+                    <span>{controls.bowling.length.toFixed(1)}</span>
+                    <span>Full</span>
+                  </div>
+                </div>
+
+                {/* Pitch Control */}
+                <div style={{ marginBottom: '10px' }}>
+                  <label style={{ display: 'block', marginBottom: '2px', color: '#888' }}>Pitch</label>
+                  <input 
+                    type="range" 
+                    min="-1" 
+                    max="1" 
+                    step="0.1"
+                    value={controls.bowling.pitch || 0} 
+                    onChange={(e) => gameData.onBowlingControlChange?.('pitch', parseFloat(e.target.value))}
+                    style={{
+                      width: '100%',
+                      accentColor: '#4CAF50'
+                    }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#888' }}>
+                    <span>Left</span>
+                    <span>{(controls.bowling.pitch || 0).toFixed(1)}</span>
+                    <span>Right</span>
+                  </div>
+                </div>
+
+                {/* Bounce Height Control */}
+                <div style={{ marginBottom: '10px' }}>
+                  <label style={{ display: 'block', marginBottom: '2px', color: '#888' }}>Pitch Bounce</label>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="4" 
+                    step="0.2"
+                    value={controls.bowling.bounceHeight || 0.5} 
+                    onChange={(e) => gameData.onBowlingControlChange?.('bounceHeight', parseFloat(e.target.value))}
+                    style={{
+                      width: '100%',
+                      accentColor: '#4CAF50'
+                    }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#888' }}>
+                    <span>Dead</span>
+                    <span>{(controls.bowling.bounceHeight || 0.5).toFixed(1)}</span>
+                    <span>WACA</span>
+                  </div>
+                  <div style={{ fontSize: '8px', color: '#666', textAlign: 'center', marginTop: '2px' }}>
+                    Pitch characteristics: 0 = Dead pitch, 2 = Normal, 4 = Very bouncy
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '2px', marginTop: '10px' }}><span style={{ fontWeight: 'bold' }}>SPACEBAR</span> - Bowl</div>
               </div>
             )}
             

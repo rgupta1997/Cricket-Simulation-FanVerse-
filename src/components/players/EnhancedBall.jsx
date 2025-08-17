@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import React, { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Vector3 } from 'three';
@@ -17,11 +18,12 @@ const EnhancedBall = ({
   const { currentBall, ballState } = gameState;
   const { position, velocity, isMoving } = currentBall;
 
-  // Physics constants (reduced gravity for better ball reach)
-  const GRAVITY = -4.5; // Reduced gravity so ball travels further
-  const AIR_RESISTANCE = 0.99; // Less air resistance
-  const BOUNCE_DAMPING = 0.7;
-  const GROUND_LEVEL = 0.05;
+  // Physics constants for cricket ball
+  const GRAVITY = -9.81; // Real world gravity
+  const AIR_RESISTANCE = 0.995; // Slight air resistance
+  const BOUNCE_DAMPING = 0.6; // 60% energy retention on bounce
+  const GROUND_LEVEL = 0.07; // Ball radius
+  const SPIN_FACTOR = 2.5; // Ball spin multiplier
 
   useFrame((state, delta) => {
     if (!ballRef.current) return;
@@ -61,9 +63,37 @@ const EnhancedBall = ({
       // Ground collision detection
       if (currentPos.y <= GROUND_LEVEL && currentVel.y < 0) {
         currentPos.y = GROUND_LEVEL;
-        currentVel.y = Math.abs(currentVel.y) * BOUNCE_DAMPING;
-        currentVel.x *= 0.9; // Friction
-        currentVel.z *= 0.9; // Friction
+        
+        // Get bounce parameters from game state
+        const bounceHeight = currentBall.bounceHeight || 0.5;
+        const bounceData = currentBall.trajectory?.bounce;
+        
+        if (bounceData && bounceCount === 0) {
+          // First bounce - use pre-calculated bounce velocity
+          currentVel.set(
+            bounceData.velocity[0],
+            bounceData.velocity[1],
+            bounceData.velocity[2]
+          );
+        } else {
+          // Subsequent bounces use physics based on pitch characteristics
+          const pitchBounce = bounceHeight; // 0 = dead pitch, 2 = normal, 4 = very bouncy
+          
+          // Calculate bounce energy retention based on pitch characteristics
+          const pitchBounceMultiplier = Math.pow(1.2, pitchBounce);
+          const dampingFactor = BOUNCE_DAMPING * pitchBounceMultiplier;
+          
+          // Vertical velocity after bounce
+          currentVel.y = Math.abs(currentVel.y) * dampingFactor;
+          
+          // Horizontal momentum - bouncier pitches retain more pace
+          const baseFriction = 0.85; // More base friction for realistic pace drop
+          const frictionReduction = Math.min(0.25, pitchBounce * 0.05); // Max 25% friction reduction
+          const frictionFactor = baseFriction + frictionReduction;
+          
+          currentVel.x *= frictionFactor;
+          currentVel.z *= frictionFactor;
+        }
         
         setBounceCount(prev => prev + 1);
         
@@ -72,7 +102,8 @@ const EnhancedBall = ({
           onBounce({
             position: currentPos.toArray(),
             velocity: currentVel.toArray(),
-            bounceCount: bounceCount + 1
+            bounceCount: bounceCount + 1,
+            bounceHeight: bounceHeight
           });
         }
       }
@@ -106,10 +137,14 @@ const EnhancedBall = ({
         }
       }
       
-      // Rotate ball based on movement
-      const speed = currentVel && currentVel.length ? currentVel.length() : Math.sqrt(currentVel.x**2 + currentVel.y**2 + currentVel.z**2);
-      ball.rotation.x += speed * delta * 2;
-      ball.rotation.z += speed * delta * 1.5;
+      // Enhanced ball rotation with spin effects
+      const speed = currentVel.length();
+      const horizontalSpeed = Math.sqrt(currentVel.x**2 + currentVel.z**2);
+      
+      // Add spin based on velocity components
+      ball.rotation.x += horizontalSpeed * delta * SPIN_FACTOR; // Forward rotation
+      ball.rotation.y += currentVel.x * delta * SPIN_FACTOR * 0.5; // Side spin
+      ball.rotation.z += currentVel.z * delta * SPIN_FACTOR * 0.3; // Drift spin
 
       // Update trail
       setTrail(prev => {
@@ -215,24 +250,63 @@ const EnhancedBall = ({
     }
   };
 
-  // Render trajectory line
+  // Render trajectory line and predicted path
   const renderTrajectory = () => {
-    if (!showTrajectory || trail.length < 2) return null;
+    if (!showTrajectory) return null;
 
-    const points = trail.map(pos => [pos.x, pos.y, pos.z]);
+    // Actual trail
+    const trailPoints = trail.map(pos => [pos.x, pos.y, pos.z]);
+    
+    // Predicted trajectory from bounce data
+    const bounceData = currentBall.trajectory?.bounce;
+    const predictedPoints = [];
+    
+    if (bounceData && bounceCount === 0) {
+      // Add predicted path after bounce
+      const steps = 20;
+      const timeStep = 0.05;
+      let pos = new Vector3(...bounceData.position);
+      let vel = new Vector3(...bounceData.velocity);
+      
+      for (let i = 0; i < steps; i++) {
+        predictedPoints.push([pos.x, pos.y, pos.z]);
+        pos.add(vel.clone().multiplyScalar(timeStep));
+        vel.y += GRAVITY * timeStep;
+      }
+    }
     
     return (
-      <line ref={trajectoryRef}>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={points.length}
-            array={new Float32Array(points.flat())}
-            itemSize={3}
-          />
-        </bufferGeometry>
-        <lineBasicMaterial color="#ff4444" opacity={0.6} transparent />
-      </line>
+      <group>
+        {/* Actual trail */}
+        {trail.length >= 2 && (
+          <line ref={trajectoryRef}>
+            <bufferGeometry>
+              <bufferAttribute
+                attach="attributes-position"
+                count={trailPoints.length}
+                array={new Float32Array(trailPoints.flat())}
+                itemSize={3}
+              />
+            </bufferGeometry>
+            <lineBasicMaterial color="#ff4444" opacity={0.6} transparent />
+          </line>
+        )}
+        
+        {/* Predicted path */}
+        {predictedPoints.length > 0 && (
+          <line>
+            <bufferGeometry>
+              <bufferAttribute
+                attach="attributes-position"
+                count={predictedPoints.length}
+                array={new Float32Array(predictedPoints.flat())}
+                itemSize={3}
+              />
+            </bufferGeometry>
+            <lineBasicMaterial color="#44ff44" opacity={0.4} transparent dashSize={0.2} gapSize={0.1} />
+          </line>
+        )}
+      </group>
     );
   };
 

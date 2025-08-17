@@ -1,6 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { PerspectiveCamera } from '@react-three/drei';
+import { PerspectiveCamera, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Pure function to smoothly interpolate between two Vector3 objects
@@ -27,46 +27,90 @@ const CricketCamera = ({ view, transitionSpeed = 0.05 }) => {
     }
   }, [set]);
 
+  const controlsRef = useRef();
+  const isTransitioning = useRef(false);
+  const lastManualPosition = useRef(null);
+  const lastManualTarget = useRef(null);
+
   // Update target positions when view changes
   useEffect(() => {
-    targetPosition.current = createVector3(view.position);
-    targetLookAt.current = createVector3(view.target);
+    // Only transition if it's a preset view change (not manual camera movement)
+    if (!lastManualPosition.current || !lastManualTarget.current) {
+      targetPosition.current = createVector3(view.position);
+      targetLookAt.current = createVector3(view.target);
+      isTransitioning.current = true;
+
+      // Reset transition after animation completes
+      const timeout = setTimeout(() => {
+        isTransitioning.current = false;
+      }, 1000); // Adjust based on your transition speed
+
+      return () => clearTimeout(timeout);
+    }
   }, [view]);
+
+  // Handle manual camera movement
+  useEffect(() => {
+    if (controlsRef.current) {
+      const controls = controlsRef.current;
+      
+      const handleChange = () => {
+        if (!isTransitioning.current && controls.object) {
+          lastManualPosition.current = controls.object.position.clone();
+          lastManualTarget.current = controls.target.clone();
+        }
+      };
+
+      controls.addEventListener('change', handleChange);
+      return () => controls.removeEventListener('change', handleChange);
+    }
+  }, []);
 
   // Smooth camera animation
   useFrame(() => {
-    if (cameraRef.current) {
+    if (cameraRef.current && controlsRef.current) {
       const camera = cameraRef.current;
+      const controls = controlsRef.current;
       
-      // Smoothly move camera position
-      smoothLerp(camera.position, targetPosition.current, transitionSpeed);
-      
-      // Smoothly change camera look-at target
-      const currentLookAt = new THREE.Vector3();
-      camera.getWorldDirection(currentLookAt);
-      currentLookAt.add(camera.position);
-      
-      smoothLerp(currentLookAt, targetLookAt.current, transitionSpeed);
-      camera.lookAt(currentLookAt);
-      
-      // Update camera fov smoothly
-      const targetFov = view.fov;
-      if (Math.abs(camera.fov - targetFov) > 0.1) {
-        camera.fov += (targetFov - camera.fov) * transitionSpeed;
-        camera.updateProjectionMatrix();
+      if (isTransitioning.current) {
+        // Smoothly move camera position during transitions
+        smoothLerp(camera.position, targetPosition.current, transitionSpeed);
+        smoothLerp(controls.target, targetLookAt.current, transitionSpeed);
+        controls.update();
+        
+        // Update camera fov smoothly
+        const targetFov = view.fov;
+        if (Math.abs(camera.fov - targetFov) > 0.1) {
+          camera.fov += (targetFov - camera.fov) * transitionSpeed;
+          camera.updateProjectionMatrix();
+        }
       }
     }
   });
 
   return (
-    <PerspectiveCamera
-      ref={cameraRef}
-      makeDefault
-      position={view.position}
-      fov={view.fov}
-      near={0.1}
-      far={100}
-    />
+    <>
+      <PerspectiveCamera
+        ref={cameraRef}
+        makeDefault
+        position={view.position}
+        fov={view.fov}
+        near={0.1}
+        far={100}
+      />
+      <OrbitControls
+        ref={controlsRef}
+        camera={cameraRef.current}
+        enablePan={true}
+        enableZoom={true}
+        enableRotate={true}
+        minDistance={5}
+        maxDistance={50}
+        minPolarAngle={0}
+        maxPolarAngle={Math.PI / 2}
+        target={view.target}
+      />
+    </>
   );
 };
 
