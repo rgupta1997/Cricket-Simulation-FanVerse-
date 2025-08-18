@@ -3,6 +3,7 @@ import { calculateBallTrajectory } from './CricketGameState';
 import CameraControlsDisabled from './CameraControlsDisabled';
 import DirectCoordinateControls from './DirectCoordinateControls';
 import BallShotControl from './BallShotControl';
+import ZoneMarkersToggle from './ZoneMarkersToggle';
 
 const CompactAccordion = ({ 
   gameState, 

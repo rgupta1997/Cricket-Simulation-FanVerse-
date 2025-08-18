@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 import { Text } from '@react-three/drei';
 
-// Helper function to get cricket position name
+// Helper function to get cricket position name - EXACT WAGON WHEEL MAPPING
 const getPositionName = (degree) => {
   switch (degree) {
     case 0: return 'Square Leg';

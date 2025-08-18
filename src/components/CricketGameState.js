@@ -125,12 +125,16 @@ export const createInitialGameState = () => ({
       pitch: 0
     },
     ballShot: {
-      lofted: false,       // Whether the shot is lofted or ground shot
-      degree: 0,           // Direction in degrees (0-360, 0 = straight, 90 = leg side)
-      distance: 10,        // Distance in meters
-      autoPlay: false,     // Auto-trigger shot when ball reaches batsman
-      power: 0.8,          // Shot power multiplier
-      timing: 1.0          // Timing multiplier for shot quality
+      lofted: false,              // Whether the shot is lofted or ground shot
+      degree: 0,                  // Direction in degrees (0-360, 0 = straight, 90 = leg side)
+      distance: 15,               // FINAL STOPPING DISTANCE in meters (0.1-40m): Where ball ends after physics
+      autoPlay: false,            // Auto-trigger shot when ball reaches batsman
+      power: 0.8,                 // Shot power multiplier
+      timing: 1.0,                // Timing multiplier for shot quality
+      keeperAutoCollect: true,    // Whether keeper should auto-collect balls
+      keeperCollectionRadius: 2.0, // Distance within which keeper collects (meters)
+      keeperSpeedThreshold: 3.0,  // Maximum speed for keeper to collect (m/s)
+      usePhysicsMode: true        // Use physics simulation instead of direct coordinates
     },
     batting: {
       footwork: 'front',
@@ -462,6 +466,86 @@ export const calculateBallTrajectory = (bowlingControls) => {
       }
     }
   };
+};
+
+// Calculate actual playable boundary distance from striker position [0, 0, -9]
+const calculateBoundaryDistance = (angleDegrees) => {
+  // ACTUAL PLAYABLE BOUNDARY: Inner Advertising Boundary (25.5m from center)
+  const PLAYABLE_BOUNDARY_RADIUS = 25.5; // field.radius * 0.85 (visible boundary ring in stadium)
+  const STRIKER_POS = [0, 0, -9];
+  
+  const angleRad = (angleDegrees * Math.PI) / 180;
+  const dirX = Math.cos(angleRad);
+  const dirZ = -Math.sin(angleRad); // Inverted Z for field orientation
+  
+  const strikerX = STRIKER_POS[0];
+  const strikerZ = STRIKER_POS[2];
+  
+  // Solve for intersection with playable boundary circle: (x)² + (z)² = R²
+  const a = dirX * dirX + dirZ * dirZ;
+  const b = 2 * (strikerX * dirX + strikerZ * dirZ);
+  const c = strikerX * strikerX + strikerZ * strikerZ - PLAYABLE_BOUNDARY_RADIUS * PLAYABLE_BOUNDARY_RADIUS;
+  
+  const discriminant = b * b - 4 * a * c;
+  if (discriminant < 0) return 20; // Fallback for playable area
+  
+  const t = (-b + Math.sqrt(discriminant)) / (2 * a);
+  return Math.sqrt((t * dirX) ** 2 + (t * dirZ) ** 2);
+};
+
+// Calculate where ball should land to end up at target position after physics
+const calculateLandingPositionForTarget = (targetDistance, angle) => {
+  // Physics approximation factors based on cricket ball behavior
+  const BOUNCE_ENERGY_RETENTION = 0.6;  // 60% energy after first bounce
+  const FRICTION_FACTOR = 0.85;          // 85% speed retained after ground friction
+  const AIR_RESISTANCE_FACTOR = 0.95;    // 95% speed retained due to air resistance
+  
+  // Combined physics factor (approximate)
+  const TOTAL_PHYSICS_FACTOR = BOUNCE_ENERGY_RETENTION * FRICTION_FACTOR * AIR_RESISTANCE_FACTOR;
+  // ≈ 0.6 * 0.85 * 0.95 ≈ 0.48 (ball travels ~48% further after landing)
+  
+  // Reverse calculation: if ball needs to travel X distance total,
+  // it should land at a position where remaining momentum carries it the rest
+  const momentumDistance = targetDistance * (1 - TOTAL_PHYSICS_FACTOR); // Distance from momentum/rolling
+  const initialLandingDistance = targetDistance - momentumDistance;      // Where to initially land
+  
+  return Math.max(0.1, initialLandingDistance); // Minimum 0.1m landing distance
+};
+
+// Shot vector calculation - PHYSICS-BASED FINAL POSITION SYSTEM
+export const calculateShotVector = (angle, targetDistanceMeters, elevation = 0.5, debugLabel = '') => {
+  // CRICKET FIELD ZONES FROM STRIKER POSITION [0, 0, -9]
+  const STRIKER_POSITION = [0, 0, -9];
+  
+  // Use distance as final target position (minimum 0.1m)
+  const targetDistance = Math.max(0.1, parseFloat(targetDistanceMeters));
+  
+  // Calculate where ball should initially land to reach target after physics
+  const landingDistance = calculateLandingPositionForTarget(targetDistance, angle);
+  
+  // Get boundary distance for reference
+  const boundaryDistance = calculateBoundaryDistance(angle);
+  
+  // Field-corrected trigonometry: 0°=East(+X), 90°=North(-Z to keeper), 180°=West(-X), 270°=South(+Z to bowler)
+  const rad = (angle * Math.PI) / 180;
+  
+  // Calculate initial landing vector from striker position (for physics simulation)
+  const landingX = Math.cos(rad) * landingDistance;   // East-West direction
+  const landingZ = -Math.sin(rad) * landingDistance;  // INVERTED: 90°=-Z(keeper), 270°=+Z(bowler)
+  
+  // Calculate target final position from striker
+  const targetX = Math.cos(rad) * targetDistance;
+  const targetZ = -Math.sin(rad) * targetDistance;
+  const finalTargetX = STRIKER_POSITION[0] + targetX;
+  const finalTargetZ = STRIKER_POSITION[2] + targetZ;
+  
+  // Log with physics calculation information
+  const label = debugLabel ? `${debugLabel} ` : '';
+  const percentageOfBoundary = ((targetDistance / boundaryDistance) * 100).toFixed(1);
+  console.log(`${label}PHYSICS SHOT: ${angle}° → Target: ${targetDistance.toFixed(1)}m | Landing: ${landingDistance.toFixed(1)}m | Final Target: [${finalTargetX.toFixed(1)}, ${finalTargetZ.toFixed(1)}] (${percentageOfBoundary}% of boundary)`);
+  
+  // Return landing position vector for physics simulation to take over
+  return [landingX, elevation, landingZ];
 };
 
 // Batting response calculations

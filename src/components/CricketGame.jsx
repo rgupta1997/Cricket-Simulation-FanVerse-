@@ -5,6 +5,7 @@ import {
   updateGameState, 
   calculateBallTrajectory,
   calculateBattingResponse,
+  calculateShotVector,
   findNearestFielder,
   GAME_STATES,
   PLAYER_STATES,
@@ -33,6 +34,7 @@ import {
 } from '../constants/playerPositions';
 import { STADIUM_CONFIG } from '../constants/cameraViews';
 import { defaultPositionManager } from '../utils/positionManager';
+import ZoneMarkers from './ZoneMarkers';
 
 // Physics constants for cricket ball
 const GRAVITY = -9.81; // Real world gravity (m/s²)
@@ -56,6 +58,7 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
 
   // Pitch guide visibility states
   const [showPitchMarkers, setShowPitchMarkers] = useState(true);
+  const [showZoneMarkers, setShowZoneMarkers] = useState(false);
   const [showCoordinateDisplay, setShowCoordinateDisplay] = useState(true);
   const [showPitchGrid, setShowPitchGrid] = useState(true);
   const [useCompactUI, setUseCompactUI] = useState(true); // Toggle between full and compact UI
@@ -227,39 +230,6 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     console.log('✅ Batting successful! Direction:', selectedShotDirection, 'Shot Type:', selectedShotType, 'Timing Power:', timingPower);
     console.log('🎯 Shot executed with timing-based power!');
 
-    // Calculate shot direction based on angle (8-directional system)
-    // Shot vectors are calculated from striker position, not field center
-    const calculateShotVector = (angle, power, elevation = 0.5) => {
-      // Get current striker position
-      const strikerPos = currentPlayerPositions?.striker?.position || [0, 0, -9];
-      
-      // Hybrid coordinate transformation to align with WagonWheel
-      let adjustedAngle;
-      
-      // Special handling for different angle ranges
-      if (angle === 0 || angle === 180) {
-        // Use new logic for 0° and 180° (working correctly)
-        adjustedAngle = angle + 90;
-      } else if (angle === 90 || angle === 270) {
-        // Use old logic for 90° and 270° (was working before)
-        adjustedAngle = angle - 90;
-      } else {
-        // Use new logic for other angles
-        adjustedAngle = angle + 90;
-      }
-      
-      const rad = (adjustedAngle * Math.PI) / 180;
-      const basePower = power || 15;
-      
-      // Calculate X and Z components for cricket field (aligned with wagon wheel, from striker position)
-      const x = Math.sin(rad) * basePower;
-      const z = -Math.cos(rad) * basePower;
-      
-      console.log(`Manual shot calculation: Input angle: ${angle}°, Adjusted angle: ${adjustedAngle}°, Power: ${basePower}, Striker: [${strikerPos.join(', ')}], Shot vector: [${x.toFixed(2)}, ${elevation}, ${z.toFixed(2)}]`);
-      
-      return [x, elevation, z];
-    };
-
     // Shot direction now uses live shotAngle from arrow keys - no static mapping needed
 
     // Map shot types to elevation and power modifiers
@@ -276,7 +246,7 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     const shotModifier = shotTypeModifiers[selectedShotType] || shotTypeModifiers['drive'];
     const elevation = shotModifier.elevation;
     const adjustedPower = timingPower * shotModifier.powerMultiplier;
-    const shotDirection = calculateShotVector(angle, adjustedPower, elevation);
+    const shotDirection = calculateShotVector(angle, adjustedPower, elevation, '🎯');
     
     console.log('🏏 EXECUTING SHOT:', selectedShotDirection, 'Type:', selectedShotType, 'Live Angle:', angle, '° Direction:', shotDirection);
     
@@ -379,10 +349,10 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       }));
     } else if (catchData.type === 'collect') {
       if (catchData.playerId === 'wicket_keeper') {
-        // Ball returned to keeper
-        setGameState(prevState => updateGameState(prevState, {
-          type: 'BALL_WITH_KEEPER'
-        }));
+      // Ball returned to keeper
+      setGameState(prevState => updateGameState(prevState, {
+        type: 'BALL_WITH_KEEPER'
+      }));
       } else if (catchData.playerId === 'bowler' || catchData.reason === 'reset_to_bowler') {
         // Ball reset to bowler (for boundary, max distance, etc.)
         resetBallToBowler(catchData.reason || 'reset_to_bowler');
@@ -431,39 +401,6 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
           const distance = distanceZ;
           const timingPower = Math.max(8, Math.min(25, 25 - (distance * 4)));
           
-          // Calculate shot direction based on ball shot config degree
-          // Shot vectors are calculated from striker position, not field center
-          const calculateShotVector = (angle, power, elevation = 0.5) => {
-            // Get current striker position
-            const strikerPos = currentPlayerPositions?.striker?.position || [0, 0, -9];
-            
-            // Hybrid coordinate transformation to align with WagonWheel
-            let adjustedAngle;
-            
-            // Special handling for different angle ranges
-            if (angle === 0 || angle === 180) {
-              // Use new logic for 0° and 180° (working correctly)
-              adjustedAngle = angle + 90;
-            } else if (angle === 90 || angle === 270) {
-              // Use old logic for 90° and 270° (was working before)
-              adjustedAngle = angle - 90;
-            } else {
-              // Use new logic for other angles
-              adjustedAngle = angle + 90;
-            }
-            
-            const rad = (adjustedAngle * Math.PI) / 180;
-            const basePower = power || 15;
-            
-            // Calculate X and Z components for cricket field (aligned with wagon wheel, from striker position)
-            const x = Math.sin(rad) * basePower;
-            const z = -Math.cos(rad) * basePower;
-            
-            console.log(`Auto shot calculation: Input angle: ${angle}°, Adjusted angle: ${adjustedAngle}°, Power: ${basePower}, Striker: [${strikerPos.join(', ')}], Shot vector: [${x.toFixed(2)}, ${elevation}, ${z.toFixed(2)}]`);
-            
-            return [x, elevation, z];
-          };
-          
           // Use ball shot configuration
           const angle = ballShotConfig.degree || 0;
           const power = ballShotConfig.power || 0.8;
@@ -471,7 +408,7 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
           const elevation = isLofted ? 8.0 : 0.5;
           
           const adjustedPower = Math.max(15, timingPower * power); // Ensure minimum power of 15
-          const shotDirection = calculateShotVector(angle, adjustedPower, elevation);
+          const shotDirection = calculateShotVector(angle, adjustedPower, elevation, '🤖 AUTO');
           const scaledVelocity = shotDirection.map(v => v * Math.max(1.0, adjustedPower / 15)); // Ensure minimum velocity
           
           console.log('🤖 AUTO SHOT CALCULATION:');
@@ -513,7 +450,7 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         }, 100); // Small delay to ensure state is updated
       } else {
         // Manual batting mode
-        console.log('🎯 BATTING WINDOW OPEN - Press D/F/G/H/V to hit!');
+      console.log('🎯 BATTING WINDOW OPEN - Press D/F/G/H/V to hit!');
       }
     } else if (targetData.target === 'final_coordinate') {
       // Ball reached final coordinate in direct coordinate mode - reset for next ball
@@ -539,7 +476,7 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     }
   }, [gameState.controls.ballShot]); // Add ballShot config to dependencies
 
-  // Advanced 8-directional shot selection - Only active when position editor is NOT open
+  // Direct compass shot selection - NO intermediate logic
   useEffect(() => {
     // Skip shot direction handling if position editor is active
     if (isPositionEditorActive) {
@@ -552,33 +489,33 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     const left = keysPressed.has('arrowleft');
     const right = keysPressed.has('arrowright');
     
-    let newDirection = 'straight';
-    let newAngle = 0; // Straight is now 0°
+    let newDirection = 'east';
+    let newAngle = 0; // East = 0°
     
     if (up && right) {
-      newDirection = 'glance';
-      newAngle = 135;  // Up-Right = Glance (was 45°, now towards bowler side)
+      newDirection = 'northeast';
+      newAngle = 45;   // Up-Right = NE (45°)
     } else if (down && right) {
-      newDirection = 'cover';
-      newAngle = 45;  // Down-Right = Covers (was 135°, now towards keeper side)
+      newDirection = 'southeast';
+      newAngle = 315;  // Down-Right = SE (315°)
     } else if (down && left) {
-      newDirection = 'onside';
-      newAngle = 315;  // Down-Left = On side (was 225°, now towards keeper side)
+      newDirection = 'southwest';
+      newAngle = 225;  // Down-Left = SW (225°)
     } else if (up && left) {
-      newDirection = 'pull';
-      newAngle = 225;  // Up-Left = Pull (was 315°, now towards bowler side) 
+      newDirection = 'northwest';
+      newAngle = 135;  // Up-Left = NW (135°)
     } else if (up) {
-      newDirection = 'defensive';
-      newAngle = 180;  // Up = Defence (towards bowler)
+      newDirection = 'north';
+      newAngle = 90;   // Up = North (90°) - Keeper
     } else if (right) {
-      newDirection = 'point';
-      newAngle = 90;  // Right = Point (right side)
+      newDirection = 'east';
+      newAngle = 0;    // Right = East (0°)
     } else if (down) {
-      newDirection = 'straight';
-      newAngle = 0;  // Down = Straight (towards keeper) - 0°
+      newDirection = 'south';
+      newAngle = 270;  // Down = South (270°) - Bowler
     } else if (left) {
-      newDirection = 'midwicket';
-      newAngle = 270;  // Left = Midwicket (left side)
+      newDirection = 'west';
+      newAngle = 180;  // Left = West (180°)
     }
     
     setSelectedShotDirection(newDirection);
@@ -760,13 +697,15 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         setShowCoordinateDisplay,
         showPitchGrid,
         setShowPitchGrid,
+        showZoneMarkers,
+        setShowZoneMarkers,
         currentView,
         switchToView
       });
     }
   }, [
     gameState, selectedControl, isPlaying, selectedShotDirection, selectedShotType, shotAngle,
-    useCompactUI, showPitchMarkers, showCoordinateDisplay, showPitchGrid, currentView,
+    useCompactUI, showPitchMarkers, showCoordinateDisplay, showPitchGrid, showZoneMarkers, currentView,
     onGameStateChange
   ]);
 
@@ -854,6 +793,16 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
           bowlingControls={gameState.controls.bowling}
           showCoordinates={false}
           showGrid={showPitchGrid}
+        />
+      )}
+
+      {/* Zone Markers for Shot Distance Visualization */}
+      {showZoneMarkers && (
+        <ZoneMarkers 
+          visible={showZoneMarkers}
+          strikerPosition={[0, 0, -9]}
+          currentDistance={gameState.controls.ballShot.distance}
+          currentAngle={gameState.controls.ballShot.degree}
         />
       )}
 

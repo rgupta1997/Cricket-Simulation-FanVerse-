@@ -259,15 +259,18 @@ const EnhancedBall = ({
         
         console.log('📏 Shot distance traveled:', currentDistance.toFixed(2), 'Max:', maxDistance);
         
-        // Check reset conditions for shots
-        if (currentDistance >= maxDistance) {
-          console.log('🎯 Ball reached maximum distance:', maxDistance, 'm - resetting to bowler');
+        // Check if ball reached target final distance and stopped
+        const ballSpeed = currentVel.length();
+        const isNearlyStoppedAtTarget = ballSpeed < 0.5 && currentDistance >= maxDistance * 0.9; // Within 90% of target and slow
+        
+        if (isNearlyStoppedAtTarget || currentDistance >= maxDistance * 1.2) { // Stop if very close to target or overshot significantly
+          console.log('🎯 Ball reached target distance:', maxDistance, 'm at distance:', currentDistance.toFixed(2), 'speed:', ballSpeed.toFixed(2));
           if (onCatch) {
             onCatch({
               type: 'collect',
               playerId: 'bowler',
               position: currentPos.toArray(),
-              reason: 'max_distance_reached'
+              reason: 'target_distance_reached'
             });
           }
           return;
@@ -319,20 +322,39 @@ const EnhancedBall = ({
         });
       }
 
-      // Check if ball has stopped moving (auto-reset to keeper)
+      // Check if ball has stopped moving (auto-reset appropriate player)
       if (currentVel.length() < 0.1 && currentPos.y <= GROUND_LEVEL + 0.1) {
-        console.log('🔄 Ball stopped moving at:', currentPos.toArray(), 'velocity:', currentVel.length(), 'returning to keeper automatically');
-        console.log('🔄 Ball state before reset:', ballState, 'Game will be reset to WAITING_FOR_BALL');
-        if (onCatch) {
-          onCatch({
-            type: 'collect',
-            playerId: 'wicket_keeper',
-            position: currentPos.toArray(),
-            reason: 'ball_stopped'
-          });
+          console.log('🔄 Ball stopped moving at:', currentPos.toArray(), 'velocity:', currentVel.length());
+          
+          // Determine who should collect based on ball's final position
+          const ballZ = currentPos.z;
+          let collector = 'wicket_keeper';
+          let collectorPosition = [0, 0.5, -11];
+          
+          if (ballZ > -5) {
+            // Ball stopped in front area - bowler collects
+            collector = 'bowler';
+            collectorPosition = [0, 0.5, 15];
+            console.log('🏃 Ball stopped in front area - bowler will collect');
+          } else if (ballZ < -15) {
+            // Ball stopped far behind wicket - nearest fielder should collect, but for now use bowler
+            collector = 'bowler';
+            collectorPosition = [0, 0.5, 15];
+            console.log('🏃 Ball stopped far behind wicket - bowler will collect');
+          } else {
+            console.log('🧤 Ball stopped near wicket - keeper will collect');
+          }
+          
+          if (onCatch) {
+            onCatch({
+              type: 'collect',
+              playerId: collector,
+              position: currentPos.toArray(),
+              reason: 'ball_stopped'
+            });
+          }
+          return; // Stop further processing
         }
-        return; // Stop further processing
-      }
 
       // Check for catch or pickup
       checkForFielderInteraction(currentPos, currentVel);
@@ -418,7 +440,7 @@ const EnhancedBall = ({
     
     // Ball reaching boundary
     const boundaryDistance = Math.sqrt(ballPos.x ** 2 + ballPos.z ** 2);
-    if (boundaryDistance > 25) {
+    if (boundaryDistance > 25.5) { // Actual playable boundary (inner advertising boundary)
       console.log('🏟️ Ball reached boundary - resetting to bowler');
       onReachTarget({
         target: 'boundary',
@@ -440,13 +462,23 @@ const EnhancedBall = ({
       return;
     }
     
-    // Ball reaching wicket keeper (for shots)
+    // Ball reaching wicket keeper (for shots) - USER CONTROLLED
     if (ballState === 'hit') {
       const keeperPos = new Vector3(0, 0, -11); // Wicket keeper position
       const distanceToKeeper = ballPos.distanceTo(keeperPos);
+      const ballSpeed = ballVel.length();
       
-      if (distanceToKeeper < 2.0) {
-        console.log('🧤 Ball reached wicket keeper - resetting to bowler');
+      // Get user-defined keeper collection settings
+      const ballShotConfig = gameState.controls?.ballShot;
+      const keeperAutoCollect = ballShotConfig?.keeperAutoCollect ?? true;
+      const keeperCollectionRadius = ballShotConfig?.keeperCollectionRadius ?? 2.0;
+      const keeperSpeedThreshold = ballShotConfig?.keeperSpeedThreshold ?? 3.0;
+      
+      console.log(`🧤 Keeper check: AutoCollect=${keeperAutoCollect}, Distance=${distanceToKeeper.toFixed(1)}m (limit: ${keeperCollectionRadius}m), Speed=${ballSpeed.toFixed(1)}m/s (limit: ${keeperSpeedThreshold}m/s)`);
+      
+      // USER CONTROLLED: Only collect if auto-collect is enabled AND within user-defined limits
+      if (keeperAutoCollect && distanceToKeeper < keeperCollectionRadius && ballSpeed < keeperSpeedThreshold) {
+        console.log('🧤 Ball collected by keeper - within user-defined collection parameters');
         if (onCatch) {
           onCatch({
             type: 'collect',
@@ -466,6 +498,12 @@ const EnhancedBall = ({
           }, 1000);
         }
         return;
+      } else if (distanceToKeeper < keeperCollectionRadius) {
+        if (keeperAutoCollect) {
+          console.log(`🏃 Ball too fast (${ballSpeed.toFixed(1)} > ${keeperSpeedThreshold}) - continuing past keeper`);
+        } else {
+          console.log('🏃 Keeper auto-collect disabled - ball continuing to full distance');
+        }
       }
     }
   };
