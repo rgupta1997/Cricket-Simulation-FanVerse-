@@ -185,7 +185,7 @@ const Players = ({ use3DModel = false }) => {
       <Bowler position={positions.bowler} />
       
       {/* Wicket Keeper */}
-      <WicketKeeper position={positions.wicketKeeper} />
+      {/* <WicketKeeper position={positions.wicketKeeper} /> */}
       
       {/* Umpires */}
       <Umpire position={positions.umpire} />

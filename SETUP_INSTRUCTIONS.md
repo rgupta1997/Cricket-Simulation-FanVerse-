@@ -59,6 +59,7 @@ npm run dev
 | **5** | Right View |
 | **6** | Center View |
 | **C** | Toggle Stadium Model |
+| **W** | Toggle Wagon Wheel Overlay |
 
 ## How to Play
 

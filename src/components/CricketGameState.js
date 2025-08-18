@@ -124,6 +124,14 @@ export const createInitialGameState = () => ({
       length: 0,
       pitch: 0
     },
+    ballShot: {
+      lofted: false,       // Whether the shot is lofted or ground shot
+      degree: 0,           // Direction in degrees (0-360, 0 = straight, 90 = leg side)
+      distance: 10,        // Distance in meters
+      autoPlay: false,     // Auto-trigger shot when ball reaches batsman
+      power: 0.8,          // Shot power multiplier
+      timing: 1.0          // Timing multiplier for shot quality
+    },
     batting: {
       footwork: 'front',
       shot: 'defensive',

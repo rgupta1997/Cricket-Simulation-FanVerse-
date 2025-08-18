@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { calculateBallTrajectory } from './CricketGameState';
 import CameraControlsDisabled from './CameraControlsDisabled';
 import DirectCoordinateControls from './DirectCoordinateControls';
+import BallShotControl from './BallShotControl';
 
 const CompactAccordion = ({ 
   gameState, 
   onBowlingConfigUpdate,
+  onBallShotConfigUpdate,
+  resetBallToBowler,
   showPitchMarkers,
   setShowPitchMarkers,
   showCoordinateDisplay,
@@ -26,6 +29,7 @@ const CompactAccordion = ({
     { id: 'xyz', label: '🎯', title: 'X,Y,Z' },
     { id: 'analysis', label: '📊', title: 'Analysis' },
     { id: 'coordinates', label: '📐', title: 'Coords' },
+    { id: 'ballShot', label: '🏏', title: 'Shot' },
     { id: 'camera', label: '📹', title: 'Camera' },
     { id: 'guides', label: '👁️', title: 'Guides' }
   ];
@@ -95,7 +99,6 @@ const CompactAccordion = ({
           <button 
             onClick={() => setIsMinimized(true)}
             style={{
-              background: 'none',
               border: 'none',
               color: '#000',
               cursor: 'pointer',
@@ -254,6 +257,15 @@ const CompactAccordion = ({
                 </div>
               ))}
             </div>
+          )}
+
+          {activeTab === 'ballShot' && (
+            <BallShotControl 
+              onUpdateConfig={onBallShotConfigUpdate}
+              currentConfig={gameState.controls.ballShot}
+              gameState={gameState}
+              onResetBall={resetBallToBowler}
+            />
           )}
 
           {activeTab === 'camera' && (

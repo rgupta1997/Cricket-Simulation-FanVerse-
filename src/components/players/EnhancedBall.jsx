@@ -14,6 +14,8 @@ const EnhancedBall = ({
   const trajectoryRef = useRef();
   const [trail, setTrail] = useState([]);
   const [bounceCount, setBounceCount] = useState(0);
+  const [shotStartPosition, setShotStartPosition] = useState(null); // Track where shot started
+  const [distanceTraveled, setDistanceTraveled] = useState(0); // Track distance from shot start
   
   // Direct coordinate movement state
   const [currentWaypoint, setCurrentWaypoint] = useState(0); // 0=release, 1=bounce, 2=final
@@ -39,12 +41,27 @@ const EnhancedBall = ({
       setPhysicsMode(false);
       setTrajectoryStartTime(Date.now());
       setBounceCount(0);
+      
+      // Check if this is a shot (ball state is 'hit')
+      if (ballState === 'hit') {
+        setShotStartPosition(new Vector3(...position));
+        setDistanceTraveled(0);
+        console.log('🏏 Shot started from position:', position);
+      }
+      
       console.log('🎯 Starting direct coordinate trajectory mode');
     } else if (!isMoving) {
+      // Ball stopped - reset trajectory state completely
       setTrajectoryStartTime(null);
       setPhysicsMode(false);
+      setCurrentWaypoint(0);
+      setTrajectoryProgress(0);
+      setBounceCount(0);
+      setShotStartPosition(null);
+      setDistanceTraveled(0);
+      console.log('🔄 Ball stopped - resetting trajectory state');
     }
-  }, [isMoving, trajectoryStartTime]);
+  }, [isMoving, trajectoryStartTime, ballState, position]);
 
   useFrame((state, delta) => {
     if (!ballRef.current || !isMoving) return;
@@ -62,13 +79,20 @@ const EnhancedBall = ({
         new Vector3(...trajectory.target.position)     // Final
       ];
       
+      // Check if trajectory is complete (reached all waypoints)
+      if (currentWaypoint >= waypoints.length - 1) {
+        // Trajectory complete - ball should remain at final position
+        const finalPosition = waypoints[waypoints.length - 1];
+        ball.position.copy(finalPosition);
+        return; // Stop all movement - no physics mode
+      }
+      
       if (currentWaypoint < waypoints.length - 1) {
         // Move between current waypoint and next waypoint
         const startPoint = waypoints[currentWaypoint];
         const endPoint = waypoints[currentWaypoint + 1];
         
-        // Calculate movement speed based on distance and desired timing
-        const distance = startPoint.distanceTo(endPoint);
+        // Calculate movement speed based on desired timing
         const segmentDuration = currentWaypoint === 0 ? 1.0 : 0.8; // Release->Bounce: 1s, Bounce->Final: 0.8s
         const moveSpeed = 1 / segmentDuration; // Progress per second
         
@@ -92,9 +116,11 @@ const EnhancedBall = ({
               }
               setBounceCount(1);
             } else if (currentWaypoint === 1) {
-              // Reached final point - enable physics mode
-              console.log('🎯 Reached final coordinate, enabling physics mode');
-              setPhysicsMode(true);
+              // Reached final point - STOP the ball (don't enable physics mode for direct coordinates)
+              console.log('🎯 Reached final coordinate, stopping ball (direct coordinate mode)');
+              
+              // Stop the ball completely at final coordinate
+              ball.position.copy(endPoint);
               
               if (onReachTarget) {
                 onReachTarget({
@@ -104,6 +130,10 @@ const EnhancedBall = ({
                   distance: 0
                 });
               }
+              
+              // Mark trajectory as complete - no physics mode activation
+              setCurrentWaypoint(prev => prev + 1); // This will stop trajectory movement
+              return; // Exit early to prevent further movement
             }
             
             setCurrentWaypoint(prev => prev + 1);
@@ -122,6 +152,10 @@ const EnhancedBall = ({
           const newTrail = [...prev, currentPos.clone()];
           return newTrail.slice(-20);
         });
+        
+        // Check for batsman interaction in direct coordinate mode too
+        const dummyVelocity = new Vector3(0, 0, 0); // Create Vector3 object instead of array
+        checkTargetReached(currentPos, dummyVelocity);
         
         // Log progress occasionally  
         if (Math.random() < 0.1) {
@@ -214,6 +248,32 @@ const EnhancedBall = ({
       // Update ball position
       ball.position.copy(currentPos);
       
+      // Track distance traveled for shots
+      if (ballState === 'hit' && shotStartPosition) {
+        const currentDistance = currentPos.distanceTo(shotStartPosition);
+        setDistanceTraveled(currentDistance);
+        
+        // Get ball shot configuration to check max distance
+        const ballShotConfig = gameState.controls?.ballShot;
+        const maxDistance = ballShotConfig?.distance || 30; // Default 30 meters if not set
+        
+        console.log('📏 Shot distance traveled:', currentDistance.toFixed(2), 'Max:', maxDistance);
+        
+        // Check reset conditions for shots
+        if (currentDistance >= maxDistance) {
+          console.log('🎯 Ball reached maximum distance:', maxDistance, 'm - resetting to bowler');
+          if (onCatch) {
+            onCatch({
+              type: 'collect',
+              playerId: 'bowler',
+              position: currentPos.toArray(),
+              reason: 'max_distance_reached'
+            });
+          }
+          return;
+        }
+      }
+      
       // Update game state with new position and velocity
       if (onBounce) {
         onBounce({
@@ -261,12 +321,14 @@ const EnhancedBall = ({
 
       // Check if ball has stopped moving (auto-reset to keeper)
       if (currentVel.length() < 0.1 && currentPos.y <= GROUND_LEVEL + 0.1) {
-        console.log('🔄 Ball stopped moving at:', currentPos.toArray(), 'returning to keeper automatically');
+        console.log('🔄 Ball stopped moving at:', currentPos.toArray(), 'velocity:', currentVel.length(), 'returning to keeper automatically');
+        console.log('🔄 Ball state before reset:', ballState, 'Game will be reset to WAITING_FOR_BALL');
         if (onCatch) {
           onCatch({
             type: 'collect',
             playerId: 'wicket_keeper',
-            position: currentPos.toArray()
+            position: currentPos.toArray(),
+            reason: 'ball_stopped'
           });
         }
         return; // Stop further processing
@@ -326,22 +388,30 @@ const EnhancedBall = ({
     if (!onReachTarget) return;
 
     // Check various target conditions
-    const { players } = gameState;
     
     // Ball reaching batsman (for bowling)
     if (ballState === 'bowling') {
-      const batsmanPos = new Vector3(0, 0, -10); // Striker position at wicket
-      const distance = ballPos.distanceTo(batsmanPos);
+      const strikerPos = new Vector3(0, 0, -9); // Striker position at wicket
       
-      console.log('🎯 Ball distance to striker:', distance.toFixed(2), 'Ball pos:', ballPos.toArray());
+      // Calculate distance primarily based on Z-axis (ignore Y and X for now as requested)
+      const ballZ = ballPos.z;
+      const strikerZ = strikerPos.z;
+      const distanceZ = Math.abs(ballZ - strikerZ); // Z-axis distance only
       
-      if (distance < 4.0) { // Increased detection radius
-        console.log('⚾ Ball in batting range! Distance:', distance);
+      // Also calculate full 3D distance for reference
+      const fullDistance = ballPos.distanceTo(strikerPos);
+      
+      console.log('🎯 Ball Z-axis distance to striker:', distanceZ.toFixed(2), 'Full distance:', fullDistance.toFixed(2), 'Ball Z:', ballZ.toFixed(2), 'Striker Z:', strikerZ);
+      
+      // Trigger when ball is within 2 meters on Z-axis (approaching striker)
+      if (distanceZ <= 2.0 && ballZ > strikerZ) { // Ball must be approaching from bowler's end
+        console.log('⚾ Ball in batting range! Z-distance:', distanceZ.toFixed(2));
         onReachTarget({
           target: 'batsman',
           position: ballPos.toArray(),
           velocity: ballVel.toArray(),
-          distance: distance
+          distance: distanceZ, // Pass Z-axis distance
+          fullDistance: fullDistance // Pass full distance for reference
         });
       }
     }
@@ -349,11 +419,54 @@ const EnhancedBall = ({
     // Ball reaching boundary
     const boundaryDistance = Math.sqrt(ballPos.x ** 2 + ballPos.z ** 2);
     if (boundaryDistance > 25) {
+      console.log('🏟️ Ball reached boundary - resetting to bowler');
       onReachTarget({
         target: 'boundary',
         position: ballPos.toArray(),
         runs: ballPos.y > 1 ? 6 : 4
       });
+      
+      // Reset ball to bowler after boundary
+      if (onCatch) {
+        setTimeout(() => {
+          onCatch({
+            type: 'collect',
+            playerId: 'bowler',
+            position: ballPos.toArray(),
+            reason: 'boundary_reached'
+          });
+        }, 2000); // 2 second delay to show boundary
+      }
+      return;
+    }
+    
+    // Ball reaching wicket keeper (for shots)
+    if (ballState === 'hit') {
+      const keeperPos = new Vector3(0, 0, -11); // Wicket keeper position
+      const distanceToKeeper = ballPos.distanceTo(keeperPos);
+      
+      if (distanceToKeeper < 2.0) {
+        console.log('🧤 Ball reached wicket keeper - resetting to bowler');
+        if (onCatch) {
+          onCatch({
+            type: 'collect',
+            playerId: 'wicket_keeper',
+            position: ballPos.toArray(),
+            reason: 'keeper_collected'
+          });
+          
+          // Then reset to bowler
+          setTimeout(() => {
+            onCatch({
+              type: 'collect',
+              playerId: 'bowler',
+              position: [0, 0.5, 15], // Bowler position
+              reason: 'reset_to_bowler'
+            });
+          }, 1000);
+        }
+        return;
+      }
     }
   };
 

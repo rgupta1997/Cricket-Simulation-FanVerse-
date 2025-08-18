@@ -9,6 +9,8 @@ const RightDockedPanel = ({
   setUseCompactUI,
   gameState,
   handleBowlingConfigUpdate,
+  handleBallShotConfigUpdate,
+  resetBallToBowler,
   showPitchMarkers,
   setShowPitchMarkers,
   showCoordinateDisplay,
@@ -120,6 +122,8 @@ const RightDockedPanel = ({
           <CompactAccordion 
             gameState={gameState}
             onBowlingConfigUpdate={handleBowlingConfigUpdate}
+            onBallShotConfigUpdate={handleBallShotConfigUpdate}
+            resetBallToBowler={resetBallToBowler}
             showPitchMarkers={showPitchMarkers}
             setShowPitchMarkers={setShowPitchMarkers}
             showCoordinateDisplay={showCoordinateDisplay}
@@ -133,6 +137,7 @@ const RightDockedPanel = ({
           <CricketUIAccordion 
             gameState={gameState}
             onBowlingConfigUpdate={handleBowlingConfigUpdate}
+            onBallShotConfigUpdate={handleBallShotConfigUpdate}
             showPitchMarkers={showPitchMarkers}
             setShowPitchMarkers={setShowPitchMarkers}
             showCoordinateDisplay={showCoordinateDisplay}

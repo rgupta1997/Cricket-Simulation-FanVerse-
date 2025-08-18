@@ -28,7 +28,7 @@ export const CORE_PLAYER_POSITIONS = {
   WICKET_KEEPER: {
     id: 'wicket_keeper',
     name: 'Wicket Keeper',
-    position: [0, 0, -12],
+    position: [0, -0.7, -12],
     role: 'fielding',
     description: 'Behind the stumps'
   }

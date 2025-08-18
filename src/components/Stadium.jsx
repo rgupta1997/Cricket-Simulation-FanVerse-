@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { STADIUM_CONFIG, COLORS } from '../constants/cameraViews';
 import CricketGame from './CricketGame';
 import StadiumModel from './StadiumModel';
+import WagonWheel from './WagonWheel';
 
 // Pure component for the main field with realistic grass texture
 const Field = ({ radius, height, color }) => (
@@ -433,8 +434,9 @@ const StadiumSeating = () => {
 const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorActive = false }) => {
   const { field, pitch } = STADIUM_CONFIG;
   const [useCustomModel, setUseCustomModel] = useState(false);
+  const [showWagonWheel, setShowWagonWheel] = useState(false);
   
-  console.log("Stadium rendering, useCustomModel:", useCustomModel);
+  console.log("Stadium rendering, useCustomModel:", useCustomModel, "showWagonWheel:", showWagonWheel);
 
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -446,11 +448,17 @@ const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorAc
           window.dispatchEvent(new Event('resize'));
         }, 100);
       }
+      
+      // Add 'W' key to toggle wagon wheel
+      if (event.key.toLowerCase() === 'w') {
+        setShowWagonWheel(prev => !prev);
+        console.log('Toggled wagon wheel:', !showWagonWheel ? 'ON' : 'OFF');
+      }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [useCustomModel]);
+  }, [useCustomModel, showWagonWheel]);
   
   return (
     <group>
@@ -505,6 +513,13 @@ const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorAc
           </mesh>
         </>
       )}
+      
+      {/* Wagon Wheel Overlay (shown in both stadium modes) */}
+      <WagonWheel 
+        radius={field.radius * 0.9} 
+        visible={showWagonWheel}
+        strikerPosition={currentPlayerPositions?.striker?.position || [0, 0, -9]}
+      />
       
       {/* Cricket Game (shown in both stadium modes) */}
       <CricketGame 

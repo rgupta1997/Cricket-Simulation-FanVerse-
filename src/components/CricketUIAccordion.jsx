@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import BowlingConfigPanel from './BowlingConfigPanel';
+import BallShotControl from './BallShotControl';
 import CoordinateDisplay from './CoordinateDisplay';
 import DeliveryInfo from './DeliveryInfo';
 import CameraControlsDisabled from './CameraControlsDisabled';
@@ -61,6 +62,7 @@ const AccordionSection = ({ title, children, isOpen, onToggle, icon, color = '#F
 const CricketUIAccordion = ({ 
   gameState, 
   onBowlingConfigUpdate,
+  onBallShotConfigUpdate,
   showPitchMarkers,
   setShowPitchMarkers,
   showCoordinateDisplay,
@@ -77,7 +79,8 @@ const CricketUIAccordion = ({
     coordinates: false,
     camera: false,
     guides: false,
-    ballTrajectory: false
+    ballTrajectory: false,
+    ballShot: true  // Set to true to show by default
   });
 
   const toggleSection = (section) => {
@@ -314,6 +317,21 @@ const CricketUIAccordion = ({
                 </div>
               </div>
             </div>
+          </AccordionSection>
+
+          {/* Ball Shot Control Section */}
+          <AccordionSection
+            title="Ball Shot Control"
+            icon="🏏"
+            color="#FF6B35"
+            isOpen={openSections.ballShot}
+            onToggle={() => toggleSection('ballShot')}
+          >
+            <BallShotControl 
+              onUpdateConfig={onBallShotConfigUpdate}
+              currentConfig={gameState.controls.ballShot}
+              gameState={gameState}
+            />
           </AccordionSection>
 
           {/* Camera Controls Section */}

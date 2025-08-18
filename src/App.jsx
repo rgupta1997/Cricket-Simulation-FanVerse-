@@ -130,6 +130,8 @@ const App = () => {
           setUseCompactUI={cricketUIData.setUseCompactUI}
           gameState={cricketUIData.gameState}
           handleBowlingConfigUpdate={cricketUIData.handleBowlingConfigUpdate}
+          handleBallShotConfigUpdate={cricketUIData.handleBallShotConfigUpdate}
+          resetBallToBowler={cricketUIData.resetBallToBowler}
           showPitchMarkers={cricketUIData.showPitchMarkers}
           setShowPitchMarkers={cricketUIData.setShowPitchMarkers}
           showCoordinateDisplay={cricketUIData.showCoordinateDisplay}
