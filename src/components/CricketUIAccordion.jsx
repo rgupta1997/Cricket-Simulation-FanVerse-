@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import BowlingConfigPanel from './BowlingConfigPanel';
 import BallShotControl from './BallShotControl';
 import CoordinateDisplay from './CoordinateDisplay';
 import DeliveryInfo from './DeliveryInfo';
 import CameraControlsDisabled from './CameraControlsDisabled';
-import DirectCoordinateControls from './DirectCoordinateControls';
 import { calculateBallTrajectory } from './CricketGameState';
 
 const AccordionSection = ({ title, children, isOpen, onToggle, icon, color = '#FFD700' }) => {
@@ -61,7 +59,6 @@ const AccordionSection = ({ title, children, isOpen, onToggle, icon, color = '#F
 
 const CricketUIAccordion = ({ 
   gameState, 
-  onBowlingConfigUpdate,
   onBallShotConfigUpdate,
   showPitchMarkers,
   setShowPitchMarkers,
@@ -70,17 +67,27 @@ const CricketUIAccordion = ({
   showPitchGrid,
   setShowPitchGrid,
   currentCameraView,
-  onCameraViewChange
+  onCameraViewChange,
+  playShot // Add playShot function prop
 }) => {
   const [openSections, setOpenSections] = useState({
-    config: true,
-    xyz: false,
+    playBall: true,  // New section, open by default
     analysis: false,
     coordinates: false,
     camera: false,
     guides: false,
     ballTrajectory: false,
-    ballShot: true  // Set to true to show by default
+    ballShot: false
+  });
+
+  // Form state for ball delivery
+  const [ballDelivery, setBallDelivery] = useState({
+    releasePosition: [0, 2, 15],
+    bouncePosition: [0, 0, 0],
+    finalPosition: [0, 0.5, -9],
+    shotDegree: 0,
+    shotDistance: 0,
+    isLofted: false
   });
 
   const toggleSection = (section) => {
@@ -119,92 +126,180 @@ const CricketUIAccordion = ({
         </div>
 
         <div style={{ padding: '10px' }}>
-          {/* Bowling Configuration Section */}
+          {/* Play Ball Section */}
           <AccordionSection
-            title="Bowling Configuration"
+            title="Play Ball"
             icon="🎯"
-            color="#0066FF"
-            isOpen={openSections.config}
-            onToggle={() => toggleSection('config')}
+            color="#4CAF50"
+            isOpen={openSections.playBall}
+            onToggle={() => toggleSection('playBall')}
           >
-            <div>
-              <button 
-                onClick={() => {
-                  const analysisConfig = {
-                    velocity: 133.5,
-                    ball_axis_x: 35.74,
-                    ball_axis_y: 18.40,
-                    length_axis_x: 55.89,
-                    length_axis_z: 8.07,
-                    line_axis_x: 39.04,
-                    line_axis_z: 23.93
-                  };
-                  onBowlingConfigUpdate(analysisConfig);
-                }}
-                style={{
-                  width: '100%',
-                  background: '#4CAF50',
-                  color: 'white',
-                  border: 'none',
-                  padding: '8px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  marginBottom: '10px',
-                  fontSize: '11px',
-                  fontWeight: 'bold'
-                }}
-              >
-                🎯 Load Pitch Analysis Data
-              </button>
+            <div style={{ display: 'grid', gap: '12px' }}>
+              {/* Release Position */}
+              <div>
+                <div style={{ color: '#0066FF', marginBottom: '4px', fontWeight: 'bold' }}>Release Position</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                  {['X', 'Y', 'Z'].map((axis, i) => (
+                    <div key={axis}>
+                      <label style={{ fontSize: '10px', color: '#aaa' }}>{axis}</label>
+                      <input
+                        type="number"
+                        value={ballDelivery.releasePosition[i]}
+                        onChange={(e) => {
+                          const newPos = [...ballDelivery.releasePosition];
+                          newPos[i] = parseFloat(e.target.value);
+                          setBallDelivery(prev => ({ ...prev, releasePosition: newPos }));
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '4px',
+                          background: 'rgba(0, 102, 255, 0.1)',
+                          border: '1px solid #0066FF',
+                          borderRadius: '4px',
+                          color: 'white'
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-              <div style={{ display: 'grid', gap: '8px' }}>
-                {[
-                  { key: 'velocity', label: 'Velocity (km/h)', step: '1' },
-                  { key: 'ball_axis_x', label: 'Ball Axis X', step: '1' },
-                  { key: 'ball_axis_y', label: 'Ball Axis Y', step: '1' },
-                  { key: 'length_axis_x', label: 'Length Axis X', step: '1' },
-                  { key: 'length_axis_z', label: 'Length Axis Z', step: '1' },
-                  { key: 'line_axis_x', label: 'Line Axis X', step: '1' },
-                  { key: 'line_axis_z', label: 'Line Axis Z', step: '1' }
-                ].map(field => (
-                  <div key={field.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <label style={{ flex: 1, fontSize: '11px' }}>{field.label}:</label>
+              {/* Bounce Position */}
+              <div>
+                <div style={{ color: '#FF4444', marginBottom: '4px', fontWeight: 'bold' }}>Bounce Position</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                  {['X', 'Y', 'Z'].map((axis, i) => (
+                    <div key={axis}>
+                      <label style={{ fontSize: '10px', color: '#aaa' }}>{axis}</label>
+                      <input
+                        type="number"
+                        value={ballDelivery.bouncePosition[i]}
+                        onChange={(e) => {
+                          const newPos = [...ballDelivery.bouncePosition];
+                          newPos[i] = parseFloat(e.target.value);
+                          setBallDelivery(prev => ({ ...prev, bouncePosition: newPos }));
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '4px',
+                          background: 'rgba(255, 68, 68, 0.1)',
+                          border: '1px solid #FF4444',
+                          borderRadius: '4px',
+                          color: 'white'
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Final Position */}
+              <div>
+                <div style={{ color: '#44FF44', marginBottom: '4px', fontWeight: 'bold' }}>Final Position</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                  {['X', 'Y', 'Z'].map((axis, i) => (
+                    <div key={axis}>
+                      <label style={{ fontSize: '10px', color: '#aaa' }}>{axis}</label>
+                      <input
+                        type="number"
+                        value={ballDelivery.finalPosition[i]}
+                        onChange={(e) => {
+                          const newPos = [...ballDelivery.finalPosition];
+                          newPos[i] = parseFloat(e.target.value);
+                          setBallDelivery(prev => ({ ...prev, finalPosition: newPos }));
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '4px',
+                          background: 'rgba(68, 255, 68, 0.1)',
+                          border: '1px solid #44FF44',
+                          borderRadius: '4px',
+                          color: 'white'
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Shot Controls */}
+              <div>
+                <div style={{ color: '#FF9800', marginBottom: '4px', fontWeight: 'bold' }}>Shot Controls</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <div>
+                    <label style={{ fontSize: '10px', color: '#aaa' }}>Degree</label>
                     <input
                       type="number"
-                      step={field.step}
-                      value={gameState.controls.bowling[field.key]}
-                      onChange={(e) => {
-                        const newConfig = { ...gameState.controls.bowling, [field.key]: parseFloat(e.target.value) };
-                        onBowlingConfigUpdate(newConfig);
-                      }}
+                      value={ballDelivery.shotDegree}
+                      onChange={(e) => setBallDelivery(prev => ({ ...prev, shotDegree: parseFloat(e.target.value) }))}
                       style={{
-                        width: '70px',
+                        width: '100%',
                         padding: '4px',
-                        border: '1px solid #333',
-                        borderRadius: '3px',
-                        background: 'rgba(255,255,255,0.1)',
-                        color: 'white',
-                        fontSize: '10px'
+                        background: 'rgba(255, 152, 0, 0.1)',
+                        border: '1px solid #FF9800',
+                        borderRadius: '4px',
+                        color: 'white'
                       }}
                     />
                   </div>
-                ))}
+                  <div>
+                    <label style={{ fontSize: '10px', color: '#aaa' }}>Distance</label>
+                    <input
+                      type="number"
+                      value={ballDelivery.shotDistance}
+                      onChange={(e) => setBallDelivery(prev => ({ ...prev, shotDistance: parseFloat(e.target.value) }))}
+                      style={{
+                        width: '100%',
+                        padding: '4px',
+                        background: 'rgba(255, 152, 0, 0.1)',
+                        border: '1px solid #FF9800',
+                        borderRadius: '4px',
+                        color: 'white'
+                      }}
+                    />
+                  </div>
+                </div>
+                <div style={{ marginTop: '8px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={ballDelivery.isLofted}
+                      onChange={(e) => setBallDelivery(prev => ({ ...prev, isLofted: e.target.checked }))}
+                      style={{ transform: 'scale(1.2)' }}
+                    />
+                    <span style={{ fontSize: '12px', color: '#FF9800' }}>Lofted Shot</span>
+                  </label>
+                </div>
               </div>
-            </div>
-          </AccordionSection>
 
-          {/* Direct X,Y,Z Coordinate Controls */}
-          <AccordionSection
-            title="Direct X,Y,Z Controls"
-            icon="🎯"
-            color="#00FF88"
-            isOpen={openSections.xyz}
-            onToggle={() => toggleSection('xyz')}
-          >
-            <DirectCoordinateControls 
-              bowlingControls={gameState.controls.bowling}
-              onUpdate={onBowlingConfigUpdate}
-            />
+              {/* Play Ball Button */}
+              <button
+                onClick={() => {
+                  if (playShot) {
+                    playShot(ballDelivery);
+                  }
+                }}
+                style={{
+                  marginTop: '8px',
+                  padding: '12px',
+                  background: 'linear-gradient(135deg, #4CAF50, #45a049)',
+                  border: 'none',
+                  borderRadius: '6px',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  fontSize: '14px',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }}
+              >
+                <span>🎯</span>
+                Play Ball
+              </button>
+            </div>
           </AccordionSection>
 
           {/* Delivery Analysis Section */}

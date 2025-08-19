@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import cricketData from '../../data/cricketData.json';
+import EmbeddedSimulator from '../EmbeddedSimulator';
 
 const MatchDetailPage = ({ matchId, onBackClick }) => {
   const [activeTab, setActiveTab] = useState('scorecard');
@@ -380,6 +381,11 @@ const MatchDetailPage = ({ matchId, onBackClick }) => {
           active={activeTab === 'commentary'}
           onClick={setActiveTab}
         />
+      </div>
+
+      {/* Simulator Section */}
+      <div style={{ width: '100%', marginBottom: '20px' }}>
+        <EmbeddedSimulator matchId={matchId} />
       </div>
 
       {/* Content */}

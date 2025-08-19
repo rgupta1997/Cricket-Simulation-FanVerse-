@@ -500,7 +500,7 @@ const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorAc
           <Wicket position={[0, 0, 10]} /> {/* Adjusted for larger field */}
           
           {/* Stadium Seating */}
-          <StadiumSeating />
+          {/* <StadiumSeating /> */}
           
           {/* Creases (swapped positions) */}
           <mesh position={[0, 0.16, -11]}> {/* Adjusted for larger field */}

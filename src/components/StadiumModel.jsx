@@ -1,6 +1,5 @@
 /* eslint-disable react/no-unknown-property */
-/* eslint-disable no-unused-vars */
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useLoader } from '@react-three/fiber';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
@@ -14,7 +13,7 @@ const StadiumModel = ({ visible = true }) => {
       gltf.scene.position.set(0, 0, 0);
       
       // Rotate stadium to the right (90 degrees clockwise)
-      gltf.scene.rotation.y = -Math.PI / 2;
+      gltf.scene.rotation.y = Math.PI / 2;
       
       // Apply shadows
       gltf.scene.traverse((node) => {

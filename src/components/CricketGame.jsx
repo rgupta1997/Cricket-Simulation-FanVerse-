@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   createInitialGameState, 
   updateGameState, 
   calculateBallTrajectory,
-  calculateBattingResponse,
   calculateShotVector,
   findNearestFielder,
   GAME_STATES,
@@ -12,13 +10,7 @@ import {
   BALL_STATES
 } from './CricketGameState';
 import EnhancedBall from './players/EnhancedBall';
-import BowlingConfigPanel from './BowlingConfigPanel';
 import PitchMarkers from './PitchMarkers';
-import CoordinateDisplay from './CoordinateDisplay';
-import PitchGuideToggle from './PitchGuideToggle';
-import DeliveryInfo from './DeliveryInfo';
-import BallTrajectoryInfo from './BallTrajectoryInfo';
-import RightDockedPanel from './RightDockedPanel';
 import { useCameraControls } from '../hooks/useCameraControls';
 import { 
   AnimatedBatsman, 
@@ -27,34 +19,19 @@ import {
   AnimatedFielder 
 } from './players/AnimatedPlayers';
 import { 
-  CORE_PLAYER_POSITIONS, 
   FIELDER_POSITIONS, 
-  UMPIRE_POSITIONS,
-  getAllPlayersArray
+  UMPIRE_POSITIONS
 } from '../constants/playerPositions';
-import { STADIUM_CONFIG } from '../constants/cameraViews';
-import { defaultPositionManager } from '../utils/positionManager';
 import ZoneMarkers from './ZoneMarkers';
 
-// Physics constants for cricket ball
-const GRAVITY = -9.81; // Real world gravity (m/s²)
-const AIR_RESISTANCE = 0.995; // Slight air resistance
-const BOUNCE_DAMPING = 0.6; // 60% energy retention on bounce
-const GROUND_LEVEL = 0.07; // Ball radius
-const SPIN_FACTOR = 2.5; // Ball spin multiplier
-const BATSMAN_HEIGHT = 1.2; // Height of batsman's bat (m)
-
-const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEditorActive = false }) => {
+const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEditorActive = false, isEmbedded = false, matchId = null }) => {
   const [gameState, setGameState] = useState(createInitialGameState());
   const [isPlaying, setIsPlaying] = useState(false);
-  const [selectedControl, setSelectedControl] = useState('bowling');
   const [selectedShotDirection, setSelectedShotDirection] = useState('straight');
   const [selectedShotType, setSelectedShotType] = useState('drive'); // drive, defensive, pull, cut, loft
-  const [shotPower, setShotPower] = useState(0);
   const [showBatSwing, setShowBatSwing] = useState(false);
   const [shotAngle, setShotAngle] = useState(0); // Default to straight (down arrow) - 0°
   const [keysPressed, setKeysPressed] = useState(new Set());
-  const animationFrameRef = useRef();
 
   // Pitch guide visibility states
   const [showPitchMarkers, setShowPitchMarkers] = useState(true);
@@ -80,37 +57,10 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         }
       }
     }));
-    console.log('🔧 Updated bowling config:', newConfig);
   }, []);
 
   // Handler for updating ball shot configuration
   const handleBallShotConfigUpdate = useCallback((newConfig) => {
-    console.group('📊 BALL SHOT CONFIG UPDATE DEBUG');
-    
-    const previousConfig = gameState.controls.ballShot;
-    console.log('PREVIOUS CONFIG:', previousConfig);
-    console.log('NEW CONFIG:', newConfig);
-    
-    const updatedConfig = {
-      ...previousConfig,
-      ...newConfig
-    };
-    console.log('MERGED CONFIG:', updatedConfig);
-    
-    // Check for distance changes specifically
-    if (newConfig.distance !== undefined) {
-      console.log('🎯 DISTANCE VALUE CHANGE DETECTED:', {
-        oldDistance: previousConfig.distance,
-        newDistance: newConfig.distance,
-        oldType: typeof previousConfig.distance,
-        newType: typeof newConfig.distance,
-        isNumeric: !isNaN(parseFloat(newConfig.distance)),
-        parsedValue: parseFloat(newConfig.distance)
-      });
-    }
-    
-    console.groupEnd();
-    
     setGameState(prevState => ({
       ...prevState,
       controls: {
@@ -121,20 +71,12 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         }
       }
     }));
-    console.log('🏏 Updated ball shot config:', newConfig);
   }, [gameState.controls.ballShot]);
 
-  // Debug: Log when component mounts
-  useEffect(() => {
-    console.log('🏏 CricketGame component mounted and ready!');
-    console.log('Initial game state:', gameState.gameState);
-    console.log('Press SPACEBAR to bowl, D/F/G/H/V for batting, R to reset ball');
-    return () => console.log('🏏 CricketGame component unmounted');
-  }, []);
+  useEffect(() => {}, []);
 
   // Reusable helper function to reset ball to bowler position
   const resetBallToBowler = useCallback((reason = 'manual_reset') => {
-    console.log('🔄 Resetting ball to bowler due to:', reason);
     setGameState(prevState => ({
       ...prevState,
       gameState: GAME_STATES.WAITING_FOR_BALL,
@@ -166,28 +108,15 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
 
   // Game action handlers
   const handleBowl = useCallback(() => {
-    console.log('🎳 Spacebar pressed! Current game state:', gameState.gameState);
     if (gameState.gameState !== GAME_STATES.WAITING_FOR_BALL) {
-      console.log('❌ Cannot bowl right now. Game state must be WAITING_FOR_BALL, currently:', gameState.gameState);
       return;
     }
-    
-    console.log('✅ Starting bowling action with enhanced trajectory system!');
 
     const { controls } = gameState;
     const bowlingControls = controls.bowling;
     
     // Calculate enhanced ball trajectory using pitch analysis
     const trajectory = calculateBallTrajectory(bowlingControls);
-    
-    console.log('🎯 Enhanced Bowling Parameters:', {
-      velocity: bowlingControls.velocity + ' km/h',
-      releasePosition: trajectory.initial.position,
-      bouncePosition: trajectory.bounce.position,
-      finalPosition: trajectory.target.position,
-      totalFlightTime: trajectory.metadata.totalTime.toFixed(2) + ' s',
-      pitchAnalysis: trajectory.metadata.pitchAnalysis
-    });
     
     // Start bowling animation
     setGameState(prevState => updateGameState(prevState, {
@@ -217,8 +146,6 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         }
       };
       
-      console.log('🚀 Releasing ball with data:', ballData);
-      
       setGameState(prevState => updateGameState(prevState, {
         type: 'BALL_BOWLED',
         ballData: ballData
@@ -228,17 +155,13 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
   }, [gameState]);
 
   const handleBat = useCallback(() => {
-    console.log('🏏 Batting attempt! Direction:', selectedShotDirection, 'Shot Type:', selectedShotType, 'Ball state:', gameState.ballState, 'Can bat:', gameState.canBat);
-    
     // Check if game is in correct state
     if (gameState.gameState !== GAME_STATES.BALL_IN_PLAY) {
-      console.log('❌ Cannot bat right now. Game state:', gameState.gameState);
       return;
     }
     
     // Check if ball is near striker (only bat when ball reaches striker)
     if (!gameState.canBat) {
-      console.log('❌ Ball is not near striker yet. Wait for ball to reach you!');
       return;
     }
     
@@ -250,14 +173,6 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       Math.pow(ballPos[2] - strikerPos[2], 2)
     );
     
-    // Power based on timing - closer = more power (max 25, min 8)
-    const timingPower = Math.max(8, Math.min(25, 25 - (distance * 4)));
-    
-    console.log('✅ Batting successful! Direction:', selectedShotDirection, 'Shot Type:', selectedShotType, 'Timing Power:', timingPower);
-    console.log('🎯 Shot executed with timing-based power!');
-
-    // Shot direction now uses live shotAngle from arrow keys - no static mapping needed
-
     // Map shot types to elevation and power modifiers
     const shotTypeModifiers = {
       'drive': { elevation: 0.5, powerMultiplier: 1.0 },
@@ -277,18 +192,8 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     const targetDistance = ballShotConfig.distance || 15; // Get exact distance from config
     const shotDirection = calculateShotVector(angle, targetDistance, elevation, '🎯 MANUAL');
     
-    console.log('🎯 MANUAL SHOT CALCULATION (DETERMINISTIC):');
-    console.log('  - Angle:', angle, '°');
-    console.log('  - Target Distance:', targetDistance, 'm (EXACT from config)');
-    console.log('  - Shot Type:', selectedShotType, 'Elevation:', elevation);
-    console.log('  - Deterministic Shot Direction:', shotDirection);
-    
-    console.log('🏏 EXECUTING SHOT:', selectedShotDirection, 'Type:', selectedShotType, 'Live Angle:', angle, '° Direction:', shotDirection);
-    
     // Calculate final velocity with deterministic target distance
     const scaledVelocity = shotDirection; // Use exact calculated velocity from deterministic system
-    
-    console.log('💥 HITTING BALL with deterministic velocity:', scaledVelocity);
     
     // Hit the ball with exact distance control!
     setGameState(prevState => updateGameState(prevState, {
@@ -307,14 +212,10 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     // Trigger bat swing animation
     setShowBatSwing(true);
     setTimeout(() => setShowBatSwing(false), 500);
-    
-    console.log('🎯 Shot dispatched successfully with animation trigger!');
-    
-    console.log('🎯 Ball hit! Direction:', shotDirection, 'Shot Type:', selectedShotType, 'Timing Power:', timingPower, 'Distance:', distance.toFixed(2));
 
   }, [gameState, selectedShotDirection, selectedShotType, shotAngle]);
 
-  const handleFielding = useCallback((fielderId) => {
+  const handleFielding = useCallback(() => {
     if (gameState.ballState !== BALL_STATES.HIT) return;
 
     const fielders = gameState.players.fielders || [];
@@ -356,9 +257,6 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
 
   // Ball event handlers
   const handleBallBounce = useCallback((bounceData) => {
-    // Handle ball bounce effects, sound, particle effects
-    console.log('Ball bounced:', bounceData);
-    
     // Update ball position in game state if it's a position update
     if (bounceData.type === 'position_update') {
       setGameState(prevState => ({
@@ -374,8 +272,6 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
   }, []);
 
   const handleBallCatch = useCallback((catchData) => {
-    console.log('🎯 Ball catch/collect event:', catchData);
-    
     if (catchData.type === 'catch') {
       // Wicket taken
       setGameState(prevState => updateGameState(prevState, {
@@ -393,50 +289,18 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         resetBallToBowler(catchData.reason || 'reset_to_bowler');
       } else {
         // Ball fielded by other player
-        handleFielding(catchData.playerId);
+        handleFielding();
       }
     } else {
       // Ball fielded
-      handleFielding(catchData.playerId);
+      handleFielding();
     }
-  }, [handleFielding]);
+  }, [handleFielding, resetBallToBowler]);
 
-  // Debug helper for ball shot power analysis
-  const debugBallShotPower = (config) => {
-    console.group('🔍 BALL SHOT POWER ANALYSIS');
-    console.log('1️⃣ Raw Config:', {
-      rawConfig: config,
-      power: config.power,
-      powerType: typeof config.power,
-      distance: config.distance,
-      distanceType: typeof config.distance
-    });
 
-    // Check if power is affecting distance
-    const effectiveDistance = config.distance;
-    console.log('2️⃣ Distance Check:', {
-      rawDistance: config.distance,
-      effectiveDistance: effectiveDistance,
-      isPowerAffectingDistance: effectiveDistance !== config.distance,
-      power: config.power
-    });
-
-    // Verify shot vector inputs
-    console.log('3️⃣ Shot Vector Inputs:', {
-      angle: config.degree,
-      targetDistance: effectiveDistance,
-      elevation: config.lofted ? 8.0 : 0.5,
-      power: config.power // Should not affect calculation
-    });
-
-    console.groupEnd();
-  };
 
   const handleBallReachTarget = useCallback((targetData) => {
     if (targetData.target === 'batsman') {
-      // Ball reached batsman - trigger batting opportunity
-      console.log('⚾ Ball reached striker - Distance:', targetData.distance);
-      
       // Calculate distance between ball and striker position (ignore Y axis for now)
       const ballPos = targetData.position;
       const strikerPos = [0, 0, -9]; // Striker position
@@ -444,14 +308,9 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       const strikerZ = strikerPos[2];
       const distanceZ = Math.abs(ballZ - strikerZ); // Distance along Z-axis only
       
-      console.log('📏 Z-axis distance to striker:', distanceZ.toFixed(2), 'Ball Z:', ballZ.toFixed(2), 'Striker Z:', strikerZ);
-      
       // Check if autoPlay is enabled and ball is close enough (within 2 meters on Z-axis)
       const ballShotConfig = gameState.controls.ballShot;
-      console.log('🤖 Ball shot config:', ballShotConfig);
       const shouldAutoShot = ballShotConfig.autoPlay && distanceZ <= 2.0;
-      
-      console.log('🤖 Auto shot check - autoPlay:', ballShotConfig.autoPlay, 'distanceZ:', distanceZ, 'shouldAutoShot:', shouldAutoShot);
       
       setGameState(prevState => ({
         ...prevState,
@@ -460,126 +319,24 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       }));
       
       if (shouldAutoShot) {
-        console.log('🤖 AUTO SHOT TRIGGERED! Distance:', distanceZ.toFixed(2), 'Config:', ballShotConfig);
-        
         // Trigger automatic shot using ball shot configuration immediately when ball is in position
         setTimeout(() => {
           // Ensure we have valid values from configuration
           const ballShotConfig = gameState.controls.ballShot;
           const targetDistance = parseFloat(ballShotConfig.distance) || 15; // Default to 15m if not specified
           
-          console.log('🎯 AUTO SHOT PARAMETERS:', {
-            distance: targetDistance,
-            config: ballShotConfig
-          });
-          
-          // DEBUG: Comprehensive auto shot analysis
-          console.group('🔍 AUTO SHOT DEBUG ANALYSIS');
-          
-          console.log('1️⃣ RAW INPUT VALUES:', {
-            degree: ballShotConfig.degree,
-            distance: ballShotConfig.distance,
-            distanceType: typeof ballShotConfig.distance,
-            lofted: ballShotConfig.lofted,
-            rawBallShotConfig: ballShotConfig
-          });
-          
           // Use ball shot configuration for DETERMINISTIC shot
           const angle = ballShotConfig.degree || 0;
           const isLofted = ballShotConfig.lofted || false;
           const elevation = isLofted ? 8.0 : 0.5;
           
-          console.log('2️⃣ PRE-CALCULATION VALUES:', {
-            angle,
-            targetDistance,
-            isLofted,
-            elevation,
-            shot_type: ballShotConfig.type || 'drive'
-          });
-          
-          console.log('3️⃣ EXPECTED CALCULATION:', {
-            expectedX: 0 + Math.cos(angle * Math.PI / 180) * targetDistance,
-            expectedZ: -9 + (-Math.sin(angle * Math.PI / 180)) * targetDistance,
-            expectedDistance: targetDistance,
-            calculationFormula: `X = 0 + cos(${angle}°) * ${targetDistance} = ${(Math.cos(angle * Math.PI / 180) * targetDistance).toFixed(3)}`,
-            calculationFormulaZ: `Z = -9 + (-sin(${angle}°)) * ${targetDistance} = ${(-9 + (-Math.sin(angle * Math.PI / 180) * targetDistance)).toFixed(3)}`
-          });
-          
-          // Adjust the calculation to account for striker's position
-          const strikerOffset = -9; // Striker's Z position
-          const adjustedAngle = angle * (Math.PI / 180); // Convert to radians
-          
-          // Calculate velocities based on striker's position
-          const velocityX = Math.cos(adjustedAngle) * targetDistance;
-          const velocityY = Math.sin(elevation) * targetDistance;
-          const velocityZ = -Math.sin(adjustedAngle) * targetDistance;
-          
-          const shotDirection = [velocityX, velocityY, velocityZ];
-          const scaledVelocity = shotDirection;
-          
-          console.log('4️⃣ CALCULATESHOT VECTOR RESULT:', {
-            strikerPosition: [0, 0, strikerOffset],
-            angle: angle,
-            adjustedAngle: adjustedAngle,
-            targetDistance,
-            shotDirection,
-            scaledVelocity,
-            expectedEndPosition: {
-              x: velocityX,
-              y: velocityY,
-              z: strikerOffset + velocityZ
-            }
-          });
-          
-          console.log('5️⃣ VELOCITY ANALYSIS:', {
-            velocityX: scaledVelocity[0],
-            velocityY: scaledVelocity[1],
-            velocityZ: scaledVelocity[2],
-            velocityMagnitude: Math.sqrt(
-              scaledVelocity[0] ** 2 + 
-              scaledVelocity[1] ** 2 + 
-              scaledVelocity[2] ** 2
-            ),
-            isPowerfulShot: Math.sqrt(scaledVelocity[0] ** 2 + scaledVelocity[2] ** 2) > 15
-          });
-          
-          console.groupEnd();
-          
-          console.log('🤖 AUTO SHOT CALCULATION (DETERMINISTIC):');
-          console.log('  - Angle:', angle, '°');
-          console.log('  - Target Distance:', targetDistance, 'm (EXACT)');
-          console.log('  - Lofted:', isLofted, 'Elevation:', elevation);
-          console.log('  - Deterministic Shot Direction:', shotDirection);
-          console.log('  - Final Velocity (Exact):', scaledVelocity);
-          
-          console.log('🤖 AUTO SHOT: Angle:', angle, '° Lofted:', isLofted, 'Velocity:', scaledVelocity);
+          // USE THE SAME calculateShotVector FUNCTION AS MANUAL SHOTS
+          // This ensures window.deterministicTarget is properly set
+          const scaledVelocity = calculateShotVector(angle, targetDistance, elevation, '🤖 AUTO');
+          const shotDirection = scaledVelocity;
           
           // Execute auto shot from striker's position
           setGameState(prevState => {
-            console.group('🎯 AUTO SHOT EXECUTION DEBUG');
-            
-            // Log shot configuration with position details
-            console.log('1️⃣ Shot Configuration:', {
-              rawConfig: ballShotConfig,
-              processedDistance: targetDistance,
-              strikerPosition: [0, 0, -9],
-              angle: angle,
-              elevation: elevation
-            });
-
-            console.log('2️⃣ Shot Vector Details:', {
-              initialPosition: [0, 0.5, -9],
-              targetDistance,
-              calculatedVelocity: scaledVelocity,
-              expectedEndpoint: [
-                scaledVelocity[0],
-                scaledVelocity[1],
-                -9 + scaledVelocity[2]
-              ]
-            });
-
-            console.groupEnd();
-            
             // Position ball at striker and apply the shot
             const updatedState = {
               ...prevState,
@@ -604,47 +361,10 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
               }
             });
           });
-          
-          // Add physics tracking after shot execution
-          setTimeout(() => {
-            console.group('🏀 BALL PHYSICS VERIFICATION');
-            
-            const currentBallPosition = gameState.currentBall.position;
-            const actualDistance = Math.sqrt(
-              Math.pow(currentBallPosition[0], 2) + 
-              Math.pow(currentBallPosition[2] + 9, 2)
-            );
-            
-            console.log('6️⃣ IMMEDIATE POST-SHOT STATE:', {
-              ballPosition: currentBallPosition,
-              ballVelocity: gameState.currentBall.velocity,
-              calculatedDistance: actualDistance,
-              deterministicTarget: window.deterministicTarget
-            });
-            
-            if (window.deterministicTarget) {
-              console.log('7️⃣ PHYSICS VS DETERMINISTIC COMPARISON:', {
-                targetDistance: window.deterministicTarget.exactDistance,
-                actualDistance: actualDistance,
-                difference: Math.abs(actualDistance - window.deterministicTarget.exactDistance),
-                isPhysicsOverriding: Math.abs(actualDistance - window.deterministicTarget.exactDistance) > 0.5,
-                targetPosition: window.deterministicTarget.finalStopPosition,
-                actualPosition: currentBallPosition
-              });
-            }
-            
-            console.groupEnd();
-          }, 200); // Check after physics has time to update
-          
-          console.log('🤖 Auto shot executed successfully!');
         }, 100); // Small delay to ensure state is updated
-      } else {
-        // Manual batting mode
-      console.log('🎯 BATTING WINDOW OPEN - Press D/F/G/H/V to hit!');
       }
     } else if (targetData.target === 'final_coordinate') {
       // Ball reached final coordinate in direct coordinate mode - reset for next ball
-      console.log('🎯 Ball reached final coordinate - resetting game state for next ball');
       setTimeout(() => {
         setGameState(prevState => updateGameState(prevState, {
           type: 'BALL_WITH_KEEPER'
@@ -670,7 +390,6 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
   useEffect(() => {
     // Skip shot direction handling if position editor is active
     if (isPositionEditorActive) {
-      console.log('🔧 Position editor active - skipping shot direction updates');
       return;
     }
 
@@ -710,12 +429,6 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     
     setSelectedShotDirection(newDirection);
     setShotAngle(newAngle);
-    
-    console.log('🎯 Shot Direction Updated:', {
-      keysPressed: Array.from(keysPressed),
-      newDirection: newDirection,
-      newAngle: newAngle
-    });
   }, [keysPressed, isPositionEditorActive]);
 
   // Keyboard controls
@@ -732,7 +445,6 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
         if (isPositionEditorActive) {
           // Don't prevent default or handle arrow keys when position editor is active
-          console.log('🔧 Position editor active - ignoring arrow key for cricket game');
           return;
         }
         event.preventDefault();
@@ -744,23 +456,18 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
          // Shot type selection (separate from direction)
          case 'd':
            setSelectedShotType('defensive');
-           console.log('🛡️ Defensive shot selected');
           break;
          case 'f':
            setSelectedShotType('drive');
-           console.log('🏏 Drive shot selected');
           break;
          case 'g':
            setSelectedShotType('pull');
-           console.log('💪 Pull shot selected');
           break;
          case 'h':
            setSelectedShotType('cut');
-           console.log('✂️ Cut shot selected');
           break;
          case 'v':
            setSelectedShotType('loft');
-           console.log('🚀 Loft shot selected');
           break;
           
         // Batting execution (Space when ball is near)
@@ -768,13 +475,9 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
           event.preventDefault();
           event.stopPropagation();
           if (gameState.gameState === GAME_STATES.BALL_IN_PLAY && gameState.canBat) {
-            console.log('🏏 Executing shot!');
             handleBat();
           } else if (gameState.gameState === GAME_STATES.WAITING_FOR_BALL) {
-            console.log('🎳 Bowling!');
             handleBowl();
-          } else {
-            console.log('⏳ Cannot act now. Game state:', gameState.gameState, 'Can bat:', gameState.canBat);
           }
           break;
           
@@ -786,7 +489,6 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         // Manual reset ball to bowler
         case 'r':
           event.preventDefault();
-          console.log('🔄 Manual reset requested');
           resetBallToBowler('manual_reset');
           break;
           
@@ -805,7 +507,6 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
         if (isPositionEditorActive) {
           // Don't handle arrow key releases when position editor is active
-          console.log('🔧 Position editor active - ignoring arrow key release for cricket game');
           return;
         }
         event.preventDefault();
@@ -824,6 +525,99 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       window.removeEventListener('keyup', handleKeyUp);
     };
   }, [gameState, isPlaying, handleBowl, handleBat, handleThrowToKeeper, isPositionEditorActive]);
+
+  // Helper function to play a complete ball delivery and shot
+  const playShot = useCallback(({
+    // Bowling inputs
+    releasePosition = [0, 2, 15],
+    bouncePosition = [0, 0, 0],
+    finalPosition = [0, 0.5, -9],
+    // Shot inputs
+    shotDegree = 0,
+    shotDistance = 0,
+    isLofted = false
+  }) => {
+    // First reset the ball to ensure clean state
+    resetBallToBowler();
+
+    // Wait for reset, then update controls and bowl
+    setTimeout(() => {
+      // Create bowling controls object with coordinates
+      const bowlingControls = {
+        useDirectCoordinates: true,
+        release_x: releasePosition[0],
+        release_y: releasePosition[1],
+        release_z: releasePosition[2],
+        bounce_x: bouncePosition[0],
+        bounce_y: bouncePosition[1],
+        bounce_z: bouncePosition[2],
+        final_x: finalPosition[0],
+        final_y: finalPosition[1],
+        final_z: finalPosition[2],
+        velocity: 100, // Default velocity in km/h
+        bounceHeight: 0.5
+      };
+
+      // Calculate trajectory directly with the new coordinates
+      const trajectory = calculateBallTrajectory(bowlingControls);
+
+      // Update the game state with new controls
+      setGameState(prevState => {
+        const updatedState = {
+          ...prevState,
+          controls: {
+            ...prevState.controls,
+            bowling: {
+              ...prevState.controls.bowling,
+              ...bowlingControls
+            },
+            ballShot: {
+              ...prevState.controls.ballShot,
+              degree: shotDegree,
+              distance: shotDistance,
+              lofted: isLofted,
+              autoPlay: true,
+              useDirectCoordinates: true
+            }
+          }
+        };
+
+        // Start bowling animation
+        const bowlingState = updateGameState(updatedState, {
+          type: 'START_BOWLING'
+        });
+
+        // Schedule ball release with the calculated trajectory
+        setTimeout(() => {
+          const ballData = {
+            position: trajectory.initial.position,
+            velocity: trajectory.initial.velocity,
+            isMoving: true,
+            bounceHeight: bowlingControls.bounceHeight || 0.5,
+            trajectory: {
+              initial: trajectory.initial,
+              bounce: trajectory.bounce,
+              target: trajectory.target,
+              metadata: trajectory.metadata
+            },
+            pitchAnalysis: {
+              ball_axis: { x: bowlingControls.final_x, y: bowlingControls.final_y },
+              length_axis: { x: bowlingControls.bounce_x, z: bowlingControls.bounce_z },
+              line_axis: { x: bowlingControls.release_x, z: bowlingControls.release_z },
+              velocity: bowlingControls.velocity
+            }
+          };
+
+          setGameState(prevState => updateGameState(prevState, {
+            type: 'BALL_BOWLED',
+            ballData: ballData
+          }));
+        }, 500);
+
+        return bowlingState;
+      });
+    }, 100);
+  }, [resetBallToBowler, handleBowl]);
 
   // Control updates
   const updateBowlingControls = useCallback((type, value) => {
@@ -869,7 +663,6 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     if (onGameStateChange) {
       onGameStateChange({
         gameState,
-        selectedControl,
         isPlaying,
         selectedDirection: selectedShotDirection,
         selectedShotType: selectedShotType,
@@ -881,6 +674,7 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         handleBowlingConfigUpdate,
         handleBallShotConfigUpdate,
         resetBallToBowler, // Expose reset function for external use
+        playShot, // Expose playShot function for external use
         showPitchMarkers,
         setShowPitchMarkers,
         showCoordinateDisplay,
@@ -890,13 +684,16 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         showZoneMarkers,
         setShowZoneMarkers,
         currentView,
-        switchToView
+        switchToView,
+        // Add playShot function to gameState for UI access
+        playShot
       });
     }
   }, [
-    gameState, selectedControl, isPlaying, selectedShotDirection, selectedShotType, shotAngle,
+    gameState, isPlaying, selectedShotDirection, selectedShotType, shotAngle,
     useCompactUI, showPitchMarkers, showCoordinateDisplay, showPitchGrid, showZoneMarkers, currentView,
-    onGameStateChange
+    onGameStateChange, updateBowlingControls, handleBowlingConfigUpdate, handleBallShotConfigUpdate,
+    resetBallToBowler, switchToView, playShot
   ]);
 
   return (
@@ -1000,60 +797,7 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
   );
 };
 
-// Wickets component
-const Wickets = () => (
-  <>
-    {/* Striker's end wickets (swapped position) */}
-    <group position={[0, 0, -10]}>
-      {/* Stumps */}
-      <mesh position={[-0.1, 0.4, 0]}>
-        <cylinderGeometry args={[0.02, 0.02, 0.8, 8]} />
-        <meshLambertMaterial color="#8B4513" />
-      </mesh>
-      <mesh position={[0, 0.4, 0]}>
-        <cylinderGeometry args={[0.02, 0.02, 0.8, 8]} />
-        <meshLambertMaterial color="#8B4513" />
-      </mesh>
-      <mesh position={[0.1, 0.4, 0]}>
-        <cylinderGeometry args={[0.02, 0.02, 0.8, 8]} />
-        <meshLambertMaterial color="#8B4513" />
-      </mesh>
-      {/* Bails */}
-      <mesh position={[-0.05, 0.82, 0]}>
-        <cylinderGeometry args={[0.01, 0.01, 0.1, 8]} />
-        <meshLambertMaterial color="#8B4513" />
-      </mesh>
-      <mesh position={[0.05, 0.82, 0]}>
-        <cylinderGeometry args={[0.01, 0.01, 0.1, 8]} />
-        <meshLambertMaterial color="#8B4513" />
-      </mesh>
-    </group>
-    
-    {/* Bowler's end wickets (swapped position) */}
-    <group position={[0, 0, 10]}>
-      <mesh position={[-0.1, 0.4, 0]}>
-        <cylinderGeometry args={[0.02, 0.02, 0.8, 8]} />
-        <meshLambertMaterial color="#8B4513" />
-      </mesh>
-      <mesh position={[0, 0.4, 0]}>
-        <cylinderGeometry args={[0.02, 0.02, 0.8, 8]} />
-        <meshLambertMaterial color="#8B4513" />
-      </mesh>
-      <mesh position={[0.1, 0.4, 0]}>
-        <cylinderGeometry args={[0.02, 0.02, 0.8, 8]} />
-        <meshLambertMaterial color="#8B4513" />
-      </mesh>
-      <mesh position={[-0.05, 0.82, 0]}>
-        <cylinderGeometry args={[0.01, 0.01, 0.1, 8]} />
-        <meshLambertMaterial color="#8B4513" />
-      </mesh>
-      <mesh position={[0.05, 0.82, 0]}>
-        <cylinderGeometry args={[0.01, 0.01, 0.1, 8]} />
-        <meshLambertMaterial color="#8B4513" />
-      </mesh>
-    </group>
-  </>
-);
+
 
 
 
@@ -1073,7 +817,7 @@ const FieldRegions = ({ selectedDirection, selectedShotType, shotAngle }) => {
   return (
     <group>
       {/* Shot direction indicator - rotating arrow */}
-      <group position={[0, 0.2, 0]} rotation={[0, (shotAngle * Math.PI) / 180, 0]}>
+      {/* <group position={[0, 0.2, 0]} rotation={[0, (shotAngle * Math.PI) / 180, 0]}>
         <mesh position={[0, 0, 8]} rotation={[-Math.PI/2, 0, 0]}>
           <coneGeometry args={[1.5, 4, 6]} />
           <meshBasicMaterial color="#FFD700" transparent opacity={0.9} />
@@ -1082,12 +826,11 @@ const FieldRegions = ({ selectedDirection, selectedShotType, shotAngle }) => {
           <cylinderGeometry args={[0.3, 0.3, 6, 8]} />
           <meshBasicMaterial color="#FFD700" transparent opacity={0.7} />
         </mesh>
-        {/* Arrow shaft pointing in direction */}
         <mesh position={[0, 0, 1]}>
           <boxGeometry args={[0.5, 0.2, 6]} />
           <meshBasicMaterial color="#FFD700" transparent opacity={0.8} />
         </mesh>
-      </group>
+      </group> */}
 
       {/* Shot zones */}
       {shotZones.map((zone, index) => {
@@ -1122,7 +865,7 @@ const FieldRegions = ({ selectedDirection, selectedShotType, shotAngle }) => {
       })}
       
       {/* Power indicator rings */}
-      <mesh position={[0, 0.05, 0]} rotation={[-Math.PI/2, 0, 0]}>
+      {/* <mesh position={[0, 0.05, 0]} rotation={[-Math.PI/2, 0, 0]}>
         <ringGeometry args={[10, 12, 32]} />
         <meshBasicMaterial color="#FF0000" transparent opacity={0.3} />
       </mesh>
@@ -1134,7 +877,7 @@ const FieldRegions = ({ selectedDirection, selectedShotType, shotAngle }) => {
         <ringGeometry args={[20, 22, 32]} />
         <meshBasicMaterial color="#00FF00" transparent opacity={0.3} />
       </mesh>
-      
+       */}
       {/* Boundary circle */}
       <mesh position={[0, 0.05, 0]} rotation={[-Math.PI/2, 0, 0]}>
         <ringGeometry args={[25, 27, 32]} />

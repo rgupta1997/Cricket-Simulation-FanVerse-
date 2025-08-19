@@ -12,6 +12,10 @@ import WagonWheelTab from './tabs/WagonWheelTab.jsx';
 import PointsTableTab from './tabs/PointsTableTab.jsx';
 import MatchChat from './MatchChat.jsx';
 import LoginModal from './LoginModal.jsx';
+import EmbeddedSimulator from './EmbeddedSimulator';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import Stadium from './Stadium';
 
 // Import responsive styles
 import '../styles/responsive.css';
@@ -27,7 +31,7 @@ class ErrorBoundary extends Component {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error, _errorInfo) {
     if (this.props.onError) {
       this.props.onError(error);
     }
@@ -60,17 +64,7 @@ class ErrorBoundary extends Component {
   }
 }
 
-// Header Component
-const Header = () => {
-  return (
-    <div className="app-header">
-      <div className="header-content">
-        <span className="header-icon">🏏</span>
-        <span className="header-title">Fixtures</span>
-      </div>
-    </div>
-  );
-};
+
 
 // Team Logo Component
 const TeamLogo = ({ team, size = 40 }) => {
@@ -310,11 +304,7 @@ const FixturesPage = ({ onMatchClick }) => {
   const [selectedSeries, setSelectedSeries] = useState(['all']); // Changed to array for multi-select
   const [showSeriesDropdown, setShowSeriesDropdown] = useState(false);
   
-  useEffect(() => {
-    fetchFixtures();
-  }, []); // Only fetch on initial load, not when dateRange changes
-
-  const fetchFixtures = async () => {
+  const fetchFixtures = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -349,7 +339,11 @@ const FixturesPage = ({ onMatchClick }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [dateRange.startDate, dateRange.endDate]);
+
+  useEffect(() => {
+    fetchFixtures();
+  }, [fetchFixtures]);
 
   // Get unique series names for filter
   const uniqueSeries = ['all', ...Array.from(new Set(matches.map(m => m.seriesName).filter(Boolean)))];
@@ -806,7 +800,7 @@ const FixturesPage = ({ onMatchClick }) => {
 };
 
 // Match Detail Page Component  
-const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetails }) => {
+const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetails, setCurrentView }) => {
   console.log('selectedMatchDetails', selectedMatchDetails)
   const [activeTab, setActiveTab] = useState('commentary');
   const [match, setMatch] = useState(selectedMatchDetails);
@@ -1139,6 +1133,14 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetai
         </div>
       </div>
 
+      {/* Embedded Simulator Section */}
+      <div style={{ width: '100%', marginBottom: '20px' }}>
+        <EmbeddedSimulator 
+          matchId={matchId} 
+          onExpand={() => setCurrentView('simulator')}
+        />
+      </div>
+
       {/* Tab Navigation */}
       <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
@@ -1198,6 +1200,7 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetai
 
 const WebApp = () => {
   const [currentView, setCurrentView] = useState('fixtures');
+
   const [selectedMatchId, setSelectedMatchId] = useState(null);
   const [selectedMatchDetails, setSelectedMatchDetails] = useState(null);
   const [error, setError] = useState(null);
@@ -1290,8 +1293,6 @@ const WebApp = () => {
 
     return (
     <div className="cricket-app">
-
-      
       {currentView === 'fixtures' && (
         <FixturesPage onMatchClick={handleMatchClick} />
       )}
@@ -1303,9 +1304,79 @@ const WebApp = () => {
               onBackClick={handleBackClick} 
               onChatClick={openMatchChat}
               selectedMatchDetails={selectedMatchDetails}
+              setCurrentView={setCurrentView}
             />
           </ErrorBoundary>
         </React.Suspense>
+      )}
+      {/* eslint-disable react/no-unknown-property */}
+      {currentView === 'simulator' && selectedMatchId && (
+        <div style={{ width: '100vw', height: '100vh', position: 'relative', backgroundColor: '#000' }}>
+          <button
+            onClick={() => {
+              setCurrentView('matchDetail');
+            }}
+            style={{
+              position: 'absolute',
+              top: '20px',
+              left: '20px',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              border: '2px solid white',
+              color: 'white',
+              padding: '8px 16px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.3s ease',
+              backdropFilter: 'blur(4px)',
+              zIndex: 1000
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 13L5 8L10 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Back to Match
+          </button>
+          <Canvas
+            camera={{ 
+              position: [30, 30, 30], 
+              fov: 60,
+              near: 0.1,
+              far: 1000
+            }}
+            shadows
+            style={{ width: '100%', height: '100%' }}
+          >
+            <ambientLight args={[0xffffff, 0.5]} />
+            <directionalLight 
+              args={[0xffffff, 1]}
+              position={[10, 10, 5]} 
+              castShadow 
+              shadow-mapSize={[2048, 2048]}
+            />
+            <Stadium 
+              matchId={selectedMatchId} 
+              isEmbedded={false}
+            />
+            <OrbitControls 
+              enablePan={true}
+              enableZoom={true}
+              enableRotate={true}
+              minDistance={10}
+              maxDistance={100}
+              maxPolarAngle={Math.PI / 2.2}
+            />
+          </Canvas>
+        </div>
       )}
       
       {/* Login Modal */}
