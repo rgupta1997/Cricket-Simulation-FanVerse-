@@ -3,11 +3,49 @@ import { extractPlayersInfo, extractKeyFacts } from '../../utils/webapp.util.js'
 import '../../styles/responsive.css';
 
 const CommentaryTab = ({ matchDetail, matchId, commentary }) => {
-  console.log('matchDetails', matchDetail, matchId, commentary)
+  console.log('matchDetails:', matchDetail, matchId, commentary)
   const [selectedInning, setSelectedInning] = useState(1);
-  
+  const [currentBallDetails, setCurrentBallDetails] = useState(null);
+
   const playersInfo = extractPlayersInfo(matchDetail, selectedInning);
   console.log('playersInfo', playersInfo);
+
+  // Extract batsmen and bowler details from currentBallDetails
+  let batsmenRows = [];
+  let bowlerRow = null;
+  if (currentBallDetails) {
+    // Striker
+    let striker = {
+      name: currentBallDetails.Batsman_Name || '-',
+      runs: currentBallDetails.Batsman_Details?.Runs || currentBallDetails.Batsman_Runs || '-',
+      balls: currentBallDetails.Batsman_Details?.Balls || '-',
+      strikeRate: currentBallDetails.Batsman_Details?.Runs && currentBallDetails.Batsman_Details?.Balls ? ((parseInt(currentBallDetails.Batsman_Details.Runs) / parseInt(currentBallDetails.Batsman_Details.Balls) * 100).toFixed(2)) : '-',
+      fours: currentBallDetails.Batsman_Details?.Fours || '-',
+      sixes: currentBallDetails.Batsman_Details?.Sixes || '-'
+    };
+    // Non-striker
+    let nonStriker = {
+      name: currentBallDetails.Non_Striker_Name || '-',
+      runs: currentBallDetails.Non_Striker_Details?.Runs || '-',
+      balls: currentBallDetails.Non_Striker_Details?.Balls || '-',
+      strikeRate: currentBallDetails.Non_Striker_Details?.Runs && currentBallDetails.Non_Striker_Details?.Balls ? ((parseInt(currentBallDetails.Non_Striker_Details.Runs) / parseInt(currentBallDetails.Non_Striker_Details.Balls) * 100).toFixed(2)) : '-',
+      fours: currentBallDetails.Non_Striker_Details?.Fours || '-',
+      sixes: currentBallDetails.Non_Striker_Details?.Sixes || '-'
+    };
+    batsmenRows = [striker, nonStriker];
+
+    // Bowler
+    let bowlerDetails = currentBallDetails.Bowler_Details || {};
+    let bowler = {
+      name: currentBallDetails.Bowler_Name || '-',
+      overs: bowlerDetails.Overs || '-',
+      runs: bowlerDetails.Runs || currentBallDetails.Bowler_Conceded_Runs || '-',
+      wickets: bowlerDetails.Wickets || '-',
+      economy: bowlerDetails.Runs && bowlerDetails.Overs ? (parseInt(bowlerDetails.Runs) / (parseFloat(bowlerDetails.Overs) || 1)).toFixed(2) : '-',
+      dots: bowlerDetails.Dot_balls || '-'
+    };
+    bowlerRow = bowler;
+  }
 
   // Use the new commentary prop if available, otherwise fall back to old data
   const commentaryData = commentary || {};
@@ -32,9 +70,25 @@ const CommentaryTab = ({ matchDetail, matchId, commentary }) => {
     }
   }, [availableInnings, selectedInning]);
 
+  useEffect(() => {
+    if (commentaryData && Object.keys(commentaryData).length > 0) {
+      // create a for loop on commentaryData and check if
+      for (let i = Object.keys(commentaryData).length - 1; i >= 0; i--) {
+        const currentInnings = commentaryData[Object.keys(commentaryData)[i]];
+        // find the first isBall true in currentInnings
+        const ballDetails = currentInnings.find(ball => ball.Isball === true);
+        // if not found try to find in previous innings
+        if (ballDetails) {
+          setCurrentBallDetails(ballDetails);
+          break;
+        }
+      }
+    }
+  }, [commentaryData]);         
+
   let keyFacts = extractKeyFacts(matchDetail);
   keyFacts = matchDetail?.keyFacts || {};
-  console.log('keyFacts', keyFacts, matchDetail)
+  console.log('keyFacts', keyFacts, matchDetail, currentBallDetails)
   
   if (!matchDetail) {
     return (
@@ -72,7 +126,7 @@ const CommentaryTab = ({ matchDetail, matchId, commentary }) => {
               </tr>
             </thead>
             <tbody>
-              {playersInfo.batting.length > 0 ? playersInfo.batting.slice(0, 2).map((player, index) => (
+              {batsmenRows.length > 0 ? batsmenRows.map((player, index) => (
                 <tr key={index} className="table-row">
                   <td className="table-cell" style={{ textAlign: 'left' }}>{player.name}</td>
                   <td className="table-cell" style={{ textAlign: 'center' }}>{player.runs}</td>
@@ -110,16 +164,16 @@ const CommentaryTab = ({ matchDetail, matchId, commentary }) => {
               </tr>
             </thead>
             <tbody>
-              {playersInfo.bowling.length > 0 ? playersInfo.bowling.slice(0, 1).map((bowler, index) => (
-                <tr key={index} className="table-row">
-                  <td className="table-cell" style={{ textAlign: 'left' }}>{bowler.name}</td>
-                  <td className="table-cell" style={{ textAlign: 'center' }}>{bowler.overs}</td>
-                  <td className="table-cell" style={{ textAlign: 'center' }}>{bowler.runs}</td>
-                  <td className="table-cell" style={{ textAlign: 'center' }}>{bowler.wickets}</td>
-                  <td className="table-cell" style={{ textAlign: 'center' }}>{bowler.economy}</td>
-                  <td className="table-cell" style={{ textAlign: 'center' }}>{bowler.dots}</td>
+              {bowlerRow ? (
+                <tr className="table-row">
+                  <td className="table-cell" style={{ textAlign: 'left' }}>{bowlerRow.name}</td>
+                  <td className="table-cell" style={{ textAlign: 'center' }}>{bowlerRow.overs}</td>
+                  <td className="table-cell" style={{ textAlign: 'center' }}>{bowlerRow.runs}</td>
+                  <td className="table-cell" style={{ textAlign: 'center' }}>{bowlerRow.wickets}</td>
+                  <td className="table-cell" style={{ textAlign: 'center' }}>{bowlerRow.economy}</td>
+                  <td className="table-cell" style={{ textAlign: 'center' }}>{bowlerRow.dots}</td>
                 </tr>
-              )) : (
+              ) : (
                 <tr className="table-row">
                   <td className="table-cell" colSpan="6" style={{ textAlign: 'center', color: '#6b7280' }}>
                     No bowling data available for this inning

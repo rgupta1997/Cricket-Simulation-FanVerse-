@@ -293,24 +293,6 @@ class WebAppApiService {
     } catch (error) {
       console.warn(`⚠️ Commentary fetch failed for inning ${inningNo}:`, error.message);
       
-      // Fallback to local files for development/testing
-      try {
-        let commentaryData;
-        if (inningNo === 1) {
-          commentaryData = (await import('../data/UpdatedMatchCommentry1.json')).default;
-          console.log(`� Using local fallback data for inning ${inningNo}`);
-        } else if (inningNo === 2) {
-          commentaryData = (await import('../data/UpdatedMatchCommentry2.json')).default;
-          console.log(`📁 Using local fallback data for inning ${inningNo}`);
-        } else {
-          throw new Error(`No fallback data for inning ${inningNo}`);
-        }
-        
-        return commentaryData.Commentary || [];
-      } catch (fallbackError) {
-        console.error(`❌ Both API and fallback failed for inning ${inningNo}:`, fallbackError.message);
-        return [];
-      }
     }
   }
 
@@ -323,7 +305,7 @@ class WebAppApiService {
       
       // Extract basic match info
       const matchInfo = this.extractMatchInfo(scorecardData);
-      const teams = this.extractTeamsInfo(scorecardData);
+      const teams = scorecardData.Teams || {};
       const players = this.transformInningsData(scorecardData);
       
       // Transform commentary data to cricketData.json format
@@ -340,7 +322,7 @@ class WebAppApiService {
         // Match basic info
         matchId: matchId,
         matchInfo: matchInfo,
-        teams: teams,
+        Teams: teams,
         
         // Player data (batting, bowling, etc.)
         players: players,
@@ -480,30 +462,13 @@ class WebAppApiService {
     Object.keys(commentaryData).forEach(inningNo => {
       const inningCommentary = commentaryData[inningNo] || [];
       
-      transformedCommentary[inningNo] = inningCommentary.map(ball => ({
-        over: parseFloat(ball.Over) || 0,
-        ball: parseInt(ball.Ball_Number) || parseInt(ball.Ball) || 0,
-        runs: parseInt(ball.Runs) || 0,
-        totalRuns: this.parseScoreFromString(ball.Score),
-        wickets: this.parseWicketsFromString(ball.Score),
-        batsman: ball.Batsman_Name || 'Unknown Batsman',
-        bowler: ball.Bowler_Name || 'Unknown Bowler',
-        commentary: ball.Commentary || 'No commentary available',
-        // Additional fields for current match state
-        striker: ball.Batsman_Name || null,
-        nonStriker: ball.Non_Striker_Name || null,
-        bowlerName: ball.Bowler_Name || null,
-        // Raw API fields for debugging
-        rawScore: ball.Score,
-        rawOver: ball.Over,
-        isball: ball.Isball || false
-      }));
+      transformedCommentary[inningNo] = inningCommentary
       
       // Sort by over and ball number (latest first as mentioned)
-      transformedCommentary[inningNo].sort((a, b) => {
-        if (b.over !== a.over) return b.over - a.over;
-        return b.ball - a.ball;
-      });
+      // transformedCommentary[inningNo].sort((a, b) => {
+      //   if (b.over !== a.over) return b.over - a.over;
+      //   return b.ball - a.ball;
+      // });
     });
     
     return transformedCommentary;
@@ -607,73 +572,74 @@ class WebAppApiService {
     return scores;
   }
 
-  // Transform scorecard API response to match cricketData.json structure
-  transformScorecardData(apiData, matchFile) {
-    console.log('apiData:', apiData);
-    try {
-      console.log('🔄 Starting scorecard transformation for:', matchFile);
+  // // Transform scorecard API response to match cricketData.json structure
+  // transformScorecardData(apiData, matchFile) {
+  //   console.log('apiData:', apiData);
+  //   try {
+  //     console.log('🔄 Starting scorecard transformation for:', matchFile);
       
-      const matchId = this.extractMatchIdFromFile(matchFile);
+  //     const matchId = this.extractMatchIdFromFile(matchFile);
       
-      // Basic match info transformation
-      const matchInfo = {
-        tournament: apiData.title || 'Cricket Match',
-        date: apiData.date_start_ist || new Date().toISOString().split('T')[0],
-        time: apiData.date_start_ist || 'Time TBD',
-        venue: apiData.venue?.name || 'Venue TBD',
-        toss: apiData.toss || 'Toss details not available',
-        umpires: apiData.umpires || 'Umpires TBD',
-        referee: apiData.referee || 'Referee TBD',
-        manOfTheMatch: apiData.man_of_the_match || 'TBD'
-      };
+  //     // Basic match info transformation
+  //     const matchInfo = {
+  //       tournament: apiData.title || 'Cricket Match',
+  //       date: apiData.date_start_ist || new Date().toISOString().split('T')[0],
+  //       time: apiData.date_start_ist || 'Time TBD',
+  //       venue: apiData.venue?.name || 'Venue TBD',
+  //       toss: apiData.toss || 'Toss details not available',
+  //       umpires: apiData.umpires || 'Umpires TBD',
+  //       referee: apiData.referee || 'Referee TBD',
+  //       manOfTheMatch: apiData.man_of_the_match || 'TBD'
+  //     };
 
-      // Team information
-      const teams = {
-        team1: {
-          name: apiData.team1?.name || 'Team 1',
-          shortName: apiData.team1?.short_name || 'T1',
-          logoUrl: apiData.team1?.logo_url || null
-        },
-        team2: {
-          name: apiData.team2?.name || 'Team 2', 
-          shortName: apiData.team2?.short_name || 'T2',
-          logoUrl: apiData.team2?.logo_url || null
-        }
-      };
+  //     // Team information
+  //     const teams = {
+  //       team1: {
+  //         name: apiData.team1?.name || 'Team 1',
+  //         shortName: apiData.team1?.short_name || 'T1',
+  //         logoUrl: apiData.team1?.logo_url || null
+  //       },
+  //       team2: {
+  //         name: apiData.team2?.name || 'Team 2', 
+  //         shortName: apiData.team2?.short_name || 'T2',
+  //         logoUrl: apiData.team2?.logo_url || null
+  //       }
+  //     };
 
-      // Batting and bowling data transformation
-      const playersData = this.transformPlayersData(apiData);
+  //     // Batting and bowling data transformation
+  //     const playersData = this.transformPlayersData(apiData);
 
-      // Live scores for quick access
-      const scores = {
-        team1: this.extractTeamScore(apiData, 'team1'),
-        team2: this.extractTeamScore(apiData, 'team2')
-      };
+  //     // Live scores for quick access
+  //     const scores = {
+  //       team1: this.extractTeamScore(apiData, 'team1'),
+  //       team2: this.extractTeamScore(apiData, 'team2')
+  //     };
 
-      // Keep wagon wheel as dummy data as requested
-      const wagonWheel = this.getDummyWagonWheelData();
+  //     // Keep wagon wheel as dummy data as requested
+  //     const wagonWheel = this.getDummyWagonWheelData();
 
-      const transformedData = {
-        matchId: matchId,
-        matchInfo,
-        teams,
-        players: playersData,
-        scores,
-        wagonWheel,
-        keyFacts: this.extractKeyFacts(apiData),
-        ballByBall: this.extractBallByBall(apiData),
-        rawApiData: apiData // Keep original for debugging
-      };
+  //     const transformedData = {
+  //       matchId: matchId,
 
-      console.log('✅ Scorecard transformation completed successfully');
-      return transformedData;
+  //       matchInfo,
+        
+  //       players: playersData,
+  //       scores,
+  //       wagonWheel,
+  //       keyFacts: this.extractKeyFacts(apiData),
+  //       ballByBall: this.extractBallByBall(apiData),
+  //       rawApiData: apiData // Keep original for debugging
+  //     };
+
+  //     console.log('✅ Scorecard transformation completed successfully');
+  //     return transformedData;
       
-    } catch (error) {
-      console.error('❌ Error transforming scorecard data:', error);
-      console.log('📋 Raw API data causing error:', apiData);
-      throw error;
-    }
-  }
+  //   } catch (error) {
+  //     console.error('❌ Error transforming scorecard data:', error);
+  //     console.log('📋 Raw API data causing error:', apiData);
+  //     throw error;
+  //   }
+  // }
 
   // Transform commentary API response to match cricketData.json structure
   transformCommentaryData(apiData, inningNo) {
