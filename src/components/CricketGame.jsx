@@ -85,6 +85,32 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
 
   // Handler for updating ball shot configuration
   const handleBallShotConfigUpdate = useCallback((newConfig) => {
+    console.group('📊 BALL SHOT CONFIG UPDATE DEBUG');
+    
+    const previousConfig = gameState.controls.ballShot;
+    console.log('PREVIOUS CONFIG:', previousConfig);
+    console.log('NEW CONFIG:', newConfig);
+    
+    const updatedConfig = {
+      ...previousConfig,
+      ...newConfig
+    };
+    console.log('MERGED CONFIG:', updatedConfig);
+    
+    // Check for distance changes specifically
+    if (newConfig.distance !== undefined) {
+      console.log('🎯 DISTANCE VALUE CHANGE DETECTED:', {
+        oldDistance: previousConfig.distance,
+        newDistance: newConfig.distance,
+        oldType: typeof previousConfig.distance,
+        newType: typeof newConfig.distance,
+        isNumeric: !isNaN(parseFloat(newConfig.distance)),
+        parsedValue: parseFloat(newConfig.distance)
+      });
+    }
+    
+    console.groupEnd();
+    
     setGameState(prevState => ({
       ...prevState,
       controls: {
@@ -96,7 +122,7 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       }
     }));
     console.log('🏏 Updated ball shot config:', newConfig);
-  }, []);
+  }, [gameState.controls.ballShot]);
 
   // Debug: Log when component mounts
   useEffect(() => {
@@ -245,27 +271,36 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     const angle = shotAngle; // Use the live angle from arrow key state
     const shotModifier = shotTypeModifiers[selectedShotType] || shotTypeModifiers['drive'];
     const elevation = shotModifier.elevation;
-    const adjustedPower = timingPower * shotModifier.powerMultiplier;
-    const shotDirection = calculateShotVector(angle, adjustedPower, elevation, '🎯');
+    
+    // Use DETERMINISTIC distance from ball shot configuration
+    const ballShotConfig = gameState.controls.ballShot;
+    const targetDistance = ballShotConfig.distance || 15; // Get exact distance from config
+    const shotDirection = calculateShotVector(angle, targetDistance, elevation, '🎯 MANUAL');
+    
+    console.log('🎯 MANUAL SHOT CALCULATION (DETERMINISTIC):');
+    console.log('  - Angle:', angle, '°');
+    console.log('  - Target Distance:', targetDistance, 'm (EXACT from config)');
+    console.log('  - Shot Type:', selectedShotType, 'Elevation:', elevation);
+    console.log('  - Deterministic Shot Direction:', shotDirection);
     
     console.log('🏏 EXECUTING SHOT:', selectedShotDirection, 'Type:', selectedShotType, 'Live Angle:', angle, '° Direction:', shotDirection);
     
-    // Calculate final velocity with timing-based power
-    const scaledVelocity = shotDirection.map(v => v * (adjustedPower / 15));
+    // Calculate final velocity with deterministic target distance
+    const scaledVelocity = shotDirection; // Use exact calculated velocity from deterministic system
     
-    console.log('💥 HITTING BALL with velocity:', scaledVelocity);
+    console.log('💥 HITTING BALL with deterministic velocity:', scaledVelocity);
     
-    // Hit the ball with timing-based power!
+    // Hit the ball with exact distance control!
     setGameState(prevState => updateGameState(prevState, {
       type: 'BALL_HIT',
       payload: {
         newVelocity: scaledVelocity,
         trajectory: shotDirection,
-        isRunnable: timingPower > 12,
+        isRunnable: targetDistance > 5, // Runnable if distance > 5m
         shotType: selectedShotType,
         shotDirection: selectedShotDirection,
-        power: timingPower,
-        timing: distance
+        power: targetDistance, // Use target distance as power indicator
+        timing: targetDistance // Use target distance for consistency
       }
     }));
     
@@ -366,6 +401,37 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     }
   }, [handleFielding]);
 
+  // Debug helper for ball shot power analysis
+  const debugBallShotPower = (config) => {
+    console.group('🔍 BALL SHOT POWER ANALYSIS');
+    console.log('1️⃣ Raw Config:', {
+      rawConfig: config,
+      power: config.power,
+      powerType: typeof config.power,
+      distance: config.distance,
+      distanceType: typeof config.distance
+    });
+
+    // Check if power is affecting distance
+    const effectiveDistance = config.distance;
+    console.log('2️⃣ Distance Check:', {
+      rawDistance: config.distance,
+      effectiveDistance: effectiveDistance,
+      isPowerAffectingDistance: effectiveDistance !== config.distance,
+      power: config.power
+    });
+
+    // Verify shot vector inputs
+    console.log('3️⃣ Shot Vector Inputs:', {
+      angle: config.degree,
+      targetDistance: effectiveDistance,
+      elevation: config.lofted ? 8.0 : 0.5,
+      power: config.power // Should not affect calculation
+    });
+
+    console.groupEnd();
+  };
+
   const handleBallReachTarget = useCallback((targetData) => {
     if (targetData.target === 'batsman') {
       // Ball reached batsman - trigger batting opportunity
@@ -396,55 +462,179 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       if (shouldAutoShot) {
         console.log('🤖 AUTO SHOT TRIGGERED! Distance:', distanceZ.toFixed(2), 'Config:', ballShotConfig);
         
-        // Trigger automatic shot using ball shot configuration
+        // Trigger automatic shot using ball shot configuration immediately when ball is in position
         setTimeout(() => {
-          const distance = distanceZ;
-          const timingPower = Math.max(8, Math.min(25, 25 - (distance * 4)));
+          // Ensure we have valid values from configuration
+          const ballShotConfig = gameState.controls.ballShot;
+          const targetDistance = parseFloat(ballShotConfig.distance) || 15; // Default to 15m if not specified
           
-          // Use ball shot configuration
+          console.log('🎯 AUTO SHOT PARAMETERS:', {
+            distance: targetDistance,
+            config: ballShotConfig
+          });
+          
+          // DEBUG: Comprehensive auto shot analysis
+          console.group('🔍 AUTO SHOT DEBUG ANALYSIS');
+          
+          console.log('1️⃣ RAW INPUT VALUES:', {
+            degree: ballShotConfig.degree,
+            distance: ballShotConfig.distance,
+            distanceType: typeof ballShotConfig.distance,
+            lofted: ballShotConfig.lofted,
+            rawBallShotConfig: ballShotConfig
+          });
+          
+          // Use ball shot configuration for DETERMINISTIC shot
           const angle = ballShotConfig.degree || 0;
-          const power = ballShotConfig.power || 0.8;
           const isLofted = ballShotConfig.lofted || false;
           const elevation = isLofted ? 8.0 : 0.5;
           
-          const adjustedPower = Math.max(15, timingPower * power); // Ensure minimum power of 15
-          const shotDirection = calculateShotVector(angle, adjustedPower, elevation, '🤖 AUTO');
-          const scaledVelocity = shotDirection.map(v => v * Math.max(1.0, adjustedPower / 15)); // Ensure minimum velocity
+          console.log('2️⃣ PRE-CALCULATION VALUES:', {
+            angle,
+            targetDistance,
+            isLofted,
+            elevation,
+            shot_type: ballShotConfig.type || 'drive'
+          });
           
-          console.log('🤖 AUTO SHOT CALCULATION:');
+          console.log('3️⃣ EXPECTED CALCULATION:', {
+            expectedX: 0 + Math.cos(angle * Math.PI / 180) * targetDistance,
+            expectedZ: -9 + (-Math.sin(angle * Math.PI / 180)) * targetDistance,
+            expectedDistance: targetDistance,
+            calculationFormula: `X = 0 + cos(${angle}°) * ${targetDistance} = ${(Math.cos(angle * Math.PI / 180) * targetDistance).toFixed(3)}`,
+            calculationFormulaZ: `Z = -9 + (-sin(${angle}°)) * ${targetDistance} = ${(-9 + (-Math.sin(angle * Math.PI / 180) * targetDistance)).toFixed(3)}`
+          });
+          
+          // Adjust the calculation to account for striker's position
+          const strikerOffset = -9; // Striker's Z position
+          const adjustedAngle = angle * (Math.PI / 180); // Convert to radians
+          
+          // Calculate velocities based on striker's position
+          const velocityX = Math.cos(adjustedAngle) * targetDistance;
+          const velocityY = Math.sin(elevation) * targetDistance;
+          const velocityZ = -Math.sin(adjustedAngle) * targetDistance;
+          
+          const shotDirection = [velocityX, velocityY, velocityZ];
+          const scaledVelocity = shotDirection;
+          
+          console.log('4️⃣ CALCULATESHOT VECTOR RESULT:', {
+            strikerPosition: [0, 0, strikerOffset],
+            angle: angle,
+            adjustedAngle: adjustedAngle,
+            targetDistance,
+            shotDirection,
+            scaledVelocity,
+            expectedEndPosition: {
+              x: velocityX,
+              y: velocityY,
+              z: strikerOffset + velocityZ
+            }
+          });
+          
+          console.log('5️⃣ VELOCITY ANALYSIS:', {
+            velocityX: scaledVelocity[0],
+            velocityY: scaledVelocity[1],
+            velocityZ: scaledVelocity[2],
+            velocityMagnitude: Math.sqrt(
+              scaledVelocity[0] ** 2 + 
+              scaledVelocity[1] ** 2 + 
+              scaledVelocity[2] ** 2
+            ),
+            isPowerfulShot: Math.sqrt(scaledVelocity[0] ** 2 + scaledVelocity[2] ** 2) > 15
+          });
+          
+          console.groupEnd();
+          
+          console.log('🤖 AUTO SHOT CALCULATION (DETERMINISTIC):');
           console.log('  - Angle:', angle, '°');
-          console.log('  - Power:', power, 'Adjusted:', adjustedPower);
+          console.log('  - Target Distance:', targetDistance, 'm (EXACT)');
           console.log('  - Lofted:', isLofted, 'Elevation:', elevation);
-          console.log('  - Shot Direction:', shotDirection);
-          console.log('  - Final Velocity:', scaledVelocity);
+          console.log('  - Deterministic Shot Direction:', shotDirection);
+          console.log('  - Final Velocity (Exact):', scaledVelocity);
           
-          console.log('🤖 AUTO SHOT: Angle:', angle, '° Power:', power, 'Lofted:', isLofted, 'Velocity:', scaledVelocity);
+          console.log('🤖 AUTO SHOT: Angle:', angle, '° Lofted:', isLofted, 'Velocity:', scaledVelocity);
           
-          // Execute auto shot - ensure ball is positioned at striker before hitting
+          // Execute auto shot from striker's position
           setGameState(prevState => {
-            // First, update ball position to striker's position
+            console.group('🎯 AUTO SHOT EXECUTION DEBUG');
+            
+            // Log shot configuration with position details
+            console.log('1️⃣ Shot Configuration:', {
+              rawConfig: ballShotConfig,
+              processedDistance: targetDistance,
+              strikerPosition: [0, 0, -9],
+              angle: angle,
+              elevation: elevation
+            });
+
+            console.log('2️⃣ Shot Vector Details:', {
+              initialPosition: [0, 0.5, -9],
+              targetDistance,
+              calculatedVelocity: scaledVelocity,
+              expectedEndpoint: [
+                scaledVelocity[0],
+                scaledVelocity[1],
+                -9 + scaledVelocity[2]
+              ]
+            });
+
+            console.groupEnd();
+            
+            // Position ball at striker and apply the shot
             const updatedState = {
               ...prevState,
               currentBall: {
                 ...prevState.currentBall,
-                position: [0, 0.5, -9] // Set ball at striker's position before hitting
+                position: [0, 0.5, -9], // Striker's position
+                velocity: [0, 0, 0] // Reset velocity before shot
               }
             };
             
-            // Then apply the ball hit action
+            // Apply the ball hit action with the calculated trajectory
             return updateGameState(updatedState, {
               type: 'BALL_HIT',
               payload: {
                 newVelocity: scaledVelocity,
                 trajectory: shotDirection,
-                isRunnable: timingPower > 12,
-                shotType: isLofted ? 'loft' : 'drive',
+                isRunnable: targetDistance > 5,
+                shotType: isLofted ? 'loft' : ballShotConfig.type || 'drive',
                 shotDirection: `${angle}°`,
-                power: timingPower,
-                timing: distance
+                startPosition: [0, 0.5, -9], // Ensure shot starts from striker
+                targetDistance // For verification
               }
             });
           });
+          
+          // Add physics tracking after shot execution
+          setTimeout(() => {
+            console.group('🏀 BALL PHYSICS VERIFICATION');
+            
+            const currentBallPosition = gameState.currentBall.position;
+            const actualDistance = Math.sqrt(
+              Math.pow(currentBallPosition[0], 2) + 
+              Math.pow(currentBallPosition[2] + 9, 2)
+            );
+            
+            console.log('6️⃣ IMMEDIATE POST-SHOT STATE:', {
+              ballPosition: currentBallPosition,
+              ballVelocity: gameState.currentBall.velocity,
+              calculatedDistance: actualDistance,
+              deterministicTarget: window.deterministicTarget
+            });
+            
+            if (window.deterministicTarget) {
+              console.log('7️⃣ PHYSICS VS DETERMINISTIC COMPARISON:', {
+                targetDistance: window.deterministicTarget.exactDistance,
+                actualDistance: actualDistance,
+                difference: Math.abs(actualDistance - window.deterministicTarget.exactDistance),
+                isPhysicsOverriding: Math.abs(actualDistance - window.deterministicTarget.exactDistance) > 0.5,
+                targetPosition: window.deterministicTarget.finalStopPosition,
+                actualPosition: currentBallPosition
+              });
+            }
+            
+            console.groupEnd();
+          }, 200); // Check after physics has time to update
           
           console.log('🤖 Auto shot executed successfully!');
         }, 100); // Small delay to ensure state is updated

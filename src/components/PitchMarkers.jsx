@@ -98,93 +98,83 @@ const PitchMarkers = ({ bowlingControls, showCoordinates = true, showGrid = true
 
       {/* Trajectory Line */}
       <group>
-        {/* Release to Bounce line */}
-        <line>
-          <bufferGeometry>
-            <bufferAttribute
-              attach="attributes-position"
-              count={2}
-              array={new Float32Array([
-                ...releasePos,
-                ...bouncePos
-              ])}
-              itemSize={3}
-            />
-          </bufferGeometry>
-          <lineBasicMaterial color="#FFAA00" linewidth={3} />
-        </line>
+        {/* Release to Bounce line - using cylinder to avoid line material issues */}
+        <mesh 
+          position={[
+            (releasePos[0] + bouncePos[0]) / 2,
+            (releasePos[1] + bouncePos[1]) / 2,
+            (releasePos[2] + bouncePos[2]) / 2
+          ]}
+          rotation={[
+            0,
+            0,
+            Math.atan2(bouncePos[0] - releasePos[0], bouncePos[2] - releasePos[2])
+          ]}
+        >
+          <cylinderGeometry args={[
+            0.02, 
+            0.02, 
+            Math.sqrt(
+              Math.pow(bouncePos[0] - releasePos[0], 2) + 
+              Math.pow(bouncePos[1] - releasePos[1], 2) + 
+              Math.pow(bouncePos[2] - releasePos[2], 2)
+            ), 
+            8
+          ]} />
+          <meshBasicMaterial color="#FFAA00" transparent opacity={0.6} />
+        </mesh>
         
-        {/* Bounce to Final line */}
-        <line>
-          <bufferGeometry>
-            <bufferAttribute
-              attach="attributes-position"
-              count={2}
-              array={new Float32Array([
-                ...bouncePos,
-                ...finalPos
-              ])}
-              itemSize={3}
-            />
-          </bufferGeometry>
-          <lineBasicMaterial color="#FFAA00" linewidth={3} dashSize={0.2} gapSize={0.1} />
-        </line>
+        {/* Bounce to Final line - using cylinder */}
+        <mesh 
+          position={[
+            (bouncePos[0] + finalPos[0]) / 2,
+            (bouncePos[1] + finalPos[1]) / 2,
+            (bouncePos[2] + finalPos[2]) / 2
+          ]}
+          rotation={[
+            0,
+            0,
+            Math.atan2(finalPos[0] - bouncePos[0], finalPos[2] - bouncePos[2])
+          ]}
+        >
+          <cylinderGeometry args={[
+            0.015, 
+            0.015, 
+            Math.sqrt(
+              Math.pow(finalPos[0] - bouncePos[0], 2) + 
+              Math.pow(finalPos[1] - bouncePos[1], 2) + 
+              Math.pow(finalPos[2] - bouncePos[2], 2)
+            ), 
+            8
+          ]} />
+          <meshBasicMaterial color="#FFAA00" transparent opacity={0.4} />
+        </mesh>
       </group>
 
       {/* Pitch Grid Overlay */}
       {showGrid && (
         <group>
-          {/* Length lines (parallel to pitch) */}
+          {/* Length lines (parallel to pitch) - using thin cylinders instead of lines */}
           {[-10, -5, 0, 5, 10].map(z => (
-            <line key={`length-${z}`}>
-              <bufferGeometry>
-                <bufferAttribute
-                  attach="attributes-position"
-                  count={2}
-                  array={new Float32Array([
-                    -2, 0.01, z,
-                    2, 0.01, z
-                  ])}
-                  itemSize={3}
-                />
-              </bufferGeometry>
-              <lineBasicMaterial color="#FFFFFF" transparent opacity={0.3} />
-            </line>
+            <mesh key={`length-${z}`} position={[0, 0.01, z]} rotation={[0, 0, Math.PI/2]}>
+              <cylinderGeometry args={[0.005, 0.005, 4, 6]} />
+              <meshBasicMaterial color="#FFFFFF" transparent opacity={0.3} />
+            </mesh>
           ))}
           
-          {/* Width lines (across pitch) */}
+          {/* Width lines (across pitch) - using thin cylinders */}
           {[-1.5, -0.75, 0, 0.75, 1.5].map(x => (
-            <line key={`width-${x}`}>
-              <bufferGeometry>
-                <bufferAttribute
-                  attach="attributes-position"
-                  count={2}
-                  array={new Float32Array([
-                    x, 0.01, -11,
-                    x, 0.01, 11
-                  ])}
-                  itemSize={3}
-                />
-              </bufferGeometry>
-              <lineBasicMaterial color="#FFFFFF" transparent opacity={0.2} />
-            </line>
+            <mesh key={`width-${x}`} position={[x, 0.01, 0]} rotation={[0, 0, 0]}>
+              <cylinderGeometry args={[0.005, 0.005, 22, 6]} />
+              <meshBasicMaterial color="#FFFFFF" transparent opacity={0.2} />
+            </mesh>
           ))}
           
-          {/* Center line */}
-          <line>
-            <bufferGeometry>
-              <bufferAttribute
-                attach="attributes-position"
-                count={2}
-                array={new Float32Array([
-                  0, 0.01, -11,
-                  0, 0.01, 11
-                ])}
-                itemSize={3}
-              />
-            </bufferGeometry>
-            <lineBasicMaterial color="#FFFF00" transparent opacity={0.5} />
-          </line>
+          {/* Center line - using cylinder */}
+          <mesh position={[0, 0.01, 0]} rotation={[0, 0, 0]}>
+            <cylinderGeometry args={[0.008, 0.008, 22, 8]} />
+            <meshBasicMaterial color="#FFFF00" transparent opacity={0.5} />
+          </mesh>
           
           {/* Coordinate markers every 5 meters */}
           {[-10, -5, 0, 5, 10].map(z => (

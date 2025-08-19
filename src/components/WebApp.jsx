@@ -860,7 +860,22 @@ const MatchDetailPage = ({ matchId, onBackClick }) => {
       if (enrichedMatch.status !== 'upcoming' && enrichedMatch.matchFile) {
         try {
           const detailData = await webappApiService.getLiveInningsData(enrichedMatch.matchFile);
+          console.log('📄 Match detail data:', detailData);
           setMatchDetail(detailData);
+          
+          // Determine number of innings from match details
+          let inningsCount = 2; // Default to 2 innings
+          if (detailData.matchDetails && detailData.matchDetails.innings) {
+            inningsCount = detailData.matchDetails.innings.length;
+          } else if (detailData.innings) {
+            inningsCount = detailData.innings.length;
+          }
+          
+          console.log(`🏏 Determined ${inningsCount} innings for match ${enrichedMatch.matchFile}`);
+          
+          // Fetch commentary for all innings based on actual innings count
+          const commentaryData = await webappApiService.fetchAllInningsCommentary(enrichedMatch.matchFile, inningsCount);
+          setCommentary(commentaryData);
           
           // Update match object with real team data from live API
           console.log('🔍 DEBUG: detailData structure:', Object.keys(detailData));
@@ -930,18 +945,6 @@ const MatchDetailPage = ({ matchId, onBackClick }) => {
       setLiveData(data);
     } catch (err) {
       console.warn('Could not fetch live data:', err);
-    }
-  };
-
-  const fetchCommentary = async () => {
-    if (!match?.matchFile) return;
-    
-    try {
-      // Default to first innings for now
-      const data = await webappApiService.getCommentaryData(match.matchFile, 1);
-      setCommentary(data);
-    } catch (err) {
-      console.warn('Could not fetch commentary:', err);
     }
   };
 
@@ -1215,7 +1218,7 @@ const WebApp = () => {
         </React.Suspense>
       )}
       
-      <style jsx>{`
+      <style>{`
         @keyframes pulse {
           0% {
             opacity: 1;

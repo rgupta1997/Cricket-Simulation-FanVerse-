@@ -77,8 +77,8 @@ class WebAppApiService {
       const scorecardData = scorecardResponse.data;
       console.log('🏏 Scorecard API Response for', matchFile, ':', scorecardData);
       
-      // Step 2: Determine number of innings from scorecard data
-      const inningsCount = scorecardData.innings ? scorecardData.innings.length : 2; // Default to 2 if not available
+      // Step 2: Determine number of innings from scorecard data (use new structure)
+      const inningsCount = scorecardData.Innings ? scorecardData.Innings.length : 2; // Default to 2 if not available
       console.log('📈 Found', inningsCount, 'innings in scorecard data');
       
       // Step 3: Fetch commentary for all innings
@@ -128,7 +128,7 @@ class WebAppApiService {
     
     return events.map(event => {
       const matchId = event.match_id;
-      console.log('📝 Creating fixture with matchId:', matchId, 'Type:', typeof matchId, 'From event.match_id:', event.match_id);
+      // console.log('📝 Creating fixture with matchId:', matchId, 'Type:', typeof matchId, 'From event.match_id:', event.match_id);
       
       return {
         matchId: matchId,
@@ -222,8 +222,22 @@ class WebAppApiService {
     };
   }
 
+  // Get enhanced match data (if available locally)
+  async getEnhancedMatchData(matchFile) {
+    try {
+      const enhancedData = (await import('../data/UpdatedMatchFile.json')).default;
+      console.log('📈 Using enhanced local match data:', enhancedData);
+      return enhancedData;
+    } catch (error) {
+      console.log('📡 Enhanced match data not available locally:', error.message);
+      return null;
+    }
+  }
+
   // Fetch commentary for all innings dynamically
   async fetchAllInningsCommentary(matchFile, inningsCount) {
+    console.log(`🏏 Fetching commentary for match: ${matchFile}, innings: ${inningsCount}`);
+    
     const commentaryPromises = [];
     const commentaryResults = {};
     
@@ -251,7 +265,8 @@ class WebAppApiService {
     console.log('📝 Commentary fetch completed for', inningsCount, 'innings');
     console.log('🎯 Final commentary results structure:', Object.keys(commentaryResults).map(key => ({
       inning: key,
-      count: commentaryResults[key].length
+      count: commentaryResults[key].length,
+      hasData: commentaryResults[key].length > 0
     })));
     
     return commentaryResults;
@@ -260,12 +275,16 @@ class WebAppApiService {
   // Fetch commentary for a specific inning
   async fetchInningCommentary(matchFile, inningNo) {
     try {
+      console.log(`💬 Fetching commentary for match: ${matchFile}, inning: ${inningNo}`);
+      
       const response = await axios.get(
         `${SPORTZ_BASE_URL}/${matchFile}_commentary_all_${inningNo}.json`
       );
       
       if (response.status === 200) {
         console.log(`💬 Commentary API Response for inning ${inningNo}:`, response.data);
+        console.log(`📊 Commentary items count for inning ${inningNo}:`, response.data.Commentary?.length || 0);
+        
         // The actual API returns commentary in 'Commentary' array (capital C)
         return response.data.Commentary || [];
       } else {
@@ -273,14 +292,32 @@ class WebAppApiService {
       }
     } catch (error) {
       console.warn(`⚠️ Commentary fetch failed for inning ${inningNo}:`, error.message);
-      return [];
+      
+      // Fallback to local files for development/testing
+      try {
+        let commentaryData;
+        if (inningNo === 1) {
+          commentaryData = (await import('../data/UpdatedMatchCommentry1.json')).default;
+          console.log(`� Using local fallback data for inning ${inningNo}`);
+        } else if (inningNo === 2) {
+          commentaryData = (await import('../data/UpdatedMatchCommentry2.json')).default;
+          console.log(`📁 Using local fallback data for inning ${inningNo}`);
+        } else {
+          throw new Error(`No fallback data for inning ${inningNo}`);
+        }
+        
+        return commentaryData.Commentary || [];
+      } catch (fallbackError) {
+        console.error(`❌ Both API and fallback failed for inning ${inningNo}:`, fallbackError.message);
+        return [];
+      }
     }
   }
 
   // Combine scorecard and commentary data into cricketData.json structure
   combineMatchData(scorecardData, commentaryData, matchFile) {
     try {
-      console.log('🔄 Starting data combination...');
+      console.log('🔄 Starting data combination...', scorecardData);
       
       const matchId = this.extractMatchIdFromFile(matchFile);
       
@@ -328,7 +365,9 @@ class WebAppApiService {
         
         // Raw data for debugging
         rawScorecardData: scorecardData,
-        rawCommentaryData: commentaryData
+        rawCommentaryData: commentaryData,
+        matchDetails: scorecardData,
+        Innings: scorecardData.Innings || []
       };
       
       console.log('✅ Data combination completed successfully');
@@ -354,44 +393,60 @@ class WebAppApiService {
     console.log('ℹ️ Extracting match info from scorecard...');
     console.log('📝 Available fields:', Object.keys(scorecardData));
     
+    const matchDetail = scorecardData.Matchdetail || {};
+    const series = scorecardData.Series || {};
+    const venue = scorecardData.Venue || {};
+    const officials = scorecardData.Officials || {};
+    
     return {
-      tournament: scorecardData.title || scorecardData.series_name || scorecardData.tournament || 'Cricket Match',
-      date: scorecardData.date_start_ist || scorecardData.match_date || scorecardData.date || new Date().toISOString().split('T')[0],
-      time: scorecardData.time_start_ist || scorecardData.match_time || scorecardData.time || 'Time TBD',
-      venue: scorecardData.venue?.name || scorecardData.venue || 'Venue TBD',
-      toss: scorecardData.toss || scorecardData.toss_info || 'Toss details not available',
-      umpires: scorecardData.umpires || scorecardData.match_officials?.umpires || 'Umpires TBD',
-      referee: scorecardData.referee || scorecardData.match_officials?.referee || 'Referee TBD',
-      manOfTheMatch: scorecardData.man_of_the_match || scorecardData.mom || 'TBD'
+      tournament: series.Name || series.Series_short_display_name || 'Cricket Match',
+      date: matchDetail.Date || matchDetail.StartDate || new Date().toISOString().split('T')[0],
+      time: matchDetail.Time || matchDetail.StartDate || 'Time TBD',
+      venue: venue.Name || 'Venue TBD',
+      toss: matchDetail.Tosswonby && matchDetail.Toss_elected_to 
+        ? `Team ${matchDetail.Tosswonby} won toss and elected to ${matchDetail.Toss_elected_to}`
+        : 'Toss details not available',
+      umpires: officials.Umpires || 'Umpires TBD',
+      referee: officials.Referee || 'Referee TBD',
+      manOfTheMatch: matchDetail.Player_Match || 'TBD'
     };
   }
 
   // Extract teams info from scorecard data
   extractTeamsInfo(scorecardData) {
     console.log('🏏 Extracting teams from scorecard data...');
-    console.log('📊 Teams data structure:', scorecardData.teams);
+    console.log('📊 Teams data structure:', scorecardData.Teams);
     
-    // Use teams array from API response
-    const teams = scorecardData.teams || [];
+    // Get team IDs from match detail
+    const team1Id = scorecardData.Matchdetail?.Team_Home;
+    const team2Id = scorecardData.Matchdetail?.Team_Away;
     
-    const team1 = teams[0] || {};
-    const team2 = teams[1] || {};
+    console.log('🏏 Team IDs - Home:', team1Id, 'Away:', team2Id);
     
-    console.log('🔍 Team 1 ALL FIELDS:', Object.keys(team1));
-    console.log('🔍 Team 1 OBJECT:', team1);
-    console.log('🔍 Team 2 ALL FIELDS:', Object.keys(team2));
-    console.log('🔍 Team 2 OBJECT:', team2);
+    // Access teams data from the Teams object
+    const teamsData = scorecardData.Teams || {};
+    const team1Data = teamsData[team1Id] || {};
+    const team2Data = teamsData[team2Id] || {};
+    
+    console.log('🔍 Team 1 ALL FIELDS:', Object.keys(team1Data));
+    console.log('🔍 Team 1 OBJECT:', team1Data);
+    console.log('🔍 Team 2 ALL FIELDS:', Object.keys(team2Data));
+    console.log('🔍 Team 2 OBJECT:', team2Data);
     
     return {
       team1: {
-        name: team1.name || team1.team_name || team1.Name || team1.TeamName || 'Team 1',
-        shortName: team1.short_name || team1.short_name || team1.ShortName || team1.team_short_name || team1.code || team1.Code || 'T1',
-        logoUrl: team1.logo_url || team1.team_logo || team1.LogoUrl || null
+        id: team1Id,
+        name: team1Data.Name_Full || 'Team 1',
+        shortName: team1Data.Name_Short || 'T1',
+        logoUrl: team1Data.LogoUrl || null,
+        players: team1Data.Players || {}
       },
       team2: {
-        name: team2.name || team2.team_name || team2.Name || team2.TeamName || 'Team 2', 
-        shortName: team2.short_name || team2.short_name || team2.ShortName || team2.team_short_name || team2.code || team2.Code || 'T2',
-        logoUrl: team2.logo_url || team2.team_logo || team2.LogoUrl || null
+        id: team2Id,
+        name: team2Data.Name_Full || 'Team 2', 
+        shortName: team2Data.Name_Short || 'T2',
+        logoUrl: team2Data.LogoUrl || null,
+        players: team2Data.Players || {}
       }
     };
   }
@@ -400,17 +455,17 @@ class WebAppApiService {
   transformInningsData(scorecardData) {
     const players = {};
     
-    if (scorecardData.innings && Array.isArray(scorecardData.innings)) {
-      scorecardData.innings.forEach((inning, index) => {
+    if (scorecardData.Innings && Array.isArray(scorecardData.Innings)) {
+      scorecardData.Innings.forEach((inning, index) => {
         const inningKey = (index + 1).toString();
         
         players[inningKey] = {
-          batting: this.transformBattingData(inning.batting || []),
-          bowling: this.transformBowlingData(inning.bowling || []),
-          extras: inning.extras_string || '0',
-          total: inning.total_string || `${inning.runs || 0}/${inning.wickets || 0}`,
-          didNotBat: inning.did_not_bat || [],
-          fallOfWickets: this.transformFallOfWickets(inning.fall_of_wickets || [])
+          batting: this.transformBattingData(inning.Batsmen || []),
+          bowling: this.transformBowlingData(inning.Bowlers || []),
+          extras: `${inning.Byes || 0}b ${inning.Legbyes || 0}lb ${inning.Wides || 0}w ${inning.Noballs || 0}nb`,
+          total: `${inning.Total || 0}/${inning.Wickets || 0}`,
+          didNotBat: this.extractDidNotBat(scorecardData, inning.Battingteam, inning.Batsmen || []),
+          fallOfWickets: this.transformFallOfWickets(inning.FallofWickets || [])
         };
       });
     }
@@ -535,16 +590,16 @@ class WebAppApiService {
   extractLiveScores(scorecardData) {
     const scores = {};
     
-    if (scorecardData.innings && Array.isArray(scorecardData.innings)) {
-      scorecardData.innings.forEach((inning, index) => {
+    if (scorecardData.Innings && Array.isArray(scorecardData.Innings)) {
+      scorecardData.Innings.forEach((inning, index) => {
         const teamKey = `team${index + 1}`;
         scores[teamKey] = {
-          runs: inning.runs || 0,
-          wickets: inning.wickets || 0,
-          overs: inning.overs || '0.0',
-          target: inning.target || null,
-          required: inning.required_runs || null,
-          requiredRate: inning.required_run_rate || null
+          runs: parseInt(inning.Total) || 0,
+          wickets: parseInt(inning.Wickets) || 0,
+          overs: inning.Overs || '0.0',
+          target: parseInt(inning.Target) || null,
+          required: null, // Could be calculated if needed
+          requiredRate: null // Could be calculated if needed
         };
       });
     }
@@ -554,6 +609,7 @@ class WebAppApiService {
 
   // Transform scorecard API response to match cricketData.json structure
   transformScorecardData(apiData, matchFile) {
+    console.log('apiData:', apiData);
     try {
       console.log('🔄 Starting scorecard transformation for:', matchFile);
       
@@ -693,37 +749,41 @@ class WebAppApiService {
   }
 
   // Transform batting data
-  transformBattingData(battingArray) {
-    return battingArray.map(batsman => ({
-      name: batsman.name || 'Unknown',
-      runs: batsman.runs || 0,
-      balls: batsman.balls_faced || 0,
-      strikeRate: batsman.strike_rate || 0,
-      fours: batsman.fours || 0,
-      sixes: batsman.sixes || 0,
-      dismissal: batsman.dismissal || 'not out'
-    }));
+  transformBattingData(batsmenArray) {
+    return batsmenArray
+      .filter(batsman => batsman.Runs !== "" && batsman.Balls !== "") // Only players who batted
+      .map(batsman => ({
+        name: `Player ${batsman.Batsman}`, // Will be enriched with actual names from Teams data
+        runs: batsman.Runs || "0",
+        balls: batsman.Balls || "0",
+        strikeRate: batsman.Strikerate || "0.00",
+        fours: batsman.Fours || "0",
+        sixes: batsman.Sixes || "0",
+        dismissal: batsman.Howout_short || batsman.Dismissal || "not out"
+      }));
   }
 
   // Transform bowling data
-  transformBowlingData(bowlingArray) {
-    return bowlingArray.map(bowler => ({
-      name: bowler.name || 'Unknown',
-      overs: bowler.overs || 0,
-      runs: bowler.runs_conceded || 0,
-      wickets: bowler.wickets || 0,
-      economy: bowler.economy_rate || 0,
-      dots: bowler.dot_balls || 0
-    }));
+  transformBowlingData(bowlersArray) {
+    return bowlersArray
+      .filter(bowler => bowler.Overs !== "" && bowler.Runs !== "") // Only bowlers who bowled
+      .map(bowler => ({
+        name: `Player ${bowler.Bowler}`, // Will be enriched with actual names from Teams data
+        overs: bowler.Overs || "0",
+        runs: bowler.Runs || "0",
+        wickets: bowler.Wickets || "0",
+        economy: bowler.Economyrate || "0.00",
+        dots: bowler.Dots || "0"
+      }));
   }
 
   // Transform fall of wickets
   transformFallOfWickets(fowArray) {
-    return fowArray.map((wicket, index) => ({
-      score: wicket.score || 0,
-      wicket: index + 1,
-      over: wicket.over || 0,
-      batsman: wicket.batsman?.name || 'Unknown'
+    return fowArray.map(wicket => ({
+      score: wicket.Score || "0",
+      wicket: wicket.Wicket_No || 1,
+      over: wicket.Overs || "0",
+      batsman: wicket.Batsman || 'Unknown'
     }));
   }
 
@@ -752,28 +812,65 @@ class WebAppApiService {
   }
 
   // Extract key facts
-  extractKeyFacts(apiData) {
+  extractKeyFacts(scorecardData) {
+    const matchDetail = scorecardData.Matchdetail || {};
+    const currentInning = scorecardData.Innings && scorecardData.Innings.length > 0 
+      ? scorecardData.Innings[scorecardData.Innings.length - 1] 
+      : {};
+    
+    const partnershipCurrent = currentInning.Partnership_Current || {};
+    const lastWicket = currentInning.FallofWickets && currentInning.FallofWickets.length > 0
+      ? currentInning.FallofWickets[currentInning.FallofWickets.length - 1]
+      : null;
+    
+    // Get team names for toss info
+    const teams = scorecardData.Teams || {};
+    const tossWinningTeam = teams[matchDetail.Tosswonby];
+    
     return {
-      partnership: apiData.current_partnership || '0[0]',
-      lastWicket: apiData.last_wicket?.batsman?.name || 'None',
-      tossInfo: apiData.toss || 'Toss details not available'
+      partnership: partnershipCurrent.Runs 
+        ? `${partnershipCurrent.Runs} runs in ${partnershipCurrent.Balls || 0} balls`
+        : 'Current partnership details not available',
+      lastWicket: lastWicket ? lastWicket.Batsman : 'None',
+      tossInfo: matchDetail.Tosswonby && matchDetail.Toss_elected_to && tossWinningTeam
+        ? `${tossWinningTeam.Name_Full} won the toss and elected to ${matchDetail.Toss_elected_to}`
+        : 'Toss details not available'
     };
   }
 
   // Extract ball by ball data (limited)
-  extractBallByBall(apiData) {
+  extractBallByBall(_scorecardData) {
     try {
-      // This would need more complex logic based on actual API structure
-      if (apiData.ball_by_ball && apiData.ball_by_ball.length > 0) {
-        const lastOver = apiData.ball_by_ball[apiData.ball_by_ball.length - 1];
-        return {
-          [`over${lastOver.over_number}`]: lastOver.balls || []
-        };
-      }
+      // For now, return empty object as ball-by-ball data would come from commentary
+      // The commentary already provides detailed ball-by-ball information
+      console.log('ℹ️ Ball-by-ball data available in commentary section');
       return {};
     } catch (error) {
       console.error('❌ Error extracting ball by ball:', error);
       return {};
+    }
+  }
+
+  // Helper function to extract "did not bat" players
+  extractDidNotBat(scorecardData, battingTeamId, batsmen) {
+    try {
+      const team = scorecardData.Teams?.[battingTeamId];
+      if (!team?.Players) return [];
+      
+      const playersWhoBatted = batsmen
+        .filter(batsman => batsman.Runs !== "" && batsman.Balls !== "")
+        .map(batsman => batsman.Batsman);
+      
+      const allPlayers = Object.keys(team.Players);
+      const didNotBat = allPlayers.filter(playerId => !playersWhoBatted.includes(playerId));
+      
+      // Convert player IDs to names
+      return didNotBat.map(playerId => 
+        team.Players[playerId]?.Name_Full || `Player ${playerId}`
+      );
+    } catch (error) {
+      console.error('❌ Error extracting did not bat players:', error);
+      return [];
     }
   }
 
@@ -811,6 +908,43 @@ class WebAppApiService {
     };
   }
 
+  // Fetch match scorecard data for ScorecardTab
+  async fetchMatchScorecard(matchFile) {
+    try {
+      console.log('🏏 WebAppApiService: Fetching scorecard for match:', matchFile);
+      
+      // Try to fetch from API first
+      try {
+        const response = await axios.get(`${SPORTZ_BASE_URL}/${matchFile}.json`);
+        
+        if (response.status === 200 && response.data) {
+          console.log('✅ WebAppApiService: Successfully fetched scorecard from API');
+          return response.data;
+        }
+      } catch (apiError) {
+        console.warn('⚠️ WebAppApiService: API fetch failed, trying local fallback:', apiError.message);
+      }
+      
+      // Fallback to local files if API fails
+      try {
+        // Try UpdatedMatchFile.json first (latest structure)
+        const localResponse = await axios.get('/UpdatedMatchFile.json');
+        console.log('✅ WebAppApiService: Using local UpdatedMatchFile.json as fallback');
+        return localResponse.data;
+      } catch (localError) {
+        console.warn('⚠️ WebAppApiService: Local UpdatedMatchFile.json not found, trying alternative');
+        
+        // Fallback to original match data structure
+        const altResponse = await axios.get('/match-data.json');
+        console.log('✅ WebAppApiService: Using local match-data.json as fallback');
+        return altResponse.data;
+      }
+    } catch (error) {
+      console.error('❌ WebAppApiService: All scorecard fetch attempts failed:', error);
+      throw new Error(`Failed to fetch scorecard data: ${error.message}`);
+    }
+  }
+
   // Helper methods to parse score strings
   parseScoreFromString(scoreString) {
     if (!scoreString || typeof scoreString !== 'string') return 0;
@@ -827,4 +961,18 @@ class WebAppApiService {
   }
 }
 
-export default new WebAppApiService();
+const webAppApiService = new WebAppApiService();
+
+export default webAppApiService;
+
+// Named exports for individual functions
+export const { 
+  getFixtures, 
+  getMatchData, 
+  getLiveInningsData, 
+  getCommentaryData, 
+  getEnhancedMatchData,
+  fetchAllInningsCommentary,
+  fetchInningCommentary,
+  fetchMatchScorecard
+} = webAppApiService;

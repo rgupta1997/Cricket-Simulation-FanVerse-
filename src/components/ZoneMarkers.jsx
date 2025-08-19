@@ -93,7 +93,7 @@ const ZoneMarkers = ({
         {/* Target marker */}
         <mesh>
           <sphereGeometry args={[0.5, 16, 16]} />
-          <meshBasicMaterial color="#00ffff" emissive="#00ffff" emissiveIntensity={0.3} />
+          <meshBasicMaterial color="#00ffff" transparent opacity={0.5} />
         </mesh>
         {/* Target ring */}
         <mesh rotation={[-Math.PI/2, 0, 0]}>
@@ -169,7 +169,7 @@ const ZoneMarkers = ({
       {/* Striker position marker */}
       <mesh position={[strikerX, 0.4, strikerZ]}>
         <sphereGeometry args={[0.4, 16, 16]} />
-        <meshBasicMaterial color="#ffff00" emissive="#ffff00" emissiveIntensity={0.2} />
+        <meshBasicMaterial color="#ffff00" transparent opacity={0.4} />
       </mesh>
       
       {/* Distance scale markers */}

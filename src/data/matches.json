@@ -1,237 +1,237 @@
-{
-  "tournaments": {
-    "ipl2025": {
-      "id": "ipl2025",
-      "name": "TATA IPL 2025",
-      "year": 2025,
-      "status": "ongoing"
-    }
-  },
-  "matches": [
-    {
-      "matchId": 1,
-      "tournamentId": "ipl2025",
-      "status": "completed",
-      "matchType": "T20",
-      "matchNumber": "Final",
-      "date": "2025-06-03",
-      "time": "19:30",
-      "timezone": "IST",
-      "venueId": "modi-stadium",
-      "team1Id": "rcb",
-      "team2Id": "mi",
-      "toss": {
-        "winnerId": "rcb",
-        "decision": "bat"
-      },
-      "result": {
-        "winnerId": "rcb",
-        "resultText": "Royal Challengers Bengaluru Won by 6 Runs",
-        "resultType": "runs",
-        "margin": 6,
-        "achievement": "Winners"
-      },
-      "scores": {
-        "team1": {
-          "runs": 200,
-          "wickets": 8,
-          "overs": 20.0,
-          "runRate": 10.0
-        },
-        "team2": {
-          "runs": 194,
-          "wickets": 9,
-          "overs": 20.0,
-          "runRate": 9.7
-        }
-      },
-      "manOfTheMatch": {
-        "playerId": "virat-kohli",
-        "playerName": "Virat Kohli"
-      },
-      "officials": {
-        "umpires": ["Nitin Menon", "Madanagopal Jayaraman"],
-        "referee": "Chris Gaffaney"
-      },
-      "ballByBall": {
-        "over20": [0, 1, 2, 6, 4, 1]
-      }
-    },
-    {
-      "matchId": 2,
-      "tournamentId": "ipl2025",
-      "status": "completed",
-      "matchType": "T20",
-      "matchNumber": "Qualifier 2",
-      "date": "2025-06-01",
-      "time": "19:30",
-      "timezone": "IST",
-      "venueId": "modi-stadium",
-      "team1Id": "mi",
-      "team2Id": "pbks",
-      "toss": {
-        "winnerId": "pbks",
-        "decision": "bowl"
-      },
-      "result": {
-        "winnerId": "pbks",
-        "resultText": "Punjab Kings Won by 5 Wickets",
-        "resultType": "wickets",
-        "margin": 5,
-        "achievement": "Qualified"
-      },
-      "scores": {
-        "team1": {
-          "runs": 203,
-          "wickets": 6,
-          "overs": 20.0,
-          "runRate": 10.15
-        },
-        "team2": {
-          "runs": 207,
-          "wickets": 5,
-          "overs": 19.0,
-          "runRate": 10.89
-        }
-      },
-      "manOfTheMatch": {
-        "playerId": "shikhar-dhawan",
-        "playerName": "Shikhar Dhawan"
-      },
-      "officials": {
-        "umpires": ["KN Ananthapadmanabhan", "Anil Kumar Chaudhary"],
-        "referee": "Javagal Srinath"
-      }
-    },
-    {
-      "matchId": 3,
-      "tournamentId": "ipl2025",
-      "status": "completed",
-      "matchType": "T20",
-      "matchNumber": "Eliminator",
-      "date": "2025-05-30",
-      "time": "19:30",
-      "timezone": "IST",
-      "venueId": "wankhede",
-      "team1Id": "mi",
-      "team2Id": "kkr",
-      "toss": {
-        "winnerId": "mi",
-        "decision": "bat"
-      },
-      "result": {
-        "winnerId": "mi",
-        "resultText": "Mumbai Indians Won by 20 Runs",
-        "resultType": "runs",
-        "margin": 20,
-        "achievement": "Qualified"
-      },
-      "scores": {
-        "team1": {
-          "runs": 195,
-          "wickets": 4,
-          "overs": 20.0,
-          "runRate": 9.75
-        },
-        "team2": {
-          "runs": 175,
-          "wickets": 8,
-          "overs": 20.0,
-          "runRate": 8.75
-        }
-      },
-      "manOfTheMatch": {
-        "playerId": "rohit-sharma",
-        "playerName": "Rohit Sharma"
-      },
-      "officials": {
-        "umpires": ["Nitin Menon", "Chris Gaffaney"],
-        "referee": "Sridharan Sharath"
-      }
-    },
-    {
-      "matchId": 4,
-      "tournamentId": "ipl2025",
-      "status": "upcoming",
-      "matchType": "T20",
-      "matchNumber": "Match 71",
-      "date": "2025-06-05",
-      "time": "19:30",
-      "timezone": "IST",
-      "venueId": "modi-stadium",
-      "team1Id": "gt",
-      "team2Id": "dc",
-      "toss": null,
-      "result": null,
-      "scores": null,
-      "broadcast": {
-        "tv": ["Star Sports 1", "Star Sports 1 HD"],
-        "digital": ["JioCinema"]
-      }
-    },
-    {
-      "matchId": 5,
-      "tournamentId": "ipl2025",
-      "status": "upcoming",
-      "matchType": "T20",
-      "matchNumber": "Match 72",
-      "date": "2025-06-06",
-      "time": "15:30",
-      "timezone": "IST",
-      "venueId": "wankhede",
-      "team1Id": "srh",
-      "team2Id": "lsg",
-      "toss": null,
-      "result": null,
-      "scores": null,
-      "broadcast": {
-        "tv": ["Star Sports 1", "Star Sports 1 HD"],
-        "digital": ["JioCinema"]
-      }
-    },
-    {
-      "matchId": 6,
-      "tournamentId": "ipl2025",
-      "status": "live",
-      "matchType": "T20",
-      "matchNumber": "Match 70",
-      "date": "2025-06-04",
-      "time": "19:30",
-      "timezone": "IST",
-      "venueId": "chinnaswamy",
-      "team1Id": "rr",
-      "team2Id": "csk",
-      "toss": {
-        "winnerId": "csk",
-        "decision": "bowl"
-      },
-      "result": null,
-      "scores": {
-        "team1": {
-          "runs": 145,
-          "wickets": 4,
-          "overs": 15.3,
-          "runRate": 9.35,
-          "currentRunRate": 9.35,
-          "requiredRunRate": null
-        },
-        "team2": null
-      },
-      "currentStatus": {
-        "innings": 1,
-        "currentOver": 15.3,
-        "currentBowler": "Ravindra Jadeja",
-        "currentBatsmen": ["Sanju Samson", "Shimron Hetmyer"],
-        "lastWicket": "Jos Buttler",
-        "partnership": {
-          "runs": 28,
-          "balls": 18
-        }
-      },
-      "broadcast": {
-        "tv": ["Star Sports 1", "Star Sports 1 HD"],
-        "digital": ["JioCinema"]
-      }
-    }
-  ]
-}
+// {
+//   "tournaments": {
+//     "ipl2025": {
+//       "id": "ipl2025",
+//       "name": "TATA IPL 2025",
+//       "year": 2025,
+//       "status": "ongoing"
+//     }
+//   },
+//   "matches": [
+//     {
+//       "matchId": 1,
+//       "tournamentId": "ipl2025",
+//       "status": "completed",
+//       "matchType": "T20",
+//       "matchNumber": "Final",
+//       "date": "2025-06-03",
+//       "time": "19:30",
+//       "timezone": "IST",
+//       "venueId": "modi-stadium",
+//       "team1Id": "rcb",
+//       "team2Id": "mi",
+//       "toss": {
+//         "winnerId": "rcb",
+//         "decision": "bat"
+//       },
+//       "result": {
+//         "winnerId": "rcb",
+//         "resultText": "Royal Challengers Bengaluru Won by 6 Runs",
+//         "resultType": "runs",
+//         "margin": 6,
+//         "achievement": "Winners"
+//       },
+//       "scores": {
+//         "team1": {
+//           "runs": 200,
+//           "wickets": 8,
+//           "overs": 20.0,
+//           "runRate": 10.0
+//         },
+//         "team2": {
+//           "runs": 194,
+//           "wickets": 9,
+//           "overs": 20.0,
+//           "runRate": 9.7
+//         }
+//       },
+//       "manOfTheMatch": {
+//         "playerId": "virat-kohli",
+//         "playerName": "Virat Kohli"
+//       },
+//       "officials": {
+//         "umpires": ["Nitin Menon", "Madanagopal Jayaraman"],
+//         "referee": "Chris Gaffaney"
+//       },
+//       "ballByBall": {
+//         "over20": [0, 1, 2, 6, 4, 1]
+//       }
+//     },
+//     {
+//       "matchId": 2,
+//       "tournamentId": "ipl2025",
+//       "status": "completed",
+//       "matchType": "T20",
+//       "matchNumber": "Qualifier 2",
+//       "date": "2025-06-01",
+//       "time": "19:30",
+//       "timezone": "IST",
+//       "venueId": "modi-stadium",
+//       "team1Id": "mi",
+//       "team2Id": "pbks",
+//       "toss": {
+//         "winnerId": "pbks",
+//         "decision": "bowl"
+//       },
+//       "result": {
+//         "winnerId": "pbks",
+//         "resultText": "Punjab Kings Won by 5 Wickets",
+//         "resultType": "wickets",
+//         "margin": 5,
+//         "achievement": "Qualified"
+//       },
+//       "scores": {
+//         "team1": {
+//           "runs": 203,
+//           "wickets": 6,
+//           "overs": 20.0,
+//           "runRate": 10.15
+//         },
+//         "team2": {
+//           "runs": 207,
+//           "wickets": 5,
+//           "overs": 19.0,
+//           "runRate": 10.89
+//         }
+//       },
+//       "manOfTheMatch": {
+//         "playerId": "shikhar-dhawan",
+//         "playerName": "Shikhar Dhawan"
+//       },
+//       "officials": {
+//         "umpires": ["KN Ananthapadmanabhan", "Anil Kumar Chaudhary"],
+//         "referee": "Javagal Srinath"
+//       }
+//     },
+//     {
+//       "matchId": 3,
+//       "tournamentId": "ipl2025",
+//       "status": "completed",
+//       "matchType": "T20",
+//       "matchNumber": "Eliminator",
+//       "date": "2025-05-30",
+//       "time": "19:30",
+//       "timezone": "IST",
+//       "venueId": "wankhede",
+//       "team1Id": "mi",
+//       "team2Id": "kkr",
+//       "toss": {
+//         "winnerId": "mi",
+//         "decision": "bat"
+//       },
+//       "result": {
+//         "winnerId": "mi",
+//         "resultText": "Mumbai Indians Won by 20 Runs",
+//         "resultType": "runs",
+//         "margin": 20,
+//         "achievement": "Qualified"
+//       },
+//       "scores": {
+//         "team1": {
+//           "runs": 195,
+//           "wickets": 4,
+//           "overs": 20.0,
+//           "runRate": 9.75
+//         },
+//         "team2": {
+//           "runs": 175,
+//           "wickets": 8,
+//           "overs": 20.0,
+//           "runRate": 8.75
+//         }
+//       },
+//       "manOfTheMatch": {
+//         "playerId": "rohit-sharma",
+//         "playerName": "Rohit Sharma"
+//       },
+//       "officials": {
+//         "umpires": ["Nitin Menon", "Chris Gaffaney"],
+//         "referee": "Sridharan Sharath"
+//       }
+//     },
+//     {
+//       "matchId": 4,
+//       "tournamentId": "ipl2025",
+//       "status": "upcoming",
+//       "matchType": "T20",
+//       "matchNumber": "Match 71",
+//       "date": "2025-06-05",
+//       "time": "19:30",
+//       "timezone": "IST",
+//       "venueId": "modi-stadium",
+//       "team1Id": "gt",
+//       "team2Id": "dc",
+//       "toss": null,
+//       "result": null,
+//       "scores": null,
+//       "broadcast": {
+//         "tv": ["Star Sports 1", "Star Sports 1 HD"],
+//         "digital": ["JioCinema"]
+//       }
+//     },
+//     {
+//       "matchId": 5,
+//       "tournamentId": "ipl2025",
+//       "status": "upcoming",
+//       "matchType": "T20",
+//       "matchNumber": "Match 72",
+//       "date": "2025-06-06",
+//       "time": "15:30",
+//       "timezone": "IST",
+//       "venueId": "wankhede",
+//       "team1Id": "srh",
+//       "team2Id": "lsg",
+//       "toss": null,
+//       "result": null,
+//       "scores": null,
+//       "broadcast": {
+//         "tv": ["Star Sports 1", "Star Sports 1 HD"],
+//         "digital": ["JioCinema"]
+//       }
+//     },
+//     {
+//       "matchId": 6,
+//       "tournamentId": "ipl2025",
+//       "status": "live",
+//       "matchType": "T20",
+//       "matchNumber": "Match 70",
+//       "date": "2025-06-04",
+//       "time": "19:30",
+//       "timezone": "IST",
+//       "venueId": "chinnaswamy",
+//       "team1Id": "rr",
+//       "team2Id": "csk",
+//       "toss": {
+//         "winnerId": "csk",
+//         "decision": "bowl"
+//       },
+//       "result": null,
+//       "scores": {
+//         "team1": {
+//           "runs": 145,
+//           "wickets": 4,
+//           "overs": 15.3,
+//           "runRate": 9.35,
+//           "currentRunRate": 9.35,
+//           "requiredRunRate": null
+//         },
+//         "team2": null
+//       },
+//       "currentStatus": {
+//         "innings": 1,
+//         "currentOver": 15.3,
+//         "currentBowler": "Ravindra Jadeja",
+//         "currentBatsmen": ["Sanju Samson", "Shimron Hetmyer"],
+//         "lastWicket": "Jos Buttler",
+//         "partnership": {
+//           "runs": 28,
+//           "balls": 18
+//         }
+//       },
+//       "broadcast": {
+//         "tv": ["Star Sports 1", "Star Sports 1 HD"],
+//         "digital": ["JioCinema"]
+//       }
+//     }
+//   ]
+// }

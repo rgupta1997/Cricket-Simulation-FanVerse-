@@ -1,12 +1,12 @@
 // Import all data modules
-import teamsData from './teams.json';
-import venuesData from './venues.json';
-import matchesData from './matches.json';
+// import teamsData from './teams.json';
+// import venuesData from './venues.json';
+// import matchesData from './matches.json';
 import pointsTableData from './pointsTable.json';
 
 // For now, import the old cricketData for match details
 // In a real app, these would be fetched from an API based on matchId
-import oldCricketData from './cricketData.json';
+// import oldCricketData from './cricketData.json';
 
 // Helper functions to work with the data
 export const getTeamById = (teamId) => {
@@ -68,18 +68,18 @@ export const formatDate = (dateString) => {
 
 // Export the data objects for direct access if needed
 export {
-  teamsData,
-  venuesData,
-  matchesData,
+  // teamsData,
+  // venuesData,
+  // matchesData,
   pointsTableData
 };
 
 // Default export with all data and helpers
 export default {
-  teams: teamsData.teams,
-  venues: venuesData.venues,
-  matches: matchesData.matches,
-  tournaments: matchesData.tournaments,
+  // teams: teamsData.teams,
+  // venues: venuesData.venues,
+  // matches: matchesData.matches,
+  // tournaments: matchesData.tournaments,
   pointsTable: pointsTableData.pointsTable,
   getTeamById,
   getVenueById,

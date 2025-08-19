@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Vector3 } from 'three';
+import BallPositionMarker from '../BallPositionMarker';
 
 const EnhancedBall = ({ 
   gameState, 
@@ -248,32 +249,152 @@ const EnhancedBall = ({
       // Update ball position
       ball.position.copy(currentPos);
       
-      // Track distance traveled for shots
+      // Track distance traveled for shots with DETERMINISTIC DISTANCE CONTROL
       if (ballState === 'hit' && shotStartPosition) {
         const currentDistance = currentPos.distanceTo(shotStartPosition);
         setDistanceTraveled(currentDistance);
         
-        // Get ball shot configuration to check max distance
-        const ballShotConfig = gameState.controls?.ballShot;
-        const maxDistance = ballShotConfig?.distance || 30; // Default 30 meters if not set
+        // Get deterministic target information
+        const deterministicTarget = typeof window !== 'undefined' ? window.deterministicTarget : null;
         
-        console.log('📏 Shot distance traveled:', currentDistance.toFixed(2), 'Max:', maxDistance);
-        
-        // Check if ball reached target final distance and stopped
-        const ballSpeed = currentVel.length();
-        const isNearlyStoppedAtTarget = ballSpeed < 0.5 && currentDistance >= maxDistance * 0.9; // Within 90% of target and slow
-        
-        if (isNearlyStoppedAtTarget || currentDistance >= maxDistance * 1.2) { // Stop if very close to target or overshot significantly
-          console.log('🎯 Ball reached target distance:', maxDistance, 'm at distance:', currentDistance.toFixed(2), 'speed:', ballSpeed.toFixed(2));
-          if (onCatch) {
-            onCatch({
-              type: 'collect',
-              playerId: 'bowler',
-              position: currentPos.toArray(),
-              reason: 'target_distance_reached'
-            });
+        if (deterministicTarget) {
+          // Use DETERMINISTIC system for EXACT stopping distance
+          const exactStopDistance = deterministicTarget.exactDistance;
+          const stopPosition = new Vector3(...deterministicTarget.finalStopPosition);
+          const timeToTarget = deterministicTarget.timeToTarget;
+          const energyRetention = deterministicTarget.energyRetention;
+          
+          console.log('📏 DETERMINISTIC Shot - Current:', currentDistance.toFixed(2), 'Target Stop:', exactStopDistance, 'm');
+          
+          // Calculate progress toward target (0 = start, 1 = target reached)
+          const progressToTarget = currentDistance / exactStopDistance;
+          const distanceToStopPosition = currentPos.distanceTo(stopPosition);
+          const ballSpeed = currentVel.length();
+          
+          // PRECISION STOPPING: Apply progressive deceleration as ball approaches target
+          if (progressToTarget > 0.7) { // Start deceleration when 70% of distance covered
+            const decelerationFactor = Math.max(0.1, 1 - ((progressToTarget - 0.7) / 0.3)); // Linear deceleration from 70% to 100%
+            currentVel.multiplyScalar(decelerationFactor);
+            console.log(`🎯 Progressive deceleration: Progress=${(progressToTarget*100).toFixed(1)}%, Decel=${decelerationFactor.toFixed(2)}, Speed=${ballSpeed.toFixed(2)}`);
           }
-          return;
+          
+          // EXACT STOPPING: Force stop when ball reaches exact target distance
+          const reachedExactDistance = currentDistance >= exactStopDistance * 0.98; // 98% accuracy threshold
+          const reachedStopPosition = distanceToStopPosition <= 0.5; // Within 0.5m of exact stop position
+          const lowSpeed = ballSpeed < 1.0; // Ball has slowed significantly
+          
+          if ((reachedExactDistance || reachedStopPosition) && (progressToTarget > 0.95 || lowSpeed)) {
+            // COMPREHENSIVE DEBUG LOGGING FOR FINAL BALL STOP POSITION
+            console.group('🎯 EXACT STOP REACHED - FINAL VERIFICATION');
+            
+            console.log('STOPPING CONDITIONS MET:', {
+              reachedExactDistance,
+              reachedStopPosition,
+              progressToTarget,
+              lowSpeed,
+              currentDistance: currentDistance.toFixed(3),
+              targetDistance: exactStopDistance,
+              distanceAccuracy: distanceToStopPosition.toFixed(3)
+            });
+            
+            console.log('INPUT VS OUTPUT COMPARISON:', {
+              originalInput: {
+                angle: window.deterministicTarget?.angle || 'unknown',
+                distance: window.deterministicTarget?.exactDistance || 'unknown'
+              },
+              actualResult: {
+                finalPosition: stopPosition.toArray(),
+                calculatedDistance: currentDistance.toFixed(3),
+                positionFromStriker: ball.position.toArray()
+              },
+              differenceAnalysis: {
+                distanceDifference: Math.abs(currentDistance - exactStopDistance).toFixed(3),
+                positionDifference: distanceToStopPosition.toFixed(3),
+                isAccurate: Math.abs(currentDistance - exactStopDistance) < 0.5
+              }
+            });
+            
+            if (window.deterministicTarget) {
+              const expectedX = window.deterministicTarget.finalStopPosition[0];
+              const expectedZ = window.deterministicTarget.finalStopPosition[2];
+              const actualX = ball.position.x;
+              const actualZ = ball.position.z;
+              
+              console.log('COORDINATE PRECISION CHECK:', {
+                expected: { x: expectedX.toFixed(3), z: expectedZ.toFixed(3) },
+                actual: { x: actualX.toFixed(3), z: actualZ.toFixed(3) },
+                error: { 
+                  x: Math.abs(expectedX - actualX).toFixed(3), 
+                  z: Math.abs(expectedZ - actualZ).toFixed(3) 
+                },
+                totalError: Math.sqrt(Math.pow(expectedX - actualX, 2) + Math.pow(expectedZ - actualZ, 2)).toFixed(3)
+              });
+            }
+            
+            console.groupEnd();
+            
+            console.log('🎯 EXACT STOP REACHED! Distance:', currentDistance.toFixed(2), 'Target:', exactStopDistance, 'Position accuracy:', distanceToStopPosition.toFixed(2), 'm');
+            
+            // FORCE ball to exact stopping position for perfect precision
+            ball.position.copy(stopPosition);
+            
+            // Stop all movement completely
+            if (onBounce) {
+              onBounce({
+                type: 'position_update',
+                position: stopPosition.toArray(),
+                velocity: [0, 0, 0],
+                isMoving: false
+              });
+            }
+            
+            if (onCatch) {
+              onCatch({
+                type: 'collect',
+                playerId: 'bowler',
+                position: stopPosition.toArray(),
+                reason: 'deterministic_exact_stop'
+              });
+            }
+            
+            // Clear deterministic target
+            if (typeof window !== 'undefined') {
+              window.deterministicTarget = null;
+            }
+            
+            return;
+          }
+          
+          // COURSE CORRECTION: Gently steer ball toward exact stopping position
+          if (progressToTarget > 0.5 && distanceToStopPosition > 1.0) {
+            const correctionVector = stopPosition.clone().sub(currentPos).normalize();
+            const correctionStrength = Math.min(2.0, distanceToStopPosition * 0.1); // Stronger correction if further from target
+            currentVel.add(correctionVector.multiplyScalar(correctionStrength * delta));
+            console.log('🎯 Course correction toward exact stop position, distance to target:', distanceToStopPosition.toFixed(2));
+          }
+          
+        } else {
+          // Fallback to original distance system if no deterministic target
+          const ballShotConfig = gameState.controls?.ballShot;
+          const maxDistance = ballShotConfig?.distance || 30;
+          
+          console.log('📏 Fallback shot distance traveled:', currentDistance.toFixed(2), 'Max:', maxDistance);
+          
+          const ballSpeed = currentVel.length();
+          const isNearlyStoppedAtTarget = ballSpeed < 0.5 && currentDistance >= maxDistance * 0.9;
+          
+          if (isNearlyStoppedAtTarget || currentDistance >= maxDistance * 1.2) {
+            console.log('🎯 Ball reached fallback target distance:', maxDistance, 'm at distance:', currentDistance.toFixed(2), 'speed:', ballSpeed.toFixed(2));
+            if (onCatch) {
+              onCatch({
+                type: 'collect',
+                playerId: 'bowler',
+                position: currentPos.toArray(),
+                reason: 'target_distance_reached'
+              });
+            }
+            return;
+          }
         }
       }
       
@@ -544,34 +665,28 @@ const EnhancedBall = ({
     
     return (
       <group>
-        {/* Actual trail */}
+        {/* Actual trail - using connected spheres instead of lines */}
         {trail.length >= 2 && (
-          <line ref={trajectoryRef}>
-            <bufferGeometry>
-              <bufferAttribute
-                attach="attributes-position"
-                count={trailPoints.length}
-                array={new Float32Array(trailPoints.flat())}
-                itemSize={3}
-              />
-            </bufferGeometry>
-            <lineBasicMaterial color="#ff4444" opacity={0.6} transparent />
-          </line>
+          <group>
+            {trail.map((pos, index) => (
+              <mesh key={index} position={[pos.x, pos.y, pos.z]}>
+                <sphereGeometry args={[0.02, 4, 4]} />
+                <meshBasicMaterial color="#ff4444" opacity={0.6} transparent />
+              </mesh>
+            ))}
+          </group>
         )}
         
-        {/* Predicted path */}
+        {/* Predicted path - using connected spheres */}
         {predictedPoints.length > 0 && (
-          <line>
-            <bufferGeometry>
-              <bufferAttribute
-                attach="attributes-position"
-                count={predictedPoints.length}
-                array={new Float32Array(predictedPoints.flat())}
-                itemSize={3}
-              />
-            </bufferGeometry>
-            <lineBasicMaterial color="#44ff44" opacity={0.4} transparent dashSize={0.2} gapSize={0.1} />
-          </line>
+          <group>
+            {predictedPoints.map((point, index) => (
+              <mesh key={index} position={point}>
+                <sphereGeometry args={[0.015, 4, 4]} />
+                <meshBasicMaterial color="#44ff44" opacity={0.4} transparent />
+              </mesh>
+            ))}
+          </group>
         )}
       </group>
     );
@@ -597,10 +712,9 @@ const EnhancedBall = ({
         receiveShadow
       >
         <sphereGeometry args={[0.15, 16, 16]} />
-        <meshPhongMaterial 
+        <meshBasicMaterial 
           color={isMoving ? "#8B2500" : "#654321"} 
-          shininess={80}
-          emissive={isMoving ? "#331100" : "#000000"}
+          transparent={false}
         />
         
         {/* Ball seam - larger and more visible */}
@@ -617,11 +731,18 @@ const EnhancedBall = ({
               color="#AA6644" 
               transparent 
               opacity={0.3}
-              blending={2} // AdditiveBlending
             />
           </mesh>
         )}
       </mesh>
+
+      {/* Ball Position Marker - Shows current XYZ coordinates */}
+      <BallPositionMarker 
+        position={Array.isArray(position) ? position : [position?.x || 0, position?.y || 0.5, position?.z || 0]}
+        velocity={Array.isArray(velocity) ? velocity : [velocity?.x || 0, velocity?.y || 0, velocity?.z || 0]}
+        isMoving={isMoving}
+        showCoordinates={true}
+      />
 
       {/* Ball trajectory trail */}
       {renderTrajectory()}

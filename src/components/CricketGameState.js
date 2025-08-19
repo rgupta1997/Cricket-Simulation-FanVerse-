@@ -390,13 +390,9 @@ export const calculateBallTrajectory = (bowlingControls) => {
     finalZ = final_z;
   } else {
     // Convert pitch analysis coordinates to 3D world coordinates
-    // Assuming the pitch analysis coordinates are in a normalized 0-100 range
-    // and need to be mapped to real world cricket pitch dimensions
+    // BOWLING: Always targets batsman position - independent of shot distance
     
-    const PITCH_LENGTH = 22; // Standard cricket pitch length in meters
-    const PITCH_WIDTH = 3.66; // Standard cricket pitch width in meters
     const CONVERSION_FACTOR = 0.22; // Convert analysis units to meters
-    const WICKET_POSITION = -10; // Static Z position for final ball position (at striker's wicket)
     
     // Release position (where bowler releases the ball)
     releaseX = (line_axis_x - 50) * CONVERSION_FACTOR; // Center around pitch middle
@@ -408,10 +404,10 @@ export const calculateBallTrajectory = (bowlingControls) => {
     bounceY = 0; // Ground level
     bounceZ = 11 - (length_axis_z * CONVERSION_FACTOR); // Distance from bowler end
     
-    // Final position (where ball reaches after bounce)
+    // Final position (where ball reaches after bounce) - ALWAYS at batsman for bowling
     finalX = (ball_axis_x - 50) * CONVERSION_FACTOR;
     finalY = ball_axis_y * 0.05; // Convert to meters (height is changeable)
-    finalZ = WICKET_POSITION; // Static position at the wicket (striker's end)
+    finalZ = -9; // FIXED: Always deliver to batsman position regardless of shot distance
   }
   
   // Calculate velocity components for release to bounce
@@ -512,16 +508,33 @@ const calculateLandingPositionForTarget = (targetDistance, angle) => {
   return Math.max(0.1, initialLandingDistance); // Minimum 0.1m landing distance
 };
 
-// Shot vector calculation - PHYSICS-BASED FINAL POSITION SYSTEM
+// Shot vector calculation - DETERMINISTIC DISTANCE CONTROL SYSTEM
 export const calculateShotVector = (angle, targetDistanceMeters, elevation = 0.5, debugLabel = '') => {
+  // COMPREHENSIVE DEBUG ANALYSIS
+  console.group(`🎯 calculateShotVector - ${debugLabel}`);
+  
+  // CRITICAL: Check if distance is being modified internally
+  console.log('INPUT PARAMETERS:', {
+    angle,
+    targetDistanceMeters,
+    targetType: typeof targetDistanceMeters,
+    elevation,
+    debugLabel
+  });
+  
   // CRICKET FIELD ZONES FROM STRIKER POSITION [0, 0, -9]
   const STRIKER_POSITION = [0, 0, -9];
   
-  // Use distance as final target position (minimum 0.1m)
-  const targetDistance = Math.max(0.1, parseFloat(targetDistanceMeters));
+  // Use distance as EXACT final stopping distance (minimum 0.1m)
+  const exactStopDistance = Math.max(0.1, parseFloat(targetDistanceMeters));
   
-  // Calculate where ball should initially land to reach target after physics
-  const landingDistance = calculateLandingPositionForTarget(targetDistance, angle);
+  // Check for any hidden transformations
+  console.log('DISTANCE PROCESSING:', {
+    rawInput: targetDistanceMeters,
+    parsedFloat: parseFloat(targetDistanceMeters),
+    finalDistance: exactStopDistance,
+    wasModified: exactStopDistance !== parseFloat(targetDistanceMeters)
+  });
   
   // Get boundary distance for reference
   const boundaryDistance = calculateBoundaryDistance(angle);
@@ -529,23 +542,90 @@ export const calculateShotVector = (angle, targetDistanceMeters, elevation = 0.5
   // Field-corrected trigonometry: 0°=East(+X), 90°=North(-Z to keeper), 180°=West(-X), 270°=South(+Z to bowler)
   const rad = (angle * Math.PI) / 180;
   
-  // Calculate initial landing vector from striker position (for physics simulation)
-  const landingX = Math.cos(rad) * landingDistance;   // East-West direction
-  const landingZ = -Math.sin(rad) * landingDistance;  // INVERTED: 90°=-Z(keeper), 270°=+Z(bowler)
+  // Check angle conversion
+  console.log('ANGLE CONVERSION:', {
+    inputDegree: angle,
+    radians: rad,
+    cosValue: Math.cos(rad),
+    sinValue: Math.sin(rad)
+  });
   
-  // Calculate target final position from striker
-  const targetX = Math.cos(rad) * targetDistance;
-  const targetZ = -Math.sin(rad) * targetDistance;
-  const finalTargetX = STRIKER_POSITION[0] + targetX;
-  const finalTargetZ = STRIKER_POSITION[2] + targetZ;
+  // Calculate EXACT final stopping position from striker (DETERMINISTIC)
+  const stopX = Math.cos(rad) * exactStopDistance;
+  const stopZ = -Math.sin(rad) * exactStopDistance;
+  const finalStopX = STRIKER_POSITION[0] + stopX;
+  const finalStopZ = STRIKER_POSITION[2] + stopZ;
   
-  // Log with physics calculation information
+  // Calculate final position step by step
+  console.log('POSITION CALCULATION:', {
+    strikerPosition: STRIKER_POSITION,
+    deltaX: stopX,
+    deltaZ: stopZ,
+    finalStopX,
+    finalStopZ,
+    calculatedDistance: Math.sqrt(Math.pow(finalStopX - STRIKER_POSITION[0], 2) + Math.pow(finalStopZ - STRIKER_POSITION[2], 2))
+  });
+  
+  // REVERSE PHYSICS CALCULATION: Calculate initial velocity needed to stop at exact distance
+  // We need to work backwards from the final position to determine required initial velocity
+  
+  // Physics constants for reverse calculation
+  const GRAVITY = -9.81;
+  const totalFrictionLoss = 0.3; // Combined air resistance + ground friction loss factor
+  const bounceEnergyLoss = 0.4;  // Energy lost in bounces
+  const totalEnergyLoss = totalFrictionLoss + bounceEnergyLoss; // 70% total energy loss
+  
+  // Calculate required initial velocity magnitude to overcome energy losses and reach exact distance
+  // Formula: initial_velocity = target_distance / (1 - total_energy_loss) / time_factor
+  const timeToTarget = Math.sqrt(exactStopDistance / 5); // Dynamic time based on distance
+  const energyRetentionFactor = 1 - totalEnergyLoss; // 30% energy retention
+  const requiredVelocityMagnitude = exactStopDistance / (energyRetentionFactor * timeToTarget);
+  
+  // Direction vector (normalized)
+  const dirX = Math.cos(rad);
+  const dirZ = -Math.sin(rad);
+  
+  // Calculate velocity components that will result in EXACT stopping position
+  const exactVelocityX = dirX * requiredVelocityMagnitude;
+  const exactVelocityZ = dirZ * requiredVelocityMagnitude;
+  const exactVelocityY = elevation + (exactStopDistance * 0.1); // Scale elevation with distance
+  
+  console.log('VELOCITY CALCULATION:', {
+    requiredVelocityMagnitude,
+    dirX,
+    dirZ,
+    exactVelocityX,
+    exactVelocityZ,
+    exactVelocityY,
+    totalVelocity: Math.sqrt(exactVelocityX * exactVelocityX + exactVelocityZ * exactVelocityZ)
+  });
+  
+  // Store deterministic target information for physics system
+  if (typeof window !== 'undefined') {
+    window.deterministicTarget = {
+      exactDistance: exactStopDistance,
+      angle: angle,
+      finalStopPosition: [finalStopX, 0, finalStopZ],
+      strikerPosition: STRIKER_POSITION,
+      requiredVelocity: [exactVelocityX, exactVelocityY, exactVelocityZ],
+      timeToTarget: timeToTarget,
+      energyRetention: energyRetentionFactor
+    };
+    
+    console.log('DETERMINISTIC TARGET SET:', window.deterministicTarget);
+  }
+  
+  // Log with deterministic calculation information
   const label = debugLabel ? `${debugLabel} ` : '';
-  const percentageOfBoundary = ((targetDistance / boundaryDistance) * 100).toFixed(1);
-  console.log(`${label}PHYSICS SHOT: ${angle}° → Target: ${targetDistance.toFixed(1)}m | Landing: ${landingDistance.toFixed(1)}m | Final Target: [${finalTargetX.toFixed(1)}, ${finalTargetZ.toFixed(1)}] (${percentageOfBoundary}% of boundary)`);
+  const percentageOfBoundary = ((exactStopDistance / boundaryDistance) * 100).toFixed(1);
+  console.log(`${label}DETERMINISTIC SHOT: ${angle}° → EXACT STOP: ${exactStopDistance.toFixed(1)}m | Stop Position: [${finalStopX.toFixed(1)}, ${finalStopZ.toFixed(1)}] (${percentageOfBoundary}% of boundary)`);
+  console.log(`${label}Reverse Physics: Required Velocity: [${exactVelocityX.toFixed(2)}, ${exactVelocityY.toFixed(2)}, ${exactVelocityZ.toFixed(2)}] | Time: ${timeToTarget.toFixed(2)}s | Energy Retention: ${(energyRetentionFactor*100).toFixed(1)}%`);
   
-  // Return landing position vector for physics simulation to take over
-  return [landingX, elevation, landingZ];
+  console.log('FINAL RETURN VALUE:', [exactVelocityX, exactVelocityY, exactVelocityZ]);
+  console.groupEnd();
+  
+  // Return calculated velocity vector that will result in exact stopping distance
+  return [exactVelocityX, exactVelocityY, exactVelocityZ];
 };
 
 // Batting response calculations

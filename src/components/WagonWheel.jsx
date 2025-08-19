@@ -17,8 +17,9 @@ const getPositionName = (degree) => {
 };
 
 // Pure component for wagon wheel overlay with 8 sections centered at striker position
+// Now displays X, Y, Z coordinates at intersection points where degree lines cross circles
 const WagonWheel = ({ radius = 28, visible = true, strikerPosition = [0, 0, -9] }) => {
-  console.log('🎯 WagonWheel rendering:', { radius, visible, strikerPosition });
+  console.log('🎯 WagonWheel rendering with coordinates:', { radius, visible, strikerPosition });
   
   if (!visible) return null;
 
@@ -89,19 +90,117 @@ const WagonWheel = ({ radius = 28, visible = true, strikerPosition = [0, 0, -9] 
   keyDegrees.forEach((cricketDegree) => {
     // Convert cricket degree to 3D angle with 90° clockwise rotation
     const angle3D = (90 - cricketDegree - 90) * (Math.PI / 180);
+    
+    // Create intersection markers at each circle radius for this degree line
+    circleRadii.forEach((circleRadius, circleIndex) => {
+      const intersectionX = strikerX + Math.cos(angle3D) * circleRadius;
+      const intersectionY = 0.3; // Fixed Y height for markers
+      const intersectionZ = strikerZ + Math.sin(angle3D) * circleRadius;
+      
+      // Create intersection marker (small sphere at each circle intersection)
+      degreeMarkers.push(
+        <mesh key={`intersection-marker-${cricketDegree}-${circleIndex}`} position={[intersectionX, intersectionY, intersectionZ]}>
+          <sphereGeometry args={[0.3, 12, 12]} />
+          <meshBasicMaterial color="#ff6600" />
+        </mesh>
+      );
+      
+      // Add coordinate labels at intersection points (similar to how degrees are shown)
+      try {
+        sectionLabels.push(
+          <group key={`coord-label-${cricketDegree}-${circleIndex}`} position={[intersectionX, intersectionY + 2, intersectionZ]}>
+            {/* Coordinate background panel for better readability */}
+            <mesh position={[0, 0, -0.1]}>
+              <boxGeometry args={[3, 2.5, 0.1]} />
+              <meshBasicMaterial color="#000000" transparent opacity={0.7} />
+            </mesh>
+            
+            {/* Coordinate title */}
+            <Text
+              position={[0, 1, 0]}
+              fontSize={0.5}
+              color="#ffffff"
+              anchorX="center"
+              anchorY="middle"
+            >
+              Coordinates
+            </Text>
+            
+            {/* X, Y, Z Coordinates in a compact format */}
+            <Text
+              position={[0, 0.3, 0]}
+              fontSize={0.6}
+              color="#ff6666"
+              anchorX="center"
+              anchorY="middle"
+            >
+              X: {intersectionX.toFixed(1)}
+            </Text>
+            
+            <Text
+              position={[0, -0.1, 0]}
+              fontSize={0.6}
+              color="#66ff66"
+              anchorX="center"
+              anchorY="middle"
+            >
+              Y: {intersectionY.toFixed(1)}
+            </Text>
+            
+            <Text
+              position={[0, -0.5, 0]}
+              fontSize={0.6}
+              color="#6666ff"
+              anchorX="center"
+              anchorY="middle"
+            >
+              Z: {intersectionZ.toFixed(1)}
+            </Text>
+            
+            {/* Distance from striker */}
+            <Text
+              position={[0, -0.9, 0]}
+              fontSize={0.4}
+              color="#ffff00"
+              anchorX="center"
+              anchorY="middle"
+            >
+              Dist: {circleRadius}m
+            </Text>
+            
+            {/* Small vertical line to point to intersection */}
+            <mesh position={[0, -1.8, 0]}>
+              <cylinderGeometry args={[0.03, 0.03, 1.2, 8]} />
+              <meshBasicMaterial color="#00ff00" />
+            </mesh>
+          </group>
+        );
+      } catch (error) {
+        console.warn('Coordinate text rendering failed:', error);
+        // Fallback to colored cube if Text fails
+        sectionLabels.push(
+          <mesh key={`coord-fallback-${cricketDegree}-${circleIndex}`} position={[intersectionX, intersectionY + 1.5, intersectionZ]}>
+            <boxGeometry args={[0.8, 0.8, 0.1]} />
+            <meshBasicMaterial color="#00ff00" />
+          </mesh>
+        );
+      }
+    });
+    
+    // Create main degree marker at boundary (existing functionality)
     const markerRadius = radius - 2; // Position markers near boundary from striker
     const markerX = strikerX + Math.cos(angle3D) * markerRadius;
     const markerZ = strikerZ + Math.sin(angle3D) * markerRadius;
 
-    // Create degree marker (small sphere)
+    // Create main degree marker (larger sphere at boundary)
     degreeMarkers.push(
       <mesh key={`degree-marker-${cricketDegree}`} position={[markerX, 0.3, markerZ]}>
         <sphereGeometry args={[0.4, 12, 12]} />
-        <meshBasicMaterial color="#ff6600" />
+        <meshBasicMaterial color="#ff0000" />
       </mesh>
     );
 
-    // Add text labels for key degrees
+    // Add text labels for key degrees at boundary
     const labelRadius = radius; // At boundary from striker
     const labelX = strikerX + Math.cos(angle3D) * labelRadius;
     const labelZ = strikerZ + Math.sin(angle3D) * labelRadius;
@@ -134,7 +233,7 @@ const WagonWheel = ({ radius = 28, visible = true, strikerPosition = [0, 0, -9] 
           {/* Small line pointing to the exact degree */}
           <mesh position={[0, -2.5, 0]}>
             <cylinderGeometry args={[0.05, 0.05, 1, 8]} />
-            <meshBasicMaterial color="#00ff00" />
+            <meshBasicMaterial color="#ffffff" />
           </mesh>
         </group>
       );

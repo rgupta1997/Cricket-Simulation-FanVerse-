@@ -1,18 +1,68 @@
-import React from 'react';
-import { getMatchScorecard } from '../../data/index.js';
+import { useState, useEffect } from 'react';
+import { fetchMatchScorecard } from '../../services/webappApiService.js';
+import { extractPlayersInfo } from '../../utils/webapp.util.js';
 import '../../styles/responsive.css';
 
 const ScorecardTab = ({ matchDetail, matchId }) => {
+  console.log('matchDetail:', matchDetail);
+  const [playersInfo, setPlayersInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   // Use matchId prop if available, otherwise try to get from matchDetail
   const actualMatchId = matchId || (matchDetail?.matchId ? String(matchDetail.matchId) : "1");
-  
-  const playersInfo = getMatchScorecard(actualMatchId);
-  
-  if (!matchDetail || !playersInfo) {
+
+  useEffect(() => {
+    const loadScorecardData = async () => {
+      console.log('🏏 ScorecardTab: Loading scorecard for match:', actualMatchId);
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const data = await fetchMatchScorecard(actualMatchId);
+        console.log('🏏 ScorecardTab: Received scorecard data:', data);
+        
+        // Extract players info using our utility function
+        const extractedPlayers = extractPlayersInfo(data);
+        console.log('🏏 ScorecardTab: Extracted players info:', extractedPlayers);
+        
+        setPlayersInfo(extractedPlayers);
+      } catch (err) {
+        console.error('❌ ScorecardTab: Error loading scorecard data:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadScorecardData();
+  }, [actualMatchId]);
+
+  if (loading) {
     return (
       <div className="tab-panel">
         <div style={{ textAlign: 'center' }}>
           <div>Loading scorecard data...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="tab-panel">
+        <div style={{ textAlign: 'center', color: 'red' }}>
+          <div>Error loading scorecard: {error}</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!matchDetail || !playersInfo) {
+    return (
+      <div className="tab-panel">
+        <div style={{ textAlign: 'center' }}>
+          <div>No scorecard data available</div>
         </div>
       </div>
     );

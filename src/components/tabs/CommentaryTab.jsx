@@ -1,15 +1,42 @@
-import React from 'react';
-import { getMatchScorecard, getMatchCommentary } from '../../data/index.js';
+import { useState, useEffect } from 'react';
+import { extractPlayersInfo, extractKeyFacts } from '../../utils/webapp.util.js';
 import '../../styles/responsive.css';
 
-const CommentaryTab = ({ matchDetail, matchId }) => {
-  // Use matchId prop if available, otherwise try to get from matchDetail
-  const actualMatchId = matchId || (matchDetail?.matchId ? String(matchDetail.matchId) : "1");
+const CommentaryTab = ({ matchDetail, matchId, commentary }) => {
+  console.log('matchDetails', matchDetail, matchId, commentary)
+  const [selectedInning, setSelectedInning] = useState(1);
   
-  const playersInfo = getMatchScorecard(actualMatchId);
-  const commentaryData = getMatchCommentary(actualMatchId);
+  const playersInfo = extractPlayersInfo(matchDetail, selectedInning);
+  console.log('playersInfo', playersInfo);
+
+  // Use the new commentary prop if available, otherwise fall back to old data
+  const commentaryData = commentary || {};
+  const currentInningCommentary = commentaryData[selectedInning] || [];
   
-  if (!matchDetail || !playersInfo || !commentaryData) {
+  // Determine available innings from commentary data
+  const availableInnings = Object.keys(commentaryData).map(key => parseInt(key)).filter(key => !isNaN(key)).sort();
+  
+  // Debug logging
+  console.log('🏏 CommentaryTab received data:', {
+    hasCommentary: !!commentary,
+    commentaryKeys: Object.keys(commentaryData),
+    availableInnings,
+    selectedInning,
+    currentInningCount: currentInningCommentary.length
+  });
+  
+  // Auto-select first available inning if current selection doesn't exist
+  useEffect(() => {
+    if (availableInnings.length > 0 && !availableInnings.includes(selectedInning)) {
+      setSelectedInning(availableInnings[0]);
+    }
+  }, [availableInnings, selectedInning]);
+
+  let keyFacts = extractKeyFacts(matchDetail);
+  keyFacts = matchDetail?.keyFacts || {};
+  console.log('keyFacts', keyFacts, matchDetail)
+  
+  if (!matchDetail) {
     return (
       <div className="tab-panel">
         <div style={{ textAlign: 'center' }}>
@@ -45,7 +72,7 @@ const CommentaryTab = ({ matchDetail, matchId }) => {
               </tr>
             </thead>
             <tbody>
-              {playersInfo.batting.slice(0, 2).map((player, index) => (
+              {playersInfo.batting.length > 0 ? playersInfo.batting.slice(0, 2).map((player, index) => (
                 <tr key={index} className="table-row">
                   <td className="table-cell" style={{ textAlign: 'left' }}>{player.name}</td>
                   <td className="table-cell" style={{ textAlign: 'center' }}>{player.runs}</td>
@@ -54,7 +81,13 @@ const CommentaryTab = ({ matchDetail, matchId }) => {
                   <td className="table-cell" style={{ textAlign: 'center' }}>{player.fours}</td>
                   <td className="table-cell" style={{ textAlign: 'center' }}>{player.sixes}</td>
                 </tr>
-              ))}
+              )) : (
+                <tr className="table-row">
+                  <td className="table-cell" colSpan="6" style={{ textAlign: 'center', color: '#6b7280' }}>
+                    No batting data available for this inning
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -77,7 +110,7 @@ const CommentaryTab = ({ matchDetail, matchId }) => {
               </tr>
             </thead>
             <tbody>
-              {playersInfo.bowling.slice(0, 1).map((bowler, index) => (
+              {playersInfo.bowling.length > 0 ? playersInfo.bowling.slice(0, 1).map((bowler, index) => (
                 <tr key={index} className="table-row">
                   <td className="table-cell" style={{ textAlign: 'left' }}>{bowler.name}</td>
                   <td className="table-cell" style={{ textAlign: 'center' }}>{bowler.overs}</td>
@@ -86,7 +119,13 @@ const CommentaryTab = ({ matchDetail, matchId }) => {
                   <td className="table-cell" style={{ textAlign: 'center' }}>{bowler.economy}</td>
                   <td className="table-cell" style={{ textAlign: 'center' }}>{bowler.dots}</td>
                 </tr>
-              ))}
+              )) : (
+                <tr className="table-row">
+                  <td className="table-cell" colSpan="6" style={{ textAlign: 'center', color: '#6b7280' }}>
+                    No bowling data available for this inning
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -97,39 +136,85 @@ const CommentaryTab = ({ matchDetail, matchId }) => {
           Key Facts
         </h3>
         <div style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.6' }}>
-          <div>Partnership: {matchDetail.keyFacts.partnership}</div>
-          <div>Last Wkt: {playersInfo.fallOfWickets[playersInfo.fallOfWickets.length - 1].batsman}</div>
-          <div>{matchDetail.keyFacts.tossInfo}</div>
+          <div>Partnership: {keyFacts.partnership}</div>
+          <div>Last Wkt: {playersInfo.fallOfWickets[playersInfo.fallOfWickets.length - 1]?.batsman || keyFacts.lastWicket || "N/A"}</div>
+          <div>{keyFacts.tossInfo}</div>
         </div>
       </div>
 
       <div>
-        <h3 className="commentary-title">
-          Ball by Ball Commentary
-        </h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+          <h3 className="commentary-title">
+            Ball by Ball Commentary
+          </h3>
+          {/* Inning Selector */}
+          <div style={{ display: 'flex', gap: '10px' }}>
+            {availableInnings.map(inning => (
+              <button 
+                key={inning}
+                onClick={() => setSelectedInning(inning)}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: selectedInning === inning ? '#3b82f6' : '#f3f4f6',
+                  color: selectedInning === inning ? 'white' : '#374151',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                {inning === 1 ? '1st Innings' : inning === 2 ? '2nd Innings' : `${inning}rd Innings`}
+              </button>
+            ))}
+            {availableInnings.length === 0 && (
+              <div style={{ color: '#6b7280', fontSize: '14px', padding: '8px' }}>
+                No commentary data available
+              </div>
+            )}
+          </div>
+        </div>
         <div className="ball-commentary">
-          {commentaryData.map((ball, index) => (
-            <div key={index} className="ball-item">
-              <div className={`ball-runs-badge ${
-                ball.runs === 6 ? 'ball-runs-six' : 
-                ball.runs === 4 ? 'ball-runs-four' : 
-                'ball-runs-other'
-              }`}>
-                {ball.runs}
+          {currentInningCommentary.length > 0 ? currentInningCommentary.map((ball, index) => {
+            // Handle different data structures - check if it's new API format or old format
+            const runs = ball.Runs || ball.runs || 0;
+            const over = ball.Over || ball.over || '0';
+            const ballNumber = ball.Ball_Number || ball.Ball || ball.ball || 0;
+            const batsman = ball.Batsman_Name || ball.batsman || 'Unknown';
+            const bowler = ball.Bowler_Name || ball.bowler || 'Unknown';
+            const commentary = ball.Commentary || ball.commentary || 'No commentary available';
+            const score = ball.Score || `${ball.totalRuns || 0}/${ball.wickets || 0}`;
+            const isball = ball.Isball !== undefined ? ball.Isball : true;
+            
+            // Only show actual ball deliveries, skip text-only commentary
+            if (!isball && !ball.Commentary) return null;
+            
+            return (
+              <div key={index} className="ball-item">
+                <div className={`ball-runs-badge ${
+                  runs == 6 ? 'ball-runs-six' : 
+                  runs == 4 ? 'ball-runs-four' : 
+                  'ball-runs-other'
+                }`}>
+                  {runs || (ball.Detail === 'W' ? 'W' : '•')}
+                </div>
+                <div className="ball-content">
+                  <div className="ball-meta">
+                    {over && ballNumber ? `Over ${over} • ` : ''}{batsman} vs {bowler}
+                  </div>
+                  <div className="ball-commentary-text">
+                    {commentary}
+                  </div>
+                  <div className="ball-score">
+                    Score: {score}
+                  </div>
+                </div>
               </div>
-              <div className="ball-content">
-                <div className="ball-meta">
-                  Over {ball.over}.{ball.ball} • {ball.batsman} vs {ball.bowler}
-                </div>
-                <div className="ball-commentary-text">
-                  {ball.commentary}
-                </div>
-                <div className="ball-score">
-                  Score: {ball.totalRuns}/{ball.wickets}
-                </div>
-              </div>
+            );
+          }) : (
+            <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>
+              No commentary available for this inning
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>

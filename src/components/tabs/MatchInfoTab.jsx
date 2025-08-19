@@ -1,22 +1,33 @@
-import React from 'react';
-import { getVenueById } from '../../data/index.js';
 import '../../styles/responsive.css';
 
-const MatchInfoTab = ({ matchDetail, match }) => {
-  const venue = match ? getVenueById(match.venueId) : null;
+const MatchInfoTab = ({ matchDetail }) => {
+  // Extract data from the new matchDetail structure
+  const matchDetailData = matchDetail?.Matchdetail || {};
+  const seriesData = matchDetail?.Series || {};
+  const venueData = matchDetail?.Venue || {};
+  const officialsData = matchDetail?.Officials || {};
+  const matchData = matchDetailData?.Match || {};
+  const teamsData = matchDetail?.Teams || {};
   
-  // Use match data if available, fallback to matchDetail
-  const tournament = match?.tournamentId === 'ipl2025' ? 'TATA IPL 2025' : matchDetail?.matchInfo?.tournament;
-  const date = match?.date || matchDetail?.matchInfo?.date;
-  const time = match?.time || '';
-  const venueName = venue ? `${venue.name}, ${venue.city}` : matchDetail?.matchInfo?.venue;
-  const toss = match?.toss ? 
-    `${match.toss.winnerId} Won The Toss And Elected To ${match.toss.decision === 'bat' ? 'Bat' : 'Bowl'}` : 
-    matchDetail?.matchInfo?.toss;
-  const officials = match?.officials || matchDetail?.matchInfo;
-  const manOfMatch = match?.manOfTheMatch?.playerName || matchDetail?.matchInfo?.manOfTheMatch;
+  // Use new data structure
+  const tournament = seriesData.Name || seriesData.Series_short_display_name || 'Cricket Match';
+  const date = matchData.Date || matchData.StartDate?.split('T')[0] || 'TBD';
+  const time = matchData.Time || '';
+  const venueName = venueData.Name ? `${venueData.Name}, ${venueData.City}` : 'Venue TBD';
   
-  if (!match && (!matchDetail || !matchDetail.matchInfo)) {
+  // Extract toss information using team names
+  const tossWinningTeamId = matchDetailData.Tosswonby;
+  const tossWinningTeam = teamsData[tossWinningTeamId];
+  const tossDecision = matchDetailData.Toss_elected_to;
+  const toss = tossWinningTeam && tossDecision 
+    ? `${tossWinningTeam.Name_Full} won the toss and elected to ${tossDecision}` 
+    : 'Toss details not available';
+  
+  const umpires = officialsData.Umpires || 'Umpires TBD';
+  const referee = officialsData.Referee || 'Referee TBD';
+  const manOfMatch = matchDetailData.Player_Match || 'TBD';
+  
+  if (!matchDetail) {
     return (
       <div className="tab-panel">
         <div style={{ textAlign: 'center' }}>
@@ -42,7 +53,7 @@ const MatchInfoTab = ({ matchDetail, match }) => {
       <div style={{ marginBottom: '30px' }}>
         <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Date & Time</h3>
         <div style={{ fontSize: '16px' }}>
-          {date} {time && `• ${time}`} {match?.timezone || 'IST'}
+          {date} {time && `• ${time}`} IST
         </div>
       </div>
 
@@ -51,6 +62,15 @@ const MatchInfoTab = ({ matchDetail, match }) => {
         <div style={{ fontSize: '16px' }}>{venueName}</div>
       </div>
 
+      {venueData.Venue_Weather && (
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Weather</h3>
+          <div style={{ fontSize: '16px' }}>
+            {venueData.Venue_Weather.Weather || 'N/A'} - {venueData.Venue_Weather.Temperature || 'N/A'}, {venueData.Venue_Weather.Description || 'N/A'}
+          </div>
+        </div>
+      )}
+
       {toss && (
         <div style={{ marginBottom: '30px' }}>
           <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Toss</h3>
@@ -58,41 +78,41 @@ const MatchInfoTab = ({ matchDetail, match }) => {
         </div>
       )}
 
-      {officials?.umpires && (
+      {umpires && umpires !== 'Umpires TBD' && (
         <div style={{ marginBottom: '30px' }}>
           <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Umpires</h3>
-          <div style={{ fontSize: '16px' }}>
-            {Array.isArray(officials.umpires) ? officials.umpires.join(', ') : officials.umpires}
-          </div>
+          <div style={{ fontSize: '16px' }}>{umpires}</div>
         </div>
       )}
 
-      {officials?.referee && (
+      {referee && referee !== 'Referee TBD' && (
         <div style={{ marginBottom: '30px' }}>
           <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Referee</h3>
-          <div style={{ fontSize: '16px' }}>{officials.referee}</div>
+          <div style={{ fontSize: '16px' }}>{referee}</div>
         </div>
       )}
 
-      {manOfMatch && (
+      {manOfMatch && manOfMatch !== 'TBD' && (
         <div style={{ marginBottom: '30px' }}>
           <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Man of the Match</h3>
           <div style={{ fontSize: '16px' }}>{manOfMatch}</div>
         </div>
       )}
 
-      {match?.broadcast && (
-        <>
-          <div style={{ marginBottom: '30px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>TV Broadcast</h3>
-            <div style={{ fontSize: '16px' }}>{match.broadcast.tv.join(', ')}</div>
-          </div>
-          <div style={{ marginBottom: '30px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Live Streaming</h3>
-            <div style={{ fontSize: '16px' }}>{match.broadcast.digital.join(', ')}</div>
-          </div>
-        </>
+      {matchData.Type && (
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Match Type</h3>
+          <div style={{ fontSize: '16px' }}>{matchData.Type}</div>
+        </div>
       )}
+
+      {matchDetailData.Result && (
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Result</h3>
+          <div style={{ fontSize: '16px' }}>{matchDetailData.Result}</div>
+        </div>
+      )}
+
     </div>
   );
 };
