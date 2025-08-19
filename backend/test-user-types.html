@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket User Types Test</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .user-panel {
+            border: 2px solid #ccc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .generic { border-color: #007bff; background: #f0f8ff; }
+        .chatuser { border-color: #28a745; background: #f0fff0; }
+        .commentaryuser { border-color: #ffc107; background: #fffef0; }
+        .matchuser { border-color: #dc3545; background: #fff0f0; }
+        
+        input, button, select {
+            margin: 5px;
+            padding: 8px;
+        }
+        .messages {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin: 10px 0;
+            background: white;
+        }
+        .commentary-data {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin: 10px 0;
+            background: white;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .user-message { background: #e3f2fd; }
+        .chat-message { background: #e8f5e8; }
+        .system-message { background: #fff3e0; font-style: italic; }
+        .commentary-message { background: #fff8e1; }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .connected { background: #e8f5e8; color: #2e7d32; }
+        .disconnected { background: #ffebee; color: #c62828; }
+        h3 { margin-top: 0; }
+    </style>
+</head>
+<body>
+    <h1>🏏 Cricket User Types Test System</h1>
+    
+    <div class="container">
+        <!-- Generic User Panel -->
+        <div class="user-panel generic">
+            <h3>👤 Generic User</h3>
+            <div>
+                <input type="text" id="generic-match" placeholder="Match ID" value="stbovl08182025256492">
+                <input type="text" id="generic-username" placeholder="Username" value="GenericUser">
+                <button onclick="connectUser('generic')">Connect</button>
+                <button onclick="disconnectUser('generic')">Disconnect</button>
+            </div>
+            <div id="generic-status" class="status disconnected">Disconnected</div>
+            
+            <h4>Send Message</h4>
+            <input type="text" id="generic-message" placeholder="Message...">
+            <button onclick="sendMessage('generic')">Send</button>
+            
+            <div id="generic-messages" class="messages"></div>
+        </div>
+
+        <!-- Chat User Panel -->
+        <div class="user-panel chatuser">
+            <h3>💬 Chat User</h3>
+            <div>
+                <input type="text" id="chat-match" placeholder="Match ID" value="stbovl08182025256492">
+                <input type="text" id="chat-username" placeholder="Username" value="ChatUser">
+                <button onclick="connectUser('chatuser')">Connect</button>
+                <button onclick="disconnectUser('chatuser')">Disconnect</button>
+            </div>
+            <div id="chatuser-status" class="status disconnected">Disconnected</div>
+            
+            <h4>Send Chat Message</h4>
+            <input type="text" id="chat-message" placeholder="Chat message...">
+            <button onclick="sendMessage('chatuser')">Send Chat</button>
+            
+            <div id="chatuser-messages" class="messages"></div>
+        </div>
+
+        <!-- Commentary User Panel -->
+        <div class="user-panel commentaryuser">
+            <h3>🎤 Commentary User</h3>
+            <div>
+                <input type="text" id="commentary-match" placeholder="Match ID" value="stbovl08182025256492">
+                <input type="text" id="commentary-username" placeholder="Username" value="CommentaryUser">
+                <button onclick="connectUser('commentaryuser')">Connect</button>
+                <button onclick="disconnectUser('commentaryuser')">Disconnect</button>
+            </div>
+            <div id="commentaryuser-status" class="status disconnected">Disconnected</div>
+            
+            <h4>Commentary Actions</h4>
+            <button onclick="getCommentary()">Get Commentary</button>
+            <input type="number" id="inning-number" placeholder="Inning #" value="1" min="1" max="4">
+            <button onclick="pollCommentary()">Poll Commentary</button>
+            
+            <div id="commentaryuser-messages" class="messages"></div>
+            
+            <h4>🏏 Live Ball Information:</h4>
+            <div id="live-ball-info" class="commentary-data" style="background: #f0f8ff; border: 2px solid #4CAF50;">
+                No live ball data yet...
+            </div>
+            
+            <h4>📊 Commentary Data (JSON):</h4>
+            <div id="commentary-data" class="commentary-data">No commentary data yet...</div>
+        </div>
+
+        <!-- Match User Panel -->
+        <div class="user-panel matchuser">
+            <h3>🏏 Match User</h3>
+            <div>
+                <input type="text" id="match-match" placeholder="Match ID" value="stbovl08182025256492">
+                <input type="text" id="match-username" placeholder="Username" value="MatchUser">
+                <button onclick="connectUser('matchuser')">Connect</button>
+                <button onclick="disconnectUser('matchuser')">Disconnect</button>
+            </div>
+            <div id="matchuser-status" class="status disconnected">Disconnected</div>
+            
+            <h4>Match Actions</h4>
+            <button onclick="getMatchData()">Get Match Data</button>
+            <button onclick="getMatchStatus()">Get Match Status</button>
+            
+            <div id="matchuser-messages" class="messages"></div>
+        </div>
+    </div>
+
+    <!-- Global Status -->
+    <div style="margin-top: 20px; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+        <h3>🌐 Global Status</h3>
+        <button onclick="getServerStats()">Refresh Server Stats</button>
+        <div id="global-stats"></div>
+    </div>
+
+    <script>
+        // Socket connections for each user type
+        const sockets = {
+            generic: null,
+            chatuser: null,
+            commentaryuser: null,
+            matchuser: null
+        };
+
+        const userStates = {
+            generic: { connected: false, matchId: null },
+            chatuser: { connected: false, matchId: null },
+            commentaryuser: { connected: false, matchId: null },
+            matchuser: { connected: false, matchId: null }
+        };
+
+        function connectUser(userType) {
+            // Map user types to their correct element ID prefixes
+            const idMap = {
+                'generic': 'generic',
+                'chatuser': 'chat',
+                'commentaryuser': 'commentary',
+                'matchuser': 'match'
+            };
+            
+            const prefix = idMap[userType];
+            const matchElement = document.getElementById(`${prefix}-match`);
+            const usernameElement = document.getElementById(`${prefix}-username`);
+            
+            if (!matchElement || !usernameElement) {
+                alert(`Elements not found for user type: ${userType}`);
+                console.error(`Looking for: ${prefix}-match and ${prefix}-username`);
+                return;
+            }
+            
+            const matchId = matchElement.value.trim();
+            const username = usernameElement.value.trim();
+            
+            if (!matchId || !username) {
+                alert('Please enter both Match ID and Username');
+                return;
+            }
+
+            // Disconnect if already connected
+            if (sockets[userType]) {
+                sockets[userType].disconnect();
+            }
+
+            // Create new connection
+            sockets[userType] = io('http://localhost:3001');
+            
+            // Set up event listeners
+            setupSocketListeners(userType, sockets[userType]);
+            
+            // Join match with user type
+            sockets[userType].emit('join_match', { 
+                matchId, 
+                username, 
+                userType: userType === 'generic' ? 'generic' : userType
+            });
+
+            userStates[userType].matchId = matchId;
+        }
+
+        function disconnectUser(userType) {
+            if (sockets[userType]) {
+                sockets[userType].disconnect();
+                sockets[userType] = null;
+                userStates[userType].connected = false;
+                userStates[userType].matchId = null;
+                updateStatus(userType, 'Disconnected', 'disconnected');
+            }
+        }
+
+        function setupSocketListeners(userType, socket) {
+            socket.on('connect', () => {
+                updateStatus(userType, 'Connected to server', 'connected');
+                addMessage(userType, '🔗 Connected to server', 'system');
+            });
+
+            socket.on('disconnect', () => {
+                updateStatus(userType, 'Disconnected from server', 'disconnected');
+                addMessage(userType, '❌ Disconnected from server', 'system');
+                userStates[userType].connected = false;
+            });
+
+            socket.on('joined_match', (data) => {
+                userStates[userType].connected = true;
+                updateStatus(userType, `Joined match: ${data.matchId} as ${data.username} (Type: ${data.userType})`, 'connected');
+                addMessage(userType, `✅ Joined match: ${data.matchId}`, 'system');
+            });
+
+            socket.on('new_message', (message) => {
+                addMessage(userType, `${message.username}: ${message.message}`, 'user');
+            });
+
+            socket.on('chat_message', (message) => {
+                addMessage(userType, `💬 ${message.username}: ${message.message}`, 'chat');
+            });
+
+            socket.on('commentary_update', (data) => {
+                addMessage(userType, `🎤 Commentary update received`, 'commentary');
+                if (data.Commentary) {
+                    document.getElementById('commentary-data').textContent = JSON.stringify(data, null, 2);
+                } else {
+                    document.getElementById('commentary-data').textContent = data.message || 'No commentary data';
+                }
+            });
+
+            socket.on('commentary_polled', (data) => {
+                addMessage(userType, `🎤 Commentary polled for inning ${data.inningNumber}`, 'commentary');
+            });
+
+            socket.on('match_data_update', (data) => {
+                console.log('data', data)
+                addMessage(userType, `🏏 Match data: ${data.timestamp}`, 'system');
+            });
+
+            // Enhanced commentary events
+            socket.on('commentary_data_update', (data) => {
+                console.log('Commentary Data Update:', data);
+                addMessage(userType, `🎤 Commentary updated for inning ${data.inningNumber}`, 'commentary');
+                
+                // Update live ball information display
+                const liveBallEl = document.getElementById('live-ball-info');
+                if (data.latestBallEvent && data.latestBallEvent.ballInfo) {
+                    const ballInfo = data.latestBallEvent.ballInfo;
+                    const ballText = `🏏 Latest Ball: Over ${ballInfo.over}.${ballInfo.ball} - ${ballInfo.runs} runs by ${ballInfo.striker} vs ${ballInfo.bowler}`;
+                    addMessage(userType, ballText, 'commentary');
+                    
+                    if (ballInfo.commentary) {
+                        addMessage(userType, `💬 "${ballInfo.commentary}"`, 'commentary');
+                    }
+                    
+                    // Update live ball display
+                    if (liveBallEl) {
+                        liveBallEl.innerHTML = `
+                            <div style="font-weight: bold; color: #2196F3;">🏏 LIVE BALL</div>
+                            <div><strong>Over:</strong> ${ballInfo.over}.${ballInfo.ball}</div>
+                            <div><strong>Runs:</strong> ${ballInfo.runs} ${ballInfo.isWicket ? '🚨 WICKET!' : ''}</div>
+                            <div><strong>Batsman:</strong> ${ballInfo.striker}</div>
+                            <div><strong>Bowler:</strong> ${ballInfo.bowler}</div>
+                            <div><strong>Commentary:</strong> ${ballInfo.commentary}</div>
+                            <div style="font-size: 0.8em; color: #666;">Updated: ${new Date(ballInfo.timestamp).toLocaleTimeString()}</div>
+                        `;
+                    }
+                } else {
+                    if (liveBallEl) {
+                        liveBallEl.innerHTML = '<div style="color: #999;">⏳ Waiting for ball data...</div>';
+                    }
+                }
+                
+                // Update the commentary data display
+                const commentaryDataEl = document.getElementById('commentary-data');
+                if (commentaryDataEl) {
+                    commentaryDataEl.textContent = JSON.stringify(data, null, 2);
+                }
+            });
+
+            socket.on('ball_event_update', (data) => {
+                console.log('Ball Event Update:', data);
+                const ballEvent = data.ballEvent;
+                const ballText = `⚡ Live Ball: ${ballEvent.over}.${ballEvent.ball} - ${ballEvent.runs} runs${ballEvent.isWicket ? ' - WICKET!' : ''}`;
+                addMessage(userType, ballText, 'commentary');
+                
+                // Also update live ball display for real-time updates
+                const liveBallEl = document.getElementById('live-ball-info');
+                if (liveBallEl) {
+                    liveBallEl.innerHTML = `
+                        <div style="font-weight: bold; color: #FF5722;">⚡ LIVE BALL UPDATE</div>
+                        <div><strong>Over:</strong> ${ballEvent.over}.${ballEvent.ball}</div>
+                        <div><strong>Runs:</strong> ${ballEvent.runs} ${ballEvent.isWicket ? '🚨 WICKET!' : ''}</div>
+                        <div><strong>Batsman:</strong> ${ballEvent.striker}</div>
+                        <div><strong>Bowler:</strong> ${ballEvent.bowler}</div>
+                        <div><strong>Commentary:</strong> ${ballEvent.commentary}</div>
+                        <div style="font-size: 0.8em; color: #666;">Updated: ${new Date().toLocaleTimeString()}</div>
+                    `;
+                }
+            });
+
+            socket.on('match_ball_update', (data) => {
+                console.log('Match Ball Update:', data);
+                addMessage(userType, `🏏 Ball Update: ${data.over}.${data.ball} - ${data.runs} runs`, 'system');
+            });
+
+            socket.on('match_status_update', (data) => {
+                console.log('Match Status Update:', data);
+                addMessage(userType, `📊 Match Status: ${data.summary.status}`, 'system');
+            });
+
+            socket.on('match_info_update', (data) => {
+                console.log('Match Info Update:', data);
+                addMessage(userType, `📈 Match Info: Inning ${data.summary.currentInning}, Status: ${data.summary.status}`, 'commentary');
+            });
+
+            socket.on('system_notification', (notification) => {
+                addMessage(userType, `📢 ${notification.message}`, 'system');
+            });
+
+            socket.on('error', (error) => {
+                addMessage(userType, `❌ Error: ${error.message}`, 'system');
+            });
+        }
+
+        function sendMessage(userType) {
+            const socket = sockets[userType];
+            if (!socket || !userStates[userType].connected) {
+                alert('Please connect first');
+                return;
+            }
+
+            // Map user types to their correct element ID prefixes
+            const idMap = {
+                'generic': 'generic',
+                'chatuser': 'chat',
+                'commentaryuser': 'commentary',
+                'matchuser': 'match'
+            };
+            
+            const prefix = idMap[userType];
+            const messageInput = document.getElementById(`${prefix}-message`);
+            
+            if (!messageInput) {
+                alert(`Message input not found for user type: ${userType}`);
+                return;
+            }
+            
+            const message = messageInput.value.trim();
+            
+            if (!message) {
+                alert('Please enter a message');
+                return;
+            }
+
+            socket.emit('send_message', { message });
+            addMessage(userType, `You: ${message}`, 'user');
+            messageInput.value = '';
+        }
+
+        function getCommentary() {
+            const socket = sockets.commentaryuser;
+            if (!socket || !userStates.commentaryuser.connected) {
+                alert('Please connect as commentary user first');
+                return;
+            }
+
+            socket.emit('get_commentary');
+        }
+
+        function pollCommentary() {
+            const socket = sockets.commentaryuser;
+            if (!socket || !userStates.commentaryuser.connected) {
+                alert('Please connect as commentary user first');
+                return;
+            }
+
+            const inningNumber = parseInt(document.getElementById('inning-number').value) || 1;
+            socket.emit('poll_commentary', { inningNumber });
+        }
+
+        function getMatchData() {
+            const socket = sockets.matchuser;
+            if (!socket || !userStates.matchuser.connected) {
+                alert('Please connect as match user first');
+                return;
+            }
+
+            socket.emit('get_match_data');
+        }
+
+        function getMatchStatus() {
+            const socket = sockets.matchuser;
+            if (!socket || !userStates.matchuser.connected) {
+                alert('Please connect as match user first');
+                return;
+            }
+
+            socket.emit('get_match_status');
+        }
+
+        function updateStatus(userType, message, type) {
+            const statusDiv = document.getElementById(`${userType}-status`);
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        function addMessage(userType, message, type) {
+            const messagesDiv = document.getElementById(`${userType}-messages`);
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            messageDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        async function getServerStats() {
+            try {
+                const response = await fetch('http://localhost:3001/api/stats');
+                const stats = await response.json();
+                
+                const statsDiv = document.getElementById('global-stats');
+                statsDiv.innerHTML = `
+                    <h4>Server Statistics:</h4>
+                    <p><strong>Server Status:</strong> ${stats.server?.status || 'Unknown'}</p>
+                    <p><strong>Uptime:</strong> ${Math.round(stats.server?.uptime || 0)}s</p>
+                    <p><strong>Legacy Connections:</strong> ${stats.socket?.legacy?.totalConnections || 0}</p>
+                    <p><strong>Match Manager Matches:</strong> ${Object.keys(stats.socket?.matchManager || {}).length}</p>
+                    <p><strong>Total Managed Users:</strong> ${Object.values(stats.socket?.matchManager || {}).reduce((sum, match) => sum + (match.userCount || 0), 0)}</p>
+                `;
+                
+            } catch (error) {
+                document.getElementById('global-stats').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        // Auto-refresh stats every 5 seconds
+        setInterval(getServerStats, 5000);
+        
+        // Initial stats load
+        window.onload = getServerStats;
+    </script>
+</body>
+</html>

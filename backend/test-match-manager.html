@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Match Manager Test</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .panel {
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        input, button, select {
+            margin: 5px;
+            padding: 8px;
+        }
+        #messages {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin: 10px 0;
+            background: #f9f9f9;
+        }
+        #matchData {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin: 10px 0;
+            background: #f0f8ff;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .user-message {
+            background: #e3f2fd;
+        }
+        .system-message {
+            background: #fff3e0;
+            font-style: italic;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .connected {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        .disconnected {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .stat-card {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏏 Cricket Match Manager Test</h1>
+    
+    <div class="container">
+        <div class="panel">
+            <h3>Connection Control</h3>
+            <div>
+                <input type="text" id="matchId" placeholder="Match ID" value="stbovl08182025256492">
+                <input type="text" id="username" placeholder="Username" value="TestUser">
+                <button onclick="joinMatch()">Join Match</button>
+                <button onclick="disconnect()">Disconnect</button>
+            </div>
+            
+            <div id="status" class="status disconnected">
+                Disconnected
+            </div>
+            
+            <h3>Send Message</h3>
+            <div>
+                <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+            
+            <h3>Messages</h3>
+            <div id="messages"></div>
+        </div>
+        
+        <div class="panel">
+            <h3>Match Data Polling</h3>
+            <div>
+                <button onclick="pollMatchData()">Poll Current Match</button>
+                <button onclick="getMatchStatus()">Get Match Status</button>
+                <button onclick="getServerStats()">Server Stats</button>
+            </div>
+            
+            <h4>Current Match Data:</h4>
+            <div id="matchData">No data loaded...</div>
+        </div>
+        
+        <div class="panel full-width">
+            <h3>API Testing</h3>
+            <div>
+                <input type="text" id="apiMatchId" placeholder="Match ID for API" value="stbovl08182025256492">
+                <button onclick="testApiPoll()">Test API Poll</button>
+                <button onclick="getMatchManagement()">Get Match Management</button>
+            </div>
+            
+            <h3>System Stats</h3>
+            <div id="stats" class="stats-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        let socket = null;
+        let currentMatch = null;
+        let currentUsername = null;
+
+        // Initialize socket connection
+        function initSocket() {
+            if (socket) {
+                socket.disconnect();
+            }
+            
+            socket = io('http://localhost:3001');
+            
+            socket.on('connect', () => {
+                updateStatus('Connected to server', 'connected');
+                addMessage('🔗 Connected to server', 'system');
+            });
+            
+            socket.on('disconnect', () => {
+                updateStatus('Disconnected from server', 'disconnected');
+                addMessage('❌ Disconnected from server', 'system');
+            });
+            
+            socket.on('joined_match', (data) => {
+                currentMatch = data.matchId;
+                currentUsername = data.username;
+                updateStatus(`Joined match: ${data.matchId} as ${data.username} (${data.connectedUsers} users)`, 'connected');
+                addMessage(`✅ Joined match: ${data.matchId} - Polling started automatically!`, 'system');
+            });
+            
+            socket.on('new_message', (message) => {
+                addMessage(`${message.username}: ${message.message}`, 'user');
+            });
+            
+            socket.on('message_sent', (data) => {
+                addMessage(`✓ Message sent at ${new Date(data.timestamp).toLocaleTimeString()}`, 'system');
+            });
+            
+            socket.on('system_notification', (notification) => {
+                addMessage(`📢 ${notification.message}`, 'system');
+            });
+            
+            socket.on('match_data_updated', (data) => {
+                addMessage(`📊 Match data updated for ${data.matchId} at ${new Date(data.lastUpdated).toLocaleTimeString()}`, 'system');
+                // Auto-refresh match data display
+                setTimeout(getMatchStatus, 1000);
+            });
+            
+            socket.on('match_status', (status) => {
+                displayMatchData(status);
+            });
+            
+            socket.on('error', (error) => {
+                addMessage(`❌ Error: ${error.message}`, 'system');
+                console.error('Socket error:', error);
+            });
+        }
+
+        function joinMatch() {
+            const matchId = document.getElementById('matchId').value.trim();
+            const username = document.getElementById('username').value.trim();
+            
+            if (!matchId || !username) {
+                alert('Please enter both Match ID and Username');
+                return;
+            }
+            
+            if (!socket) {
+                initSocket();
+            }
+            
+            socket.emit('join_match', { matchId, username });
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message) {
+                alert('Please enter a message');
+                return;
+            }
+            
+            if (!socket || !currentMatch) {
+                alert('Please join a match first');
+                return;
+            }
+            
+            socket.emit('send_message', { message });
+            addMessage(`You: ${message}`, 'user');
+            messageInput.value = '';
+        }
+
+        function pollMatchData() {
+            if (!socket || !currentMatch) {
+                alert('Please join a match first');
+                return;
+            }
+            
+            socket.emit('poll_match_data', { matchId: currentMatch });
+            addMessage('🔄 Manually polling match data...', 'system');
+        }
+
+        function getMatchStatus() {
+            if (!socket) {
+                alert('Please connect first');
+                return;
+            }
+            
+            socket.emit('get_match_status');
+        }
+
+        function disconnect() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+                currentMatch = null;
+                currentUsername = null;
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function addMessage(message, type) {
+            const messages = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            messageDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function updateStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+
+        function displayMatchData(data) {
+            const matchDataDiv = document.getElementById('matchData');
+            matchDataDiv.textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function testApiPoll() {
+            const matchId = document.getElementById('apiMatchId').value.trim();
+            
+            if (!matchId) {
+                alert('Please enter a match ID');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://localhost:3001/api/match/${matchId}/poll`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                
+                addMessage(`🌐 API Poll result: ${result.success ? 'Success' : 'Failed'}`, 'system');
+                
+                if (result.success) {
+                    addMessage(`📊 Data keys: ${result.dataKeys?.join(', ') || 'None'}`, 'system');
+                }
+                
+            } catch (error) {
+                addMessage(`❌ API Poll error: ${error.message}`, 'system');
+            }
+        }
+
+        async function getMatchManagement() {
+            try {
+                const response = await fetch('http://localhost:3001/api/matches');
+                const result = await response.json();
+                
+                displayMatchData(result);
+                addMessage('📊 Match management status loaded', 'system');
+                
+            } catch (error) {
+                addMessage(`❌ Failed to get match management: ${error.message}`, 'system');
+            }
+        }
+
+        async function getServerStats() {
+            try {
+                const response = await fetch('http://localhost:3001/api/stats');
+                const stats = await response.json();
+                
+                const statsDiv = document.getElementById('stats');
+                
+                statsDiv.innerHTML = `
+                    <div class="stat-card">
+                        <h4>Server Status</h4>
+                        <p>Status: ${stats.server?.status || 'Unknown'}</p>
+                        <p>Uptime: ${Math.round(stats.server?.uptime || 0)}s</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Legacy System</h4>
+                        <p>Connections: ${stats.socket?.legacy?.totalConnections || 0}</p>
+                        <p>Active Matches: ${stats.socket?.legacy?.activeMatches || 0}</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Match Manager</h4>
+                        <p>Monitored Matches: ${Object.keys(stats.socket?.matchManager || {}).length}</p>
+                        <p>Total Users: ${Object.values(stats.socket?.matchManager || {}).reduce((sum, match) => sum + (match.userCount || 0), 0)}</p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                document.getElementById('stats').innerHTML = `<div class="stat-card">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-connect on page load
+        window.onload = () => {
+            initSocket();
+            getServerStats();
+            
+            // Auto-refresh stats every 10 seconds
+            setInterval(getServerStats, 10000);
+        };
+    </script>
+</body>
+</html>

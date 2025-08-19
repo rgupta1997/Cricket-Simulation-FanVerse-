@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Match Socket.IO Test</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .panel {
+            flex: 1;
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        input, button {
+            margin: 5px;
+            padding: 8px;
+        }
+        #messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin: 10px 0;
+            background: #f9f9f9;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .user-message {
+            background: #e3f2fd;
+        }
+        .system-message {
+            background: #fff3e0;
+            font-style: italic;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .connected {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        .disconnected {
+            background: #ffebee;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏏 Cricket Match Socket.IO Test</h1>
+    
+    <div class="container">
+        <div class="panel">
+            <h3>Connection Control</h3>
+            <div>
+                <input type="text" id="matchId" placeholder="Match ID" value="test123">
+                <input type="text" id="username" placeholder="Username" value="Player1">
+                <button onclick="joinMatch()">Join Match</button>
+                <button onclick="disconnect()">Disconnect</button>
+            </div>
+            
+            <div id="status" class="status disconnected">
+                Disconnected
+            </div>
+            
+            <h3>Send Message</h3>
+            <div>
+                <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+            
+            <h3>Server Stats</h3>
+            <button onclick="getStats()">Refresh Stats</button>
+            <div id="stats"></div>
+        </div>
+        
+        <div class="panel">
+            <h3>Messages</h3>
+            <div id="messages"></div>
+            <button onclick="clearMessages()">Clear Messages</button>
+        </div>
+    </div>
+
+    <script>
+        let socket = null;
+        let currentMatch = null;
+        let currentUsername = null;
+
+        // Initialize socket connection
+        function initSocket() {
+            if (socket) {
+                socket.disconnect();
+            }
+            
+            socket = io('http://localhost:3001');
+            
+            socket.on('connect', () => {
+                updateStatus('Connected to server', 'connected');
+                addMessage('🔗 Connected to server', 'system');
+            });
+            
+            socket.on('disconnect', () => {
+                updateStatus('Disconnected from server', 'disconnected');
+                addMessage('❌ Disconnected from server', 'system');
+            });
+            
+            socket.on('joined_match', (data) => {
+                currentMatch = data.matchId;
+                currentUsername = data.username;
+                updateStatus(`Joined match: ${data.matchId} as ${data.username} (${data.connectedUsers} users)`, 'connected');
+                addMessage(`✅ Joined match: ${data.matchId}`, 'system');
+            });
+            
+            socket.on('new_message', (message) => {
+                addMessage(`${message.username}: ${message.message}`, 'user');
+            });
+            
+            socket.on('message_sent', (data) => {
+                addMessage(`✓ Message sent at ${new Date(data.timestamp).toLocaleTimeString()}`, 'system');
+            });
+            
+            socket.on('system_notification', (notification) => {
+                addMessage(`📢 ${notification.message}`, 'system');
+            });
+            
+            socket.on('error', (error) => {
+                addMessage(`❌ Error: ${error.message}`, 'system');
+                console.error('Socket error:', error);
+            });
+            
+            socket.on('room_info', (info) => {
+                if (info.connected) {
+                    addMessage(`📊 Room info: ${info.connectedUsers} users in ${info.matchId}`, 'system');
+                } else {
+                    addMessage(`📊 ${info.message}`, 'system');
+                }
+            });
+        }
+
+        function joinMatch() {
+            const matchId = document.getElementById('matchId').value.trim();
+            const username = document.getElementById('username').value.trim();
+            
+            if (!matchId || !username) {
+                alert('Please enter both Match ID and Username');
+                return;
+            }
+            
+            if (!socket) {
+                initSocket();
+            }
+            
+            socket.emit('join_match', { matchId, username });
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message) {
+                alert('Please enter a message');
+                return;
+            }
+            
+            if (!socket || !currentMatch) {
+                alert('Please join a match first');
+                return;
+            }
+            
+            socket.emit('send_message', { message });
+            addMessage(`You: ${message}`, 'user');
+            messageInput.value = '';
+        }
+
+        function disconnect() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+                currentMatch = null;
+                currentUsername = null;
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function addMessage(message, type) {
+            const messages = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            messageDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function updateStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+
+        function clearMessages() {
+            document.getElementById('messages').innerHTML = '';
+        }
+
+        async function getStats() {
+            try {
+                const response = await fetch('http://localhost:3001/api/stats');
+                const stats = await response.json();
+                document.getElementById('stats').innerHTML = `
+                    <h4>Server Stats:</h4>
+                    <p>Status: ${stats.server.status}</p>
+                    <p>Uptime: ${Math.round(stats.server.uptime)}s</p>
+                    <p>Active Matches: ${stats.socket.activeMatches}</p>
+                    <p>Total Connections: ${stats.socket.totalConnections}</p>
+                `;
+            } catch (error) {
+                document.getElementById('stats').innerHTML = `Error: ${error.message}`;
+            }
+        }
+
+        // Auto-connect on page load
+        window.onload = () => {
+            initSocket();
+            getStats();
+        };
+    </script>
+</body>
+</html>
