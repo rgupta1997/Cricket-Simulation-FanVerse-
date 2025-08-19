@@ -8,7 +8,7 @@ const CommentaryTab = ({ matchDetail, matchId, commentary }) => {
   const [currentBallDetails, setCurrentBallDetails] = useState(null);
 
   const playersInfo = extractPlayersInfo(matchDetail, selectedInning);
-  console.log('playersInfo', playersInfo);
+  console.log('playersInfo', playersInfo, currentBallDetails);
 
   // Extract batsmen and bowler details from currentBallDetails
   let batsmenRows = [];
@@ -231,10 +231,10 @@ const CommentaryTab = ({ matchDetail, matchId, commentary }) => {
           {currentInningCommentary.length > 0 ? currentInningCommentary.map((ball, index) => {
             // Handle different data structures - check if it's new API format or old format
             const runs = ball.Runs || ball.runs || 0;
-            const over = ball.Over || ball.over || '0';
+            const over = ball.Over || ball.over || 0;
             const ballNumber = ball.Ball_Number || ball.Ball || ball.ball || 0;
-            const batsman = ball.Batsman_Name || ball.batsman || 'Unknown';
-            const bowler = ball.Bowler_Name || ball.bowler || 'Unknown';
+            const batsman = ball.Batsman_Name || ball.batsman || null;
+            const bowler = ball.Bowler_Name || ball.bowler || null;
             const commentary = ball.Commentary || ball.commentary || 'No commentary available';
             const score = ball.Score || `${ball.totalRuns || 0}/${ball.wickets || 0}`;
             const isball = ball.Isball !== undefined ? ball.Isball : true;
@@ -253,7 +253,7 @@ const CommentaryTab = ({ matchDetail, matchId, commentary }) => {
                 </div>
                 <div className="ball-content">
                   <div className="ball-meta">
-                    {over && ballNumber ? `Over ${over} • ` : ''}{batsman} vs {bowler}
+                    {over && ballNumber ? `Over ${over} • ${batsman} vs ${bowler}` : ''}
                   </div>
                   <div className="ball-commentary-text">
                     {commentary}

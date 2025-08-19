@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Component } from 'react';
+import React, { useState, useEffect, Component, useCallback } from 'react';
 
 // Import API service instead of hardcoded data
 import webappApiService from '../services/webappApiService.js';
@@ -153,7 +153,7 @@ const ModernMatchCard = ({ match, onClick }) => {
 
   return (
     <div 
-      onClick={() => onClick(match.matchId)}
+      onClick={() => onClick(match.matchId, match)}
       style={{
         backgroundColor: statusConfig.backgroundColor,
         border: `2px solid ${statusConfig.borderColor}`,
@@ -380,9 +380,9 @@ const FixturesPage = ({ onMatchClick }) => {
 
   const filteredMatches = getFilteredMatches();
 
-  const handleMatchClick = (matchId) => {
+  const handleMatchClick = (matchId, matchDetails) => {
     console.log('🎯 Match clicked with ID:', matchId, 'Type:', typeof matchId);
-    onMatchClick(matchId);
+    onMatchClick(matchId, matchDetails);
   };
 
   const handleDateChange = (field, value) => {
@@ -806,153 +806,146 @@ const FixturesPage = ({ onMatchClick }) => {
 };
 
 // Match Detail Page Component  
-const MatchDetailPage = ({ matchId, onBackClick, onChatClick }) => {
+const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetails }) => {
+  console.log('selectedMatchDetails', selectedMatchDetails)
   const [activeTab, setActiveTab] = useState('commentary');
-  const [match, setMatch] = useState(null);
+  const [match, setMatch] = useState(selectedMatchDetails);
   const [matchDetail, setMatchDetail] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [liveData, setLiveData] = useState(null);
   const [commentary, setCommentary] = useState(null);
   const [isLoadingData, setIsLoadingData] = useState(false);
   
-  useEffect(() => {
-    fetchMatchData();
-  }, [matchId]);
-
-
-
-  const fetchMatchData = async () => {
+  const extractTeamDataFromMatchFile = useCallback((matchFileData) => {
     try {
-      setIsLoadingData(true);
-      console.log('🔍 Looking for match with ID:', matchId, typeof matchId);
-      
-      // First get the match from fixtures with a wider date range
-      const fixtures = await webappApiService.getFixtures(
-        new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days ago
-        new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]   // 30 days ahead
-      );
-      
-      console.log('📋 Available fixtures:', fixtures.map(f => ({ id: f.matchId, type: typeof f.matchId, name: f.matchName })));
-      
-      // Try both string and number comparison
-      const foundMatch = fixtures.find(f => f.matchId === matchId || f.matchId == matchId || f.matchId === String(matchId) || f.matchId === Number(matchId));
-      
-      if (!foundMatch) {
-        console.error('❌ Match not found. Available IDs:', fixtures.map(f => f.matchId));
-        console.error('❌ Looking for ID:', matchId, 'Type:', typeof matchId);
-        throw new Error(`Match not found. Looking for ID: ${matchId}, Available: ${fixtures.map(f => f.matchId).join(', ')}`);
-      }
-      
-      console.log('✅ Found match:', foundMatch.matchName, 'ID:', foundMatch.matchId);
-
-      // Enrich with team and venue data
-      const [team1, team2, venue] = await Promise.all([
-        webappApiService.getTeamDetails(foundMatch.team1Id),
-        webappApiService.getTeamDetails(foundMatch.team2Id),
-        webappApiService.getVenueDetails(foundMatch.venueId)
-      ]);
-
-      const enrichedMatch = {
-        ...foundMatch,
-        team1,
-        team2,
-        venue
-      };
-
-      setMatch(enrichedMatch);
-
-      // If match is completed or live, fetch detailed data
-      if (enrichedMatch.status !== 'upcoming' && enrichedMatch.matchFile) {
-        try {
-          const detailData = await webappApiService.getLiveInningsData(enrichedMatch.matchFile);
-          console.log('📄 Match detail data:', detailData);
-          setMatchDetail(detailData);
+      // Handle the structure from UpdatedMatchFile.json
+      if (matchFileData.Teams) {
+        // Get team IDs from the Teams object
+        const teamIds = Object.keys(matchFileData.Teams);
+        if (teamIds.length >= 2) {
+          const team1Id = teamIds[0];
+          const team2Id = teamIds[1];
           
-          // Determine number of innings from match details
-          let inningsCount = 2; // Default to 2 innings
-          if (detailData.matchDetails && detailData.matchDetails.innings) {
-            inningsCount = detailData.matchDetails.innings.length;
-          } else if (detailData.innings) {
-            inningsCount = detailData.innings.length;
-          }
+          const team1Data = matchFileData.Teams[team1Id];
+          const team2Data = matchFileData.Teams[team2Id];
           
-          console.log(`🏏 Determined ${inningsCount} innings for match ${enrichedMatch.matchFile}`);
-          
-          // Fetch commentary for all innings based on actual innings count
-          const commentaryData = await webappApiService.fetchAllInningsCommentary(enrichedMatch.matchFile, inningsCount);
-          setCommentary(commentaryData);
-          
-          // Update match object with real team data from live API
-          console.log('🔍 DEBUG: detailData structure:', Object.keys(detailData));
-          console.log('🔍 DEBUG: detailData.teams structure:', detailData.teams);
-          console.log('🔍 DEBUG: detailData.teams type:', Array.isArray(detailData.teams) ? 'array' : typeof detailData.teams);
-          
-          if (detailData.teams) {
-            let team1Data, team2Data;
-            
-            // Check if teams is an array or object
-            if (Array.isArray(detailData.teams)) {
-              console.log('📊 Teams is an array with', detailData.teams.length, 'items');
-              team1Data = detailData.teams[0];
-              team2Data = detailData.teams[1];
-            } else if (detailData.teams.team1 && detailData.teams.team2) {
-              console.log('📊 Teams is an object with team1/team2 properties');
-              team1Data = detailData.teams.team1;
-              team2Data = detailData.teams.team2;
-            } else {
-              console.log('❌ Unknown teams structure:', detailData.teams);
-              return;
+          return {
+            team1: {
+              id: team1Id,
+              name: team1Data.Name_Full,
+              shortName: team1Data.Name_Short,
+              logoUrl: selectedMatchDetails?.team1?.logoUrl || null
+            },
+            team2: {
+              id: team2Id, 
+              name: team2Data.Name_Full,
+              shortName: team2Data.Name_Short,
+              logoUrl: selectedMatchDetails?.team2?.logoUrl || null
             }
-            
-            console.log('🏏 Team 1 data:', team1Data);
-            console.log('🏏 Team 2 data:', team2Data);
-            
-            if (team1Data && team2Data) {
-              const updatedMatch = {
-                ...enrichedMatch,
-                team1: {
-                  ...enrichedMatch.team1,
-                  name: team1Data.name,
-                  shortName: team1Data.shortName
-                },
-                team2: {
-                  ...enrichedMatch.team2, 
-                  name: team2Data.name,
-                  shortName: team2Data.shortName
-                }
-              };
-              setMatch(updatedMatch);
-              console.log('✅ Updated match teams:', {
-                team1: updatedMatch.team1.name,
-                team2: updatedMatch.team2.name
-              });
-            }
-          }
-        } catch (err) {
-          console.warn('Could not fetch match details:', err);
+          };
         }
       }
+      
+      // Fallback to existing selectedMatchDetails if Teams data not available
+      return {
+        team1: selectedMatchDetails?.team1 || { 
+          name: `Team ${selectedMatchDetails?.team1Id || '1'}`, 
+          shortName: `T${selectedMatchDetails?.team1Id || '1'}` 
+        },
+        team2: selectedMatchDetails?.team2 || { 
+          name: `Team ${selectedMatchDetails?.team2Id || '2'}`, 
+          shortName: `T${selectedMatchDetails?.team2Id || '2'}` 
+        }
+      };
+    } catch (err) {
+      console.warn('Error extracting team data from match file:', err);
+      return {
+        team1: selectedMatchDetails?.team1 || { 
+          name: `Team ${selectedMatchDetails?.team1Id || '1'}`, 
+          shortName: `T${selectedMatchDetails?.team1Id || '1'}` 
+        },
+        team2: selectedMatchDetails?.team2 || { 
+          name: `Team ${selectedMatchDetails?.team2Id || '2'}`, 
+          shortName: `T${selectedMatchDetails?.team2Id || '2'}` 
+        }
+      };
+    }
+  }, [selectedMatchDetails]); // useCallback dependencies for extractTeamDataFromMatchFile
 
-      setError(null);
+  const fetchMatchData = useCallback(async () => {
+    try {
+      setIsLoadingData(true);
+      console.log('🔍 Fetching match data for ID:', matchId);
+      console.log('🔍 selectedMatchDetails teams:', {
+        team1: selectedMatchDetails?.team1,
+        team2: selectedMatchDetails?.team2,
+        status: selectedMatchDetails?.status
+      });
+      
+      // Use selectedMatchDetails as the base match data (no fixture API call needed)
+      let enrichedMatch = { ...selectedMatchDetails };
+
+      // Try to extract team data from match file if available (for all match statuses)
+      if (enrichedMatch.matchFile) {
+        try {
+          const detailData = await webappApiService.getLiveInningsData(enrichedMatch.matchFile);
+          console.log('📄 Match file data loaded for team extraction:', detailData);
+          
+          // Extract team data from the match file
+          const teamData = extractTeamDataFromMatchFile(detailData);
+          
+          // Update match with team data from match file
+          enrichedMatch = {
+            ...enrichedMatch,
+            ...teamData
+          };
+          
+          console.log('✅ Updated match with team data from match file:', {
+            team1: enrichedMatch.team1.name,
+            team2: enrichedMatch.team2.name,
+            status: enrichedMatch.status
+          });
+
+          // For live/completed matches, also set match detail and fetch commentary
+          if (enrichedMatch.status !== 'upcoming') {
+            setMatchDetail(detailData);
+            
+            // Determine number of innings from match details
+            let inningsCount = 2; // Default to 2 innings
+            if (detailData.Innings && Array.isArray(detailData.Innings)) {
+              inningsCount = detailData.Innings.length;
+            } else if (detailData.matchDetails && detailData.matchDetails.innings) {
+              inningsCount = detailData.matchDetails.innings.length;
+            } else if (detailData.innings) {
+              inningsCount = detailData.innings.length;
+            }
+            
+            console.log(`🏏 Determined ${inningsCount} innings for match ${enrichedMatch.matchFile}`);
+            
+            // Fetch commentary for all innings based on actual innings count
+            const commentaryData = await webappApiService.fetchAllInningsCommentary(enrichedMatch.matchFile, inningsCount);
+            setCommentary(commentaryData);
+          }
+          
+        } catch (err) {
+          console.warn('Could not fetch match file data:', err);
+          // Still use selectedMatchDetails even if match file fails
+        }
+      }
+      
+      setMatch(enrichedMatch);
     } catch (err) {
       setError(err.message);
       console.error('Error fetching match data:', err);
     } finally {
       setIsLoadingData(false);
     }
-  };
+  }, [matchId, selectedMatchDetails, extractTeamDataFromMatchFile]); // useCallback dependencies
 
-  const fetchLiveData = async () => {
-    if (!match?.matchFile) return;
-    
-    try {
-      const data = await webappApiService.getLiveInningsData(match.matchFile);
-      setLiveData(data);
-    } catch (err) {
-      console.warn('Could not fetch live data:', err);
+  useEffect(() => {
+    if (selectedMatchDetails) {
+      fetchMatchData();
     }
-  };
+  }, [matchId, selectedMatchDetails, fetchMatchData]);
 
 
 
@@ -1107,12 +1100,12 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick }) => {
           <div className="team-summary">
             <TeamLogo team={match.team1} size={50} />
             <div>
-              {liveData?.scores?.team1 ? (
+              {matchDetail?.scores?.team1 ? (
                 <>
                   <div className="team-score-large">
-                    {liveData.scores.team1.runs}/{liveData.scores.team1.wickets}
+                    {matchDetail.scores.team1.runs}/{matchDetail.scores.team1.wickets}
                   </div>
-                  <div className="team-overs-info">{liveData.scores.team1.overs} overs</div>
+                  <div className="team-overs-info">{matchDetail.scores.team1.overs} overs</div>
                 </>
               ) : (
                 <>
@@ -1127,12 +1120,12 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick }) => {
           
           <div className="team-summary right">
             <div style={{ textAlign: 'right' }}>
-              {liveData?.scores?.team2 ? (
+              {matchDetail?.scores?.team2 ? (
                 <>
                   <div className="team-score-large">
-                    {liveData.scores.team2.runs}/{liveData.scores.team2.wickets}
+                    {matchDetail.scores.team2.runs}/{matchDetail.scores.team2.wickets}
                   </div>
-                  <div className="team-overs-info">{liveData.scores.team2.overs} overs</div>
+                  <div className="team-overs-info">{matchDetail.scores.team2.overs} overs</div>
                 </>
               ) : (
                 <>
@@ -1152,8 +1145,8 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick }) => {
              {/* Tab Content - Scrollable */}
        <div className="tab-content">
          {activeTab === 'commentary' && <CommentaryTab matchDetail={matchDetail} matchId={matchId} commentary={commentary} />}
-         {activeTab === 'scorecard' && <ScorecardTab matchDetail={matchDetail} matchId={matchId} liveData={liveData} />}
-         {activeTab === 'matchInfo' && <MatchInfoTab matchDetail={matchDetail} match={match} />}
+         {activeTab === 'scorecard' && <ScorecardTab matchDetail={matchDetail} matchId={matchId} />}
+         {activeTab === 'matchInfo' && <MatchInfoTab matchDetail={matchDetail} match={match} matchName={match?.matchName } />}
          {activeTab === 'wagonWheel' && <WagonWheelTab matchDetail={matchDetail} match={match} />}
          {activeTab === 'pointsTable' && <PointsTableTab tournamentId={match.tournamentId} />}
        </div>
@@ -1206,6 +1199,7 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick }) => {
 const WebApp = () => {
   const [currentView, setCurrentView] = useState('fixtures');
   const [selectedMatchId, setSelectedMatchId] = useState(null);
+  const [selectedMatchDetails, setSelectedMatchDetails] = useState(null);
   const [error, setError] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMatchId, setChatMatchId] = useState(null);
@@ -1213,10 +1207,11 @@ const WebApp = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
-  const handleMatchClick = (matchId) => {
+  const handleMatchClick = (matchId, matchDetails) => {
     try {
       console.log('🚀 WebApp handleMatchClick - Received ID:', matchId, 'Type:', typeof matchId);
       setSelectedMatchId(matchId);
+      setSelectedMatchDetails(matchDetails);
       setCurrentView('matchDetail');
       setError(null);
     } catch (err) {
@@ -1307,6 +1302,7 @@ const WebApp = () => {
               matchId={selectedMatchId} 
               onBackClick={handleBackClick} 
               onChatClick={openMatchChat}
+              selectedMatchDetails={selectedMatchDetails}
             />
           </ErrorBoundary>
         </React.Suspense>

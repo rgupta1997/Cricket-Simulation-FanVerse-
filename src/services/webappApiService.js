@@ -166,59 +166,25 @@ class WebAppApiService {
     }
   }
 
-  // Get team details (placeholder - you may need to create this API)
+  // Get team details (now uses match file data instead of hardcoded fallbacks)
   async getTeamDetails(teamId) {
-    // This would replace hardcoded teams.json
-    // For now, return a better default structure
-    const teamDefaults = {
-      '1': { name: 'Team Alpha', shortName: 'ALP' },
-      '2': { name: 'Team Beta', shortName: 'BET' },
-      '3': { name: 'Team Gamma', shortName: 'GAM' },
-      '4': { name: 'Team Delta', shortName: 'DEL' },
-      '5': { name: 'Team Echo', shortName: 'ECH' },
-      '6': { name: 'Team Foxtrot', shortName: 'FOX' },
-      '7': { name: 'Team Golf', shortName: 'GOL' },
-      '8': { name: 'Team Hotel', shortName: 'HOT' }
-    };
-    
-    const defaultTeam = teamDefaults[teamId] || { 
-      name: `Team ${teamId}`, 
-      shortName: `T${teamId}` 
-    };
-    
+    // Return minimal structure - actual team data should come from match files
     return {
       id: teamId,
-      name: defaultTeam.name,
-      shortName: defaultTeam.shortName,
-      logoUrl: null, // Will trigger default SVG logo
+      name: `Team ${teamId}`, // Minimal fallback only
+      shortName: `T${teamId}`,
+      logoUrl: null,
       primaryColor: '#3b82f6'
     };
   }
 
-  // Get venue details (placeholder - you may need to create this API)
+  // Get venue details (now uses match file data instead of hardcoded fallbacks)
   async getVenueDetails(venueId) {
-    // This would replace hardcoded venues.json
-    // For now, return a better default structure
-    const venueDefaults = {
-      '1': { name: 'Central Stadium', city: 'Mumbai' },
-      '2': { name: 'National Ground', city: 'Delhi' },
-      '3': { name: 'City Arena', city: 'Bangalore' },
-      '4': { name: 'Metro Stadium', city: 'Chennai' },
-      '5': { name: 'Sports Complex', city: 'Kolkata' },
-      '6': { name: 'Regional Ground', city: 'Hyderabad' },
-      '7': { name: 'Community Stadium', city: 'Pune' },
-      '8': { name: 'District Arena', city: 'Ahmedabad' }
-    };
-    
-    const defaultVenue = venueDefaults[venueId] || { 
-      name: `Venue ${venueId}`, 
-      city: 'Unknown City' 
-    };
-    
+    // Return minimal structure - actual venue data should come from match files
     return {
       id: venueId,
-      name: defaultVenue.name,
-      city: defaultVenue.city
+      name: `Venue ${venueId}`, // Minimal fallback only
+      city: 'Unknown City'
     };
   }
 
@@ -304,7 +270,7 @@ class WebAppApiService {
       const matchId = this.extractMatchIdFromFile(matchFile);
       
       // Extract basic match info
-      const matchInfo = this.extractMatchInfo(scorecardData);
+      const matchInfo = scorecardData.Matchdetail
       const teams = scorecardData.Teams || {};
       const players = this.transformInningsData(scorecardData);
       
@@ -321,7 +287,7 @@ class WebAppApiService {
       const combinedData = {
         // Match basic info
         matchId: matchId,
-        matchInfo: matchInfo,
+        Matchdetail: matchInfo,
         Teams: teams,
         
         // Player data (batting, bowling, etc.)
@@ -418,15 +384,15 @@ class WebAppApiService {
     return {
       team1: {
         id: team1Id,
-        name: team1Data.Name_Full || 'Team 1',
-        shortName: team1Data.Name_Short || 'T1',
+        name: team1Data.Name_Full || `Team ${team1Id}`,
+        shortName: team1Data.Name_Short || `T${team1Id}`,
         logoUrl: team1Data.LogoUrl || null,
         players: team1Data.Players || {}
       },
       team2: {
         id: team2Id,
-        name: team2Data.Name_Full || 'Team 2', 
-        shortName: team2Data.Name_Short || 'T2',
+        name: team2Data.Name_Full || `Team ${team2Id}`, 
+        shortName: team2Data.Name_Short || `T${team2Id}`,
         logoUrl: team2Data.LogoUrl || null,
         players: team2Data.Players || {}
       }
