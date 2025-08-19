@@ -10,6 +10,8 @@ import ScorecardTab from './tabs/ScorecardTab.jsx';
 import MatchInfoTab from './tabs/MatchInfoTab.jsx';
 import WagonWheelTab from './tabs/WagonWheelTab.jsx';
 import PointsTableTab from './tabs/PointsTableTab.jsx';
+import MatchChat from './MatchChat.jsx';
+import LoginModal from './LoginModal.jsx';
 
 // Import responsive styles
 import '../styles/responsive.css';
@@ -268,25 +270,29 @@ const ModernMatchCard = ({ match, onClick }) => {
         </div>
       </div>
       
-      {/* Series Name - Left Aligned */}
-      <div style={{ 
-        position: 'absolute', 
-        top: '16px', 
-        left: '16px',
-        marginBottom: '16px'
-      }}>
-        <span style={{
-          backgroundColor: '#fef2f2',
-          color: '#dc2626',
-          padding: '6px 12px',
-          borderRadius: '16px',
-          fontSize: '12px',
-          fontWeight: '500',
-          border: '1px solid #fecaca'
-        }}>
-          {match.seriesName || 'Cricket Series'}
-        </span>
-      </div>
+               {/* Series Name - Left Aligned */}
+         <div style={{ 
+           position: 'absolute', 
+           top: '16px', 
+           left: '16px',
+           marginBottom: '16px'
+         }}>
+           <span style={{
+             backgroundColor: '#fef2f2',
+             color: '#dc2626',
+             padding: '6px 12px',
+             borderRadius: '16px',
+             fontSize: '12px',
+             fontWeight: '500',
+             border: '1px solid #fecaca'
+           }}>
+             {match.seriesName || 'Cricket Series'}
+           </span>
+         </div>
+
+                   {/* Chat Button Removed - Now only on match detail pages */}
+
+         
     </div>
   );
 };
@@ -786,13 +792,13 @@ const FixturesPage = ({ onMatchClick }) => {
             </div>
           </div>
         ) : (
-          filteredMatches.map((match) => (
-            <ModernMatchCard
-            key={match.matchId} 
-            match={match} 
-            onClick={handleMatchClick}
-          />
-          ))
+                     filteredMatches.map((match) => (
+             <ModernMatchCard
+             key={match.matchId} 
+             match={match} 
+             onClick={handleMatchClick}
+           />
+           ))
         )}
       </div>
     </div>
@@ -800,7 +806,7 @@ const FixturesPage = ({ onMatchClick }) => {
 };
 
 // Match Detail Page Component  
-const MatchDetailPage = ({ matchId, onBackClick }) => {
+const MatchDetailPage = ({ matchId, onBackClick, onChatClick }) => {
   const [activeTab, setActiveTab] = useState('commentary');
   const [match, setMatch] = useState(null);
   const [matchDetail, setMatchDetail] = useState(null);
@@ -1143,22 +1149,69 @@ const MatchDetailPage = ({ matchId, onBackClick }) => {
       {/* Tab Navigation */}
       <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {/* Tab Content - Scrollable */}
-      <div className="tab-content">
-        {activeTab === 'commentary' && <CommentaryTab matchDetail={matchDetail} matchId={matchId} commentary={commentary} />}
-        {activeTab === 'scorecard' && <ScorecardTab matchDetail={matchDetail} matchId={matchId} liveData={liveData} />}
-        {activeTab === 'matchInfo' && <MatchInfoTab matchDetail={matchDetail} match={match} />}
-        {activeTab === 'wagonWheel' && <WagonWheelTab matchDetail={matchDetail} match={match} />}
-        {activeTab === 'pointsTable' && <PointsTableTab tournamentId={match.tournamentId} />}
-      </div>
-    </div>
-  );
+             {/* Tab Content - Scrollable */}
+       <div className="tab-content">
+         {activeTab === 'commentary' && <CommentaryTab matchDetail={matchDetail} matchId={matchId} commentary={commentary} />}
+         {activeTab === 'scorecard' && <ScorecardTab matchDetail={matchDetail} matchId={matchId} liveData={liveData} />}
+         {activeTab === 'matchInfo' && <MatchInfoTab matchDetail={matchDetail} match={match} />}
+         {activeTab === 'wagonWheel' && <WagonWheelTab matchDetail={matchDetail} match={match} />}
+         {activeTab === 'pointsTable' && <PointsTableTab tournamentId={match.tournamentId} />}
+       </div>
+
+       {/* Chat Button - Fixed Bottom Right */}
+       <div style={{
+         position: 'fixed',
+         bottom: '20px',
+         right: '20px',
+         zIndex: 1000
+       }}>
+         <button
+           onClick={() => onChatClick(matchId, match?.matchName || 'Cricket Match')}
+           style={{
+             backgroundColor: '#3b82f6',
+             color: 'white',
+             border: 'none',
+             borderRadius: '12px',
+             padding: '12px 20px',
+             fontSize: '14px',
+             fontWeight: '600',
+             cursor: 'pointer',
+             display: 'flex',
+             alignItems: 'center',
+             gap: '8px',
+             transition: 'all 0.3s ease',
+             boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)',
+             minWidth: '100px',
+             justifyContent: 'center'
+           }}
+           onMouseEnter={(e) => {
+             e.target.style.backgroundColor = '#2563eb';
+             e.target.style.transform = 'translateY(-2px)';
+             e.target.style.boxShadow = '0 6px 20px rgba(59, 130, 246, 0.6)';
+           }}
+           onMouseLeave={(e) => {
+             e.target.style.backgroundColor = '#3b82f6';
+             e.target.style.transform = 'translateY(0)';
+             e.target.style.boxShadow = '0 4px 15px rgba(59, 130, 246, 0.4)';
+           }}
+         >
+           <span>💬</span>
+           <span>Chat</span>
+         </button>
+       </div>
+     </div>
+   );
 };
 
 const WebApp = () => {
   const [currentView, setCurrentView] = useState('fixtures');
   const [selectedMatchId, setSelectedMatchId] = useState(null);
   const [error, setError] = useState(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMatchId, setChatMatchId] = useState(null);
+  const [chatMatchName, setChatMatchName] = useState('');
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const handleMatchClick = (matchId) => {
     try {
@@ -1175,6 +1228,44 @@ const WebApp = () => {
     setCurrentView('fixtures');
     setSelectedMatchId(null);
     setError(null);
+    // Close chat when going back to fixtures
+    setIsChatOpen(false);
+    setChatMatchId(null);
+    setChatMatchName('');
+  };
+
+  const openMatchChat = (matchId, matchName) => {
+    if (!currentUser) {
+      setIsLoginOpen(true);
+      return;
+    }
+    setChatMatchId(matchId);
+    setChatMatchName(matchName);
+    setIsChatOpen(true);
+  };
+
+  const closeMatchChat = () => {
+    setIsChatOpen(false);
+    setChatMatchId(null);
+    setChatMatchName('');
+  };
+
+  const handleLoginSuccess = (userId, firstName, lastName, email) => {
+    setCurrentUser({ userId, firstName, lastName, email });
+    setIsLoginOpen(false);
+    // Open chat after successful login if we're on a match page
+    if (currentView === 'matchDetail' && selectedMatchId) {
+      setChatMatchId(selectedMatchId);
+      setChatMatchName('Cricket Match'); // Will be updated when chat opens
+      setIsChatOpen(true);
+    }
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setIsChatOpen(false);
+    setChatMatchId(null);
+    setChatMatchName('');
   };
 
   // Error boundary
@@ -1202,8 +1293,10 @@ const WebApp = () => {
     );
   }
 
-  return (
+    return (
     <div className="cricket-app">
+
+      
       {currentView === 'fixtures' && (
         <FixturesPage onMatchClick={handleMatchClick} />
       )}
@@ -1213,9 +1306,29 @@ const WebApp = () => {
             <MatchDetailPage 
               matchId={selectedMatchId} 
               onBackClick={handleBackClick} 
+              onChatClick={openMatchChat}
             />
           </ErrorBoundary>
         </React.Suspense>
+      )}
+      
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={isLoginOpen}
+        onClose={() => setIsLoginOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
+
+      {/* Match Chat Component */}
+      {isChatOpen && (
+        <MatchChat
+          matchId={chatMatchId}
+          matchName={chatMatchName}
+          isOpen={isChatOpen}
+          onClose={closeMatchChat}
+          currentUser={currentUser}
+          onLogout={handleLogout}
+        />
       )}
       
       <style>{`
