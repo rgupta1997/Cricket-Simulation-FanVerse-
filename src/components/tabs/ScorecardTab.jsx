@@ -15,7 +15,6 @@ const ScorecardTab = ({ matchDetail }) => {
 
   // Helper function to get player names from Teams data
   const getPlayerName = (playerId, teamId = null) => {
-    debugger
 
     if (!playerId || !matchDetail.Teams) {
       return `Player ${playerId}`;
