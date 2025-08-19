@@ -1148,7 +1148,7 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetai
          {activeTab === 'scorecard' && <ScorecardTab matchDetail={matchDetail} matchId={matchId} />}
          {activeTab === 'matchInfo' && <MatchInfoTab matchDetail={matchDetail} match={match} matchName={match?.matchName } />}
          {activeTab === 'wagonWheel' && <WagonWheelTab matchDetail={matchDetail} match={match} />}
-         {activeTab === 'pointsTable' && <PointsTableTab tournamentId={match.tournamentId} />}
+         {activeTab === 'pointsTable' && <PointsTableTab matchDetail={matchDetail} seriesId={match.tournamentId || '9924'} />}
        </div>
 
        {/* Chat Button - Fixed Bottom Right */}

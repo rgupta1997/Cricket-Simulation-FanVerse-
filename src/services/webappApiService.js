@@ -877,6 +877,37 @@ class WebAppApiService {
     }
   }
 
+  // Get wagon wheel data for specific players
+  async getWagonWheelData(matchId, playerIds) {
+    try {
+      console.log('🎯 Fetching wagon wheel data for match:', matchId, 'players:', playerIds);
+      
+      const response = await axios.post(
+        'https://playground-dev.sportz.io/api/wagonwheel',
+        {
+          match_id: matchId,
+          player_ids: playerIds
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      
+      if (response.status !== 200) {
+        throw new Error('Failed to fetch wagon wheel data');
+      }
+      
+      console.log('✅ Wagon wheel API response:', response.data);
+      return response.data;
+      
+    } catch (error) {
+      console.error('❌ Error fetching wagon wheel data:', error);
+      throw new Error('Failed to fetch wagon wheel data: ' + error.message);
+    }
+  }
+
   // Helper methods to parse score strings
   parseScoreFromString(scoreString) {
     if (!scoreString || typeof scoreString !== 'string') return 0;
@@ -906,5 +937,6 @@ export const {
   getEnhancedMatchData,
   fetchAllInningsCommentary,
   fetchInningCommentary,
-  fetchMatchScorecard
+  fetchMatchScorecard,
+  getWagonWheelData
 } = webAppApiService;
