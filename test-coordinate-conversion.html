@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Coordinate Conversion Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #111;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #FFD700;
+        }
+        .header {
+            text-align: center;
+            color: #FFD700;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #1a1a1a;
+            border-left: 4px solid #00ff00;
+            border-radius: 5px;
+        }
+        .api-data {
+            background: #2a2a2a;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .coordinates {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+        .coord-box {
+            background: #333;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            flex: 1;
+            margin: 0 5px;
+        }
+        .release { border-top: 3px solid #0066FF; }
+        .bounce { border-top: 3px solid #FF4444; }
+        .final { border-top: 3px solid #44FF44; }
+        button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #45a049, #4CAF50);
+        }
+        .checkbox-container {
+            margin: 15px 0;
+            padding: 10px;
+            background: #2a2a2a;
+            border-radius: 5px;
+        }
+        .output {
+            background: #0a2a0a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">🏏 Cricket Coordinate Conversion Test</div>
+        
+        <div class="section">
+            <h3>📡 API Sample Data</h3>
+            <div class="api-data">
+                <strong>Release:</strong> x: 20, y: null, z: 25<br>
+                <strong>Bounce:</strong> x: 15, y: null, z: 40<br>
+                <strong>Final:</strong> x: 30, y: 15, z: null
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🎯 PlayBall Form Simulation</h3>
+            
+            <div class="checkbox-container">
+                <label>
+                    <input type="checkbox" id="useApiData" onchange="toggleApiData()">
+                    🔄 Use API Sample Data
+                </label>
+                <p style="font-size: 12px; color: #aaa; margin: 5px 0;">
+                    Auto-fills coordinates from API sample data
+                </p>
+            </div>
+
+            <div class="coordinates">
+                <div class="coord-box release">
+                    <strong>🔵 Release Position</strong><br>
+                    X: <input type="number" id="rel_x" value="0" step="0.1"><br>
+                    Y: <input type="number" id="rel_y" value="2" step="0.1"><br>
+                    Z: <input type="number" id="rel_z" value="15" step="0.1">
+                </div>
+                <div class="coord-box bounce">
+                    <strong>🔴 Bounce Position</strong><br>
+                    X: <input type="number" id="bou_x" value="0" step="0.1"><br>
+                    Y: <input type="number" id="bou_y" value="0" step="0.1"><br>
+                    Z: <input type="number" id="bou_z" value="0" step="0.1">
+                </div>
+                <div class="coord-box final">
+                    <strong>🟢 Final Position</strong><br>
+                    X: <input type="number" id="fin_x" value="0" step="0.1"><br>
+                    Y: <input type="number" id="fin_y" value="0.5" step="0.1"><br>
+                    Z: <input type="number" id="fin_z" value="-9" step="0.1">
+                </div>
+            </div>
+
+            <button onclick="resetToDefault()">🔄 Reset to Default</button>
+            <button onclick="testConversion()">🧪 Test Conversion</button>
+            <button onclick="playBall()">🎯 Play Ball</button>
+        </div>
+
+        <div class="section">
+            <h3>📊 Output</h3>
+            <div id="output" class="output">Ready to test coordinate conversion...</div>
+        </div>
+    </div>
+
+    <script>
+        // Simulated coordinate converter functions
+        function convertApiToGameCoordinates(apiCoords, positionType) {
+            const defaults = {
+                release: { x: 0, y: 2, z: 10 },
+                bounce: { x: 0, y: 0, z: 0 },
+                final: { x: 0, y: 0.5, z: -9 }
+            };
+
+            const ranges = {
+                release: {
+                    api: { x: [0, 40], y: [null, null], z: [0, 50] },
+                    game: { x: [-1.5, 1.5], y: [2, 2], z: [9, 11] }
+                },
+                bounce: {
+                    api: { x: [0, 40], y: [null, null], z: [16, 67] },
+                    game: { x: [-1.5, 1.5], y: [0, 0], z: [-10, 10] }
+                },
+                final: {
+                    api: { x: [0, 40], y: [0, 30], z: [null, null] },
+                    game: { x: [-1.5, 1.5], y: [0, 2.5], z: [-9, -9] }
+                }
+            };
+
+            if (!ranges[positionType]) {
+                return [defaults[positionType].x, defaults[positionType].y, defaults[positionType].z];
+            }
+
+            const range = ranges[positionType];
+            const result = { ...defaults[positionType] };
+
+            ['x', 'y', 'z'].forEach(key => {
+                if (apiCoords[key] === null || apiCoords[key] === undefined) return;
+                if (range.api[key][0] === null || range.api[key][1] === null) return;
+
+                const apiMin = range.api[key][0];
+                const apiMax = range.api[key][1];
+                const apiRange = apiMax - apiMin;
+                
+                if (apiRange === 0) return;
+                
+                const percentage = (apiCoords[key] - apiMin) / apiRange;
+                const gameMin = range.game[key][0];
+                const gameMax = range.game[key][1];
+                const gameRange = gameMax - gameMin;
+                
+                result[key] = gameMin + (percentage * gameRange);
+            });
+
+            return [result.x, result.y, result.z];
+        }
+
+        const SAMPLE_API_DATA = {
+            release: { x: 20, y: null, z: 25 },
+            bounce: { x: 15, y: null, z: 40 },
+            final: { x: 30, y: 15, z: null }
+        };
+
+        function updateInputs(positions) {
+            document.getElementById('rel_x').value = positions.release[0].toFixed(2);
+            document.getElementById('rel_y').value = positions.release[1].toFixed(2);
+            document.getElementById('rel_z').value = positions.release[2].toFixed(2);
+            
+            document.getElementById('bou_x').value = positions.bounce[0].toFixed(2);
+            document.getElementById('bou_y').value = positions.bounce[1].toFixed(2);
+            document.getElementById('bou_z').value = positions.bounce[2].toFixed(2);
+            
+            document.getElementById('fin_x').value = positions.final[0].toFixed(2);
+            document.getElementById('fin_y').value = positions.final[1].toFixed(2);
+            document.getElementById('fin_z').value = positions.final[2].toFixed(2);
+        }
+
+        function toggleApiData() {
+            const checkbox = document.getElementById('useApiData');
+            const output = document.getElementById('output');
+            
+            if (checkbox.checked) {
+                const converted = {
+                    release: convertApiToGameCoordinates(SAMPLE_API_DATA.release, 'release'),
+                    bounce: convertApiToGameCoordinates(SAMPLE_API_DATA.bounce, 'bounce'),
+                    final: convertApiToGameCoordinates(SAMPLE_API_DATA.final, 'final')
+                };
+                
+                updateInputs(converted);
+                
+                output.textContent = `✅ API Data Applied!\n\nConverted Coordinates:\n🔵 Release: [${converted.release.map(v => v.toFixed(2)).join(', ')}]\n🔴 Bounce: [${converted.bounce.map(v => v.toFixed(2)).join(', ')}]\n🟢 Final: [${converted.final.map(v => v.toFixed(2)).join(', ')}]`;
+            } else {
+                resetToDefault();
+            }
+        }
+
+        function resetToDefault() {
+            document.getElementById('useApiData').checked = false;
+            const defaultPositions = {
+                release: [0, 2, 15],
+                bounce: [0, 0, 0],
+                final: [0, 0.5, -9]
+            };
+            updateInputs(defaultPositions);
+            document.getElementById('output').textContent = '🔄 Reset to default coordinates.';
+        }
+
+        function testConversion() {
+            const currentValues = {
+                release: [
+                    parseFloat(document.getElementById('rel_x').value),
+                    parseFloat(document.getElementById('rel_y').value),
+                    parseFloat(document.getElementById('rel_z').value)
+                ],
+                bounce: [
+                    parseFloat(document.getElementById('bou_x').value),
+                    parseFloat(document.getElementById('bou_y').value),
+                    parseFloat(document.getElementById('bou_z').value)
+                ],
+                final: [
+                    parseFloat(document.getElementById('fin_x').value),
+                    parseFloat(document.getElementById('fin_y').value),
+                    parseFloat(document.getElementById('fin_z').value)
+                ]
+            };
+
+            const output = document.getElementById('output');
+            output.textContent = `🧪 Testing Conversion:\n\nCurrent Form Values:\n🔵 Release: [${currentValues.release.join(', ')}]\n🔴 Bounce: [${currentValues.bounce.join(', ')}]\n🟢 Final: [${currentValues.final.join(', ')}]\n\n✅ Values are ready for playShot() function!`;
+        }
+
+        function playBall() {
+            const ballDelivery = {
+                releasePosition: [
+                    parseFloat(document.getElementById('rel_x').value),
+                    parseFloat(document.getElementById('rel_y').value),
+                    parseFloat(document.getElementById('rel_z').value)
+                ],
+                bouncePosition: [
+                    parseFloat(document.getElementById('bou_x').value),
+                    parseFloat(document.getElementById('bou_y').value),
+                    parseFloat(document.getElementById('bou_z').value)
+                ],
+                finalPosition: [
+                    parseFloat(document.getElementById('fin_x').value),
+                    parseFloat(document.getElementById('fin_y').value),
+                    parseFloat(document.getElementById('fin_z').value)
+                ],
+                shotDegree: 0,
+                shotDistance: 0,
+                isLofted: false,
+                useApiData: document.getElementById('useApiData').checked
+            };
+
+            const output = document.getElementById('output');
+            output.textContent = `🎯 Playing Ball!\n\nDelivery Data:\n${JSON.stringify(ballDelivery, null, 2)}\n\n🏏 This data would be passed to the playShot() function in the actual game.`;
+        }
+
+        // Initialize
+        resetToDefault();
+    </script>
+</body>
+</html>

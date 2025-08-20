@@ -5,6 +5,8 @@ import DeliveryInfo from './DeliveryInfo';
 import CameraControlsDisabled from './CameraControlsDisabled';
 import { calculateBallTrajectory } from './CricketGameState';
 import dummyStadiumData from '../data/dummyStadiumData.json';
+import { convertApiToGameCoordinates } from '../utils/coordinateConverter';
+import { SAMPLE_API_DATA } from '../constants/apiData';
 
 const AccordionSection = ({ title, children, isOpen, onToggle, icon, color = '#FFD700' }) => {
   return (
@@ -97,8 +99,44 @@ const CricketUIAccordion = ({
     finalPosition: [0, 0.5, -9],
     shotDegree: 0,
     shotDistance: 0,
-    isLofted: false
+    isLofted: false,
+    useApiData: false
   });
+
+  // Handle API data conversion and auto-fill
+  const handleApiDataToggle = (checked) => {
+    setBallDelivery(prev => ({
+      ...prev,
+      useApiData: checked
+    }));
+
+    if (checked) {
+      // Convert API data to our coordinate system and auto-fill
+      const convertedRelease = convertApiToGameCoordinates(SAMPLE_API_DATA.release, 'release');
+      const convertedBounce = convertApiToGameCoordinates(SAMPLE_API_DATA.bounce, 'bounce');
+      const convertedFinal = convertApiToGameCoordinates(SAMPLE_API_DATA.final, 'final');
+
+      setBallDelivery(prev => ({
+        ...prev,
+        releasePosition: convertedRelease,
+        bouncePosition: convertedBounce,
+        finalPosition: convertedFinal
+      }));
+    }
+  };
+
+  // Reset function
+  const resetBallDelivery = () => {
+    setBallDelivery({
+      releasePosition: [0, 2, 15],
+      bouncePosition: [0, 0, 0],
+      finalPosition: [0, 0.5, -9],
+      shotDegree: 0,
+      shotDistance: 0,
+      isLofted: false,
+      useApiData: false
+    });
+  };
 
   const toggleSection = (section) => {
     setOpenSections(prev => ({
@@ -145,6 +183,54 @@ const CricketUIAccordion = ({
             onToggle={() => toggleSection('playBall')}
           >
             <div style={{ display: 'grid', gap: '12px' }}>
+              {/* API Data Toggle */}
+              <div style={{ 
+                padding: '8px', 
+                background: 'rgba(33, 150, 243, 0.1)', 
+                borderRadius: '6px',
+                border: '1px solid #2196F3'
+              }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={ballDelivery.useApiData}
+                    onChange={(e) => handleApiDataToggle(e.target.checked)}
+                    style={{ transform: 'scale(1.2)' }}
+                  />
+                  <span style={{ fontSize: '12px', color: '#2196F3', fontWeight: 'bold' }}>
+                    🔄 Use API Sample Data
+                  </span>
+                </label>
+                <div style={{ 
+                  fontSize: '10px', 
+                  color: '#aaa', 
+                  marginTop: '4px',
+                  marginLeft: '28px'
+                }}>
+                  Auto-fills coordinates from API sample data
+                </div>
+              </div>
+
+              {/* Reset Button */}
+              <button
+                onClick={resetBallDelivery}
+                style={{
+                  padding: '8px 12px',
+                  background: 'linear-gradient(135deg, #757575, #616161)',
+                  border: 'none',
+                  borderRadius: '4px',
+                  color: 'white',
+                  fontSize: '11px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                <span>🔄</span>
+                Reset to Default
+              </button>
               {/* Release Position */}
               <div>
                 <div style={{ color: '#0066FF', marginBottom: '4px', fontWeight: 'bold' }}>Release Position</div>
@@ -934,7 +1020,7 @@ const CricketUIAccordion = ({
           🏏 Real-time Pitch Analysis & Trajectory Control
         </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes slideDown {
           from {
             opacity: 0;
