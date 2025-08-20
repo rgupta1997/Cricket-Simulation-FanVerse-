@@ -528,6 +528,37 @@ const handleUpdateLeaderboard = async (req, res) => {
     // Write updated predictions
     await fs.writeFile(predictionsFile, JSON.stringify(updatedPredictions, null, 2), 'utf8');
 
+    // Call external API to update leaderboard for each user who got points
+    const externalApiPromises = correctPredictions.map(async (pred) => {
+      try {
+        const response = await fetch('https://playground-dev.sportz.io/api/updateLeaderBoard', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            user_id: pred.userId,
+            is_correct: "true"
+          })
+        });
+
+        if (response.ok) {
+          console.log(`✅ External API call successful for user ${pred.userId}`);
+        } else {
+          console.warn(`⚠️ External API call failed for user ${pred.userId}: ${response.status} ${response.statusText}`);
+        }
+      } catch (error) {
+        console.error(`❌ External API call error for user ${pred.userId}:`, error.message);
+      }
+    });
+
+    // Wait for all external API calls to complete (but don't block the response)
+    Promise.allSettled(externalApiPromises).then(results => {
+      const successful = results.filter(r => r.status === 'fulfilled').length;
+      const failed = results.filter(r => r.status === 'rejected').length;
+      console.log(`🌐 External API calls completed: ${successful} successful, ${failed} failed`);
+    });
+
     console.log(`🏆 Global leaderboard updated for match ${matchId}, ball ${ballNumber}: ${correctPredictions.length} correct predictions, ${pointsAwarded} points awarded`);
 
     res.status(200).json({

@@ -1,0 +1,442 @@
+.seasonal-leaderboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 15px;
+  color: white;
+  overflow: visible;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* Top Leaderboard Section - Left Side */
+.top-leaderboard-section {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 15px;
+  height: fit-content;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.top-leaderboard-section h2 {
+  text-align: center;
+  margin: 0 0 15px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffd700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.leaderboard-table {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-height: 55vh;
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 80px 1fr 100px;
+  gap: 12px;
+  padding: 12px 15px;
+  background: rgba(255, 255, 255, 0.1);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-height: 45px;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.table-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 100px;
+  gap: 12px;
+  padding: 10px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.2s ease;
+  min-height: 45px;
+  align-items: center;
+  scroll-snap-align: start;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(1px);
+}
+
+.table-row.top-three {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0.04) 100%);
+  border-left: 2px solid #ffd700;
+}
+
+.table-row.current-user {
+  background: linear-gradient(135deg, rgba(79, 172, 254, 0.15) 0%, rgba(0, 242, 254, 0.08) 100%);
+  border-left: 3px solid #4facfe;
+  transform: scale(1.01);
+  box-shadow: 0 2px 10px rgba(79, 172, 254, 0.2);
+}
+
+.rank-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.medal {
+  font-size: 1rem;
+}
+
+.rank-number {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffd700;
+}
+
+.name-col {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  font-size: 0.85rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.score-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #ffd700;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* User Rank Section - Right Side */
+.user-rank-section {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 15px;
+  height: fit-content;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.user-rank-section h2 {
+  text-align: center;
+  margin: 0 0 15px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffd700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.user-rank-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+  color: #333;
+  text-align: center;
+}
+
+.rank-badge {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #b8860b;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-info h3 {
+  margin: 0 0 6px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.user-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Login Prompt Section */
+.login-prompt-section {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 15px;
+  height: fit-content;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.login-prompt-section h2 {
+  text-align: center;
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffd700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.login-prompt-section p {
+  margin: 0 0 15px 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+  text-align: center;
+}
+
+.login-button {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 12px rgba(79, 172, 254, 0.4);
+  width: 100%;
+}
+
+.login-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(79, 172, 254, 0.6);
+}
+
+/* Refresh Section */
+.refresh-section {
+  text-align: center;
+  margin-top: 15px;
+  padding-bottom: 15px;
+  width: 100%;
+  grid-column: 1 / -1;
+}
+
+.refresh-button {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: 18px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.refresh-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Loading States */
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  grid-column: 1 / -1;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-container .error-icon {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+.error-container h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.3rem;
+}
+
+.error-container p {
+  margin: 0 0 20px 0;
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+.retry-button {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.retry-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 12px rgba(255, 107, 107, 0.4);
+}
+
+/* Custom Scrollbar */
+.table-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.table-body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.table-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.table-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Firefox scrollbar */
+.table-body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .seasonal-leaderboard {
+    padding: 10px;
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .top-leaderboard-section,
+  .user-rank-section,
+  .login-prompt-section {
+    padding: 12px;
+  }
+  
+  .leaderboard-table {
+    max-height: 45vh;
+    min-height: 250px;
+  }
+  
+  .table-header, .table-row {
+    grid-template-columns: 70px 1fr 80px;
+    gap: 10px;
+    padding: 8px 12px;
+  }
+  
+  .medal {
+    font-size: 0.9rem;
+  }
+  
+  .rank-number {
+    font-size: 0.8rem;
+  }
+  
+  .name-col, .score-col {
+    font-size: 0.8rem;
+  }
+  
+  .user-rank-card {
+    padding: 15px;
+  }
+  
+  .rank-badge {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .seasonal-leaderboard {
+    padding: 8px;
+    gap: 12px;
+  }
+  
+  .top-leaderboard-section,
+  .user-rank-section,
+  .login-prompt-section {
+    padding: 10px;
+  }
+  
+  .leaderboard-table {
+    max-height: 40vh;
+    min-height: 200px;
+  }
+  
+  .table-header, .table-row {
+    grid-template-columns: 60px 1fr 70px;
+    gap: 8px;
+    padding: 6px 10px;
+  }
+  
+  .medal {
+    font-size: 0.85rem;
+  }
+  
+  .rank-number {
+    font-size: 0.75rem;
+  }
+  
+  .name-col, .score-col {
+    font-size: 0.75rem;
+  }
+  
+  .user-rank-card {
+    padding: 12px;
+  }
+  
+  .rank-badge {
+    font-size: 1.8rem;
+  }
+}

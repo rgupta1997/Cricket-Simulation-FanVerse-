@@ -55,7 +55,7 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
     <div className="login-overlay">
       <div className="login-modal">
         <div className="login-header">
-          <h2>🏏 Cricket Chat Login</h2>
+          <h2>🏏 Login</h2>
           <button onClick={handleClose} className="close-button">✕</button>
         </div>
         
