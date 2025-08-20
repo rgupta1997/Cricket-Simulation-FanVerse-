@@ -818,7 +818,7 @@ const FixturesPage = ({ onMatchClick }) => {
 };
 
 // Match Detail Page Component  
-const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetails, setCurrentView }) => {
+const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetails, setCurrentView,currentUser,onLoginClick,latestBallEvent }) => {
   console.log('selectedMatchDetails', selectedMatchDetails)
   const [activeTab, setActiveTab] = useState('commentary');
   const [match, setMatch] = useState(selectedMatchDetails);
@@ -962,7 +962,7 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetai
     }
   }, [matchId, selectedMatchDetails, fetchMatchData]);
 
-  
+
   const fetchLiveData = async () => {
     if (!match?.matchFile) return;
     
