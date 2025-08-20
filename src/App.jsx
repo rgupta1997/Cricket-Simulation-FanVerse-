@@ -31,7 +31,7 @@ const Scene = ({ currentView, onGameStateChange, currentPlayerPositions, isPosit
       />
       
       {/* Fog for atmospheric effect */}
-      <fog attach="fog" args={['#202020', 40, 80]} />
+      {/* <fog attach="fog" args={['#202020', 40, 80]} /> */}
       
       {/* Performance stats (can be removed in production) */}
       <Stats />

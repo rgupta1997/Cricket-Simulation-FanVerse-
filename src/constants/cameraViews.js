@@ -10,45 +10,50 @@ export const CAMERA_VIEWS = {
   TOP: {
     key: '2',
     name: 'Top View',
-    position: [0, 45, 0],
+    position: [0, 70, 0], // Adjusted for 60m stadium (was 80 for 65m)
     target: [0, 0, 0],
-    fov: 70 // Wider FOV for zoomed out view
+    fov: 80 // Adjusted FOV for 60m stadium
   },
   BIRD_EYE: {
     key: '3',
     name: 'Bird Eye View',
-    position: [30, 35, 30],
+    position: [45, 45, 45], // Moved closer for 60m stadium (was 50,50,50)
     target: [0, 0, 0],
-    fov: 80 // Wider FOV for full stadium view
+    fov: 85 // Adjusted FOV for smaller stadium
   },
   LEFT: {
     key: '4',
     name: 'Left View',
-    position: [-25, 12, 0],
+    position: [-40, 18, 0], // Moved closer from boundary (was -45)
     target: [0, 1, 0],
-    fov: 75 // Wider FOV for zoomed out view
+    fov: 75 // Adjusted FOV for closer stadium
   },
   RIGHT: {
     key: '5',
     name: 'Right View',
-    position: [25, 12, 0],
+    position: [40, 18, 0], // Moved closer from boundary (was 45)
     target: [0, 1, 0],
-    fov: 75 // Wider FOV for zoomed out view
+    fov: 75 // Adjusted FOV for closer stadium
   },
   CENTER: {
     key: '6',
     name: 'Center View',
-    position: [0, 15, 25],
+    position: [0, 22, 35], // Closer for 60m stadium (was 25,40)
     target: [0, 0, 0],
-    fov: 75 // Wider FOV for zoomed out view
+    fov: 75 // Adjusted FOV for smaller stadium
   }
 };
 
 // Stadium dimensions and positions
 export const STADIUM_CONFIG = {
   field: {
-    radius: 30, // Increased from 20 to 30 for larger ground area
+    radius: 50, // Green playing field - EXTENDED to full playable area (50m radius)
     height: 0.1
+  },
+  boundaries: {
+    innerRadius: 50, // Inner advertising boundary - MOVED IN 5m (55m → 50m)
+    outerRadius: 60, // Outer boundary wall - MOVED IN 5m (65m → 60m)
+    playingRadius: 50 // Actual playing boundary for simulation - 50m
   },
   pitch: {
     width: 3,
@@ -56,12 +61,12 @@ export const STADIUM_CONFIG = {
     height: 0.15
   },
   lights: {
-    height: 25,
+    height: 30, // Adjusted height for 60m stadium
     positions: [
-      [15, 25, 15],
-      [-15, 25, 15],
-      [15, 25, -15],
-      [-15, 25, -15]
+      [20, 30, 20], // Adjusted positions for 60m stadium coverage
+      [-20, 30, 20],
+      [20, 30, -20],
+      [-20, 30, -20]
     ]
   }
 };

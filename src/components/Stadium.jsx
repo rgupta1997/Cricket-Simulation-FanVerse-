@@ -204,18 +204,19 @@ const Wicket = ({ position }) => (
   </group>
 );
 
-// Pure component for stadium seating
+// Pure component for stadium seating with packed crowd - PERFORMANCE OPTIMIZED
 const StadiumSeating = () => {
   const seats = [];
-  const baseRadius = 35; // Start closer to boundary wall
-  const sections = 16; // Fewer sections for cleaner look
-  const rowCount = 25; // Reasonable number of rows
-  const rowHeight = 0.6; // Taller rows for better stepping
-  const rowDepth = 1.2; // Deeper rows for proper seating
-  const sectionSpacing = 0.05; // Very minimal spacing between sections
+  const crowd = [];
+  const baseRadius = 52; // Start just outside 50m green field
+  const sections = 16; // Reduced sections for better performance
+  const rowCount = 12; // Reduced rows for better performance  
+  const rowHeight = 0.5; // Tighter row spacing
+  const rowDepth = 0.8; // Smaller depth to fit more rows
+  const sectionSpacing = 0.02; // Minimal spacing for packed look
   const sectionAngle = (Math.PI * 2) / sections;
-  const wallThickness = 0.5; // Thicker walls
-  const riseAngle = Math.PI / 6; // 30 degree rise angle
+  const wallThickness = 0.3; // Thinner walls
+  const riseAngle = Math.PI / 8; // Gentler rise for better viewing
   
   // Create tiered seating sections
   for (let i = 0; i < sections; i++) {
@@ -223,8 +224,8 @@ const StadiumSeating = () => {
     const nextAngle = (i + 1) * sectionAngle;
     const midAngle = (angle + nextAngle) / 2;
     
-    // Skip sections behind wickets (create gaps)
-    if (Math.abs(Math.sin(midAngle)) > 0.88) continue;
+    // Skip sections behind wickets (create smaller gaps for more crowd)
+    if (Math.abs(Math.sin(midAngle)) > 0.95) continue;
     
     // Create complete seating block for this section
     const sectionSeats = [];
@@ -248,67 +249,65 @@ const StadiumSeating = () => {
       // Calculate arc length for this section
       const arcLength = rowRadius * (nextAngle - angle);
       
-      // Add seat following the circular arc
+      // Add crowd/audience on seats - optimized density for performance
+      const spectatorCount = Math.floor(arcLength * 2.2); // Reduced to 2.2 spectators per meter for better performance
+      
+      // Create individual seat sections aligned with spectators
+      for (let s = 0; s < spectatorCount; s++) {
+        const spectatorOffset = (s / spectatorCount - 0.5) * (arcLength - 0.5);
+        const spectatorX = centerX + Math.cos(angleToCenter + Math.PI/2) * spectatorOffset;
+        const spectatorZ = centerZ + Math.sin(angleToCenter + Math.PI/2) * spectatorOffset;
+        
+        // Add seat panel perfectly aligned with spectator position
       sectionSeats.push(
         <mesh 
-          key={`seat_${i}_${row}`}
-          position={[centerX, elevation, centerZ]}
+            key={`seat_${i}_${row}_${s}`}
+            position={[spectatorX, elevation - 0.1, spectatorZ]} // Slightly below spectator
           rotation={[-riseAngle, angleToCenter, 0]}
         >
           <boxGeometry 
             args={[
-              arcLength - sectionSpacing * 0.5, // Width based on arc length
-              rowHeight * 0.2, // Thin seat surface
-              rowDepth
+                0.3, // Individual seat width
+                0.15, // Thin seat surface
+                0.4 // Seat depth
             ]} 
           />
           <meshStandardMaterial 
             color={COLORS.stadium.seats}
             metalness={0.2}
             roughness={0.8}
+              wireframe={false}
           />
         </mesh>
       );
       
-      // Add riser (vertical part between rows)
-      if (row > 0) {
-        const prevElevation = (row - 1) * rowHeight + ((row - 1) * rowDepth * Math.sin(riseAngle));
-        const riserHeight = elevation - prevElevation;
+        // Random spectator colors for realistic crowd
+        const crowdColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
+        const randomColor = crowdColors[Math.floor(Math.random() * crowdColors.length)];
         
-        // Calculate previous row position for riser
-        const prevRadius = baseRadius + ((row - 1) * rowDepth * Math.cos(riseAngle));
-        const prevX1 = Math.cos(angle) * prevRadius;
-        const prevZ1 = Math.sin(angle) * prevRadius;
-        const prevX2 = Math.cos(nextAngle) * prevRadius;
-        const prevZ2 = Math.sin(nextAngle) * prevRadius;
-        const prevCenterX = (prevX1 + prevX2) / 2;
-        const prevCenterZ = (prevZ1 + prevZ2) / 2;
+        // Performance optimization: Use simpler geometry for distant spectators
+        const isDistantRow = row > 8; // Rows further back get simpler geometry
+        const spectatorSize = isDistantRow ? 0.12 : 0.15; // Smaller for distant rows
+        const spectatorHeight = isDistantRow ? 0.3 : 0.4; // Shorter for distant rows
         
-        sectionSeats.push(
+        crowd.push(
           <mesh 
-            key={`riser_${i}_${row}`}
-            position={[
-              (centerX + prevCenterX) / 2,
-              (elevation + prevElevation) / 2,
-              (centerZ + prevCenterZ) / 2
-            ]}
-            rotation={[0, angleToCenter, 0]}
+            key={`spectator_${i}_${row}_${s}`}
+            position={[spectatorX, elevation + 0.15, spectatorZ]} // Sitting on seat
+            rotation={[-riseAngle, angleToCenter, 0]}
           >
-            <boxGeometry 
-              args={[
-                arcLength - sectionSpacing * 0.5,
-                riserHeight,
-                0.15 // Slightly thicker riser
-              ]} 
-            />
+            <boxGeometry args={[spectatorSize, spectatorHeight, spectatorSize]} />
             <meshStandardMaterial 
-              color={COLORS.stadium.divider}
-              metalness={0.3}
-              roughness={0.7}
+              color={randomColor}
+              metalness={0.1}
+              roughness={0.9}
+              wireframe={false}
             />
           </mesh>
         );
       }
+      
+      // Remove riser - cleaner look without vertical supports
     }
     
     seats.push(
@@ -317,122 +316,52 @@ const StadiumSeating = () => {
       </group>
     );
     
-    // Add solid section walls with proper angle
-    // Create triangular side walls
-    const wallPoints = [];
-    for (let r = 0; r <= rowCount; r++) {
-      const radius = baseRadius + (r * rowDepth * Math.cos(riseAngle));
-      const height = r * rowHeight + (r * rowDepth * Math.sin(riseAngle));
-      wallPoints.push({ radius, height });
-    }
-    
-    // Left wall
-    for (let r = 0; r < wallPoints.length - 1; r++) {
-      const curr = wallPoints[r];
-      const next = wallPoints[r + 1];
-      
-      seats.push(
-        <mesh
-          key={`wall_left_${i}_${r}`}
-          position={[
-            Math.cos(angle) * (curr.radius + next.radius) / 2,
-            (curr.height + next.height) / 2,
-            Math.sin(angle) * (curr.radius + next.radius) / 2
-          ]}
-          rotation={[0, -angle + Math.PI/2, riseAngle]}
-        >
-          <boxGeometry 
-            args={[
-              wallThickness,
-              Math.sqrt(Math.pow(next.radius - curr.radius, 2) + Math.pow(next.height - curr.height, 2)),
-              rowDepth
-            ]} 
-          />
-          <meshStandardMaterial 
-            color={COLORS.stadium.divider}
-            metalness={0.2}
-            roughness={0.8}
-          />
-        </mesh>
-      );
-    }
-    
-    // Right wall (similar structure)
-    for (let r = 0; r < wallPoints.length - 1; r++) {
-      const curr = wallPoints[r];
-      const next = wallPoints[r + 1];
-      
-      seats.push(
-        <mesh
-          key={`wall_right_${i}_${r}`}
-          position={[
-            Math.cos(nextAngle) * (curr.radius + next.radius) / 2,
-            (curr.height + next.height) / 2,
-            Math.sin(nextAngle) * (curr.radius + next.radius) / 2
-          ]}
-          rotation={[0, -nextAngle + Math.PI/2, riseAngle]}
-        >
-          <boxGeometry 
-            args={[
-              wallThickness,
-              Math.sqrt(Math.pow(next.radius - curr.radius, 2) + Math.pow(next.height - curr.height, 2)),
-              rowDepth
-            ]} 
-          />
-          <meshStandardMaterial 
-            color={COLORS.stadium.divider}
-            metalness={0.2}
-            roughness={0.8}
-          />
-        </mesh>
-      );
-    }
+    // Remove all wall structures - cleaner stadium appearance
   }
   
-  // Add back wall connecting to boundary
-  for (let i = 0; i < sections; i++) {
-    const angle = i * sectionAngle;
-    const nextAngle = (i + 1) * sectionAngle;
+  // Remove back wall structures - cleaner stadium look
+  
+    // Simple roof structure - minimal visual clutter
+  const roof = [];
+  const roofSections = 12; // Fewer sections for cleaner look
+  for (let i = 0; i < roofSections; i++) {
+    const angle = (i / roofSections) * Math.PI * 2;
+    const nextAngle = ((i + 1) / roofSections) * Math.PI * 2;
     const midAngle = (angle + nextAngle) / 2;
     
-    // Skip sections behind wickets
-    if (Math.abs(Math.sin(midAngle)) > 0.88) continue;
+    // Skip roof sections behind wickets
+    if (Math.abs(Math.sin(midAngle)) > 0.95) continue;
     
-    // Back wall at ground level
-    const maxHeight = rowCount * rowHeight + (rowCount * rowDepth * Math.sin(riseAngle));
+    const roofRadius = baseRadius + (rowCount * rowDepth * Math.cos(riseAngle)) + 1;
+    const roofHeight = rowCount * rowHeight + (rowCount * rowDepth * Math.sin(riseAngle)) + 3;
     
-    seats.push(
+    const centerX = Math.cos(midAngle) * roofRadius;
+    const centerZ = Math.sin(midAngle) * roofRadius;
+    const arcLength = roofRadius * (nextAngle - angle);
+    
+    roof.push(
       <mesh
-        key={`back_wall_${i}`}
-        position={[
-          Math.cos(midAngle) * (baseRadius - 1),
-          maxHeight / 2,
-          Math.sin(midAngle) * (baseRadius - 1)
-        ]}
-        rotation={[0, -midAngle, 0]}
+        key={`roof_${i}`}
+        position={[centerX, roofHeight, centerZ]}
+        rotation={[0, midAngle, 0]}
       >
-        <boxGeometry 
-          args={[
-            (nextAngle - angle) * baseRadius,
-            maxHeight,
-            2
-          ]} 
-        />
+        <boxGeometry args={[arcLength, 0.1, 2]} />
         <meshStandardMaterial 
-          color={COLORS.stadium.support}
-          metalness={0.2}
+          color="#34495e"
+          metalness={0.1}
           roughness={0.8}
+          wireframe={false}
         />
       </mesh>
     );
   }
   
-  return <group>{seats}</group>;
+  return <group>{seats}{crowd}{roof}</group>;
 };
 
 // Main Stadium component
-const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorActive = false }) => {
-  const { field, pitch } = STADIUM_CONFIG;
+const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorActive = false, dummyGameData = null, isDummyDataActive = false }) => {
+  const { field, pitch, boundaries } = STADIUM_CONFIG;
   const [useCustomModel, setUseCustomModel] = useState(false);
   const [showWagonWheel, setShowWagonWheel] = useState(false);
   
@@ -462,6 +391,31 @@ const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorAc
   
   return (
     <group>
+      {/* Working Stadium Lighting System */}
+      <ambientLight intensity={0.5} />
+      <directionalLight
+        position={[30, 40, 30]}
+        intensity={1.8}
+        castShadow={true}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-far={100}
+        shadow-camera-left={-60}
+        shadow-camera-right={60}
+        shadow-camera-top={60}
+        shadow-camera-bottom={-60}
+      />
+      <directionalLight
+        position={[-30, 40, -30]}
+        intensity={1.2}
+        castShadow={false}
+      />
+      <directionalLight
+        position={[0, 50, 0]}
+        intensity={1.0}
+        castShadow={false}
+      />
+      
       {/* Stadium Model */}
       {useCustomModel ? (
         <StadiumModel visible={true} />
@@ -484,23 +438,199 @@ const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorAc
           
           {/* Inner Advertising Boundary */}
           <AdvertisingBoundary 
-            radius={field.radius * 0.85}  // Move inward to inner circle
-            height={1}    // Standard height
-            depth={0.5}   // Standard depth for support
+            radius={boundaries.innerRadius}  // 55m - Realistic cricket boundary
+            height={1.2}    // Slightly taller for better visibility
+            depth={0.6}     // Deeper support for larger boundary
           />
           
           {/* Outer Boundary Wall */}
           <BoundaryWall 
-            radius={field.radius}  // At the original boundary position
-            height={2}    // Taller wall
+            radius={boundaries.outerRadius}  // 65m - Stadium perimeter wall
+            height={3}      // Taller wall for larger stadium
           />
           
           {/* Wickets (swapped positions) */}
           <Wicket position={[0, 0, -10]} /> {/*Adjusted for larger field */}
           <Wicket position={[0, 0, 10]} /> {/* Adjusted for larger field */}
           
-          {/* Stadium Seating */}
-          {/* <StadiumSeating /> */}
+          {/* Stadium Seating with Packed Crowd */}
+          <StadiumSeating />
+          
+          {/* Professional Cricket Stadium Floodlights - Diagonal Positioning */}
+          <group>
+            {/* Four diagonal floodlight towers like real cricket stadiums */}
+            
+            {/* Tower 1: Northeast Diagonal */}
+            <group position={[70, 0, 70]}>
+              {/* Main tower pole with professional taper */}
+              <mesh position={[0, 17, 0]}>
+                <cylinderGeometry args={[0.4, 0.7, 34, 12]} />
+                <meshStandardMaterial color="#2C3E50" metalness={0.6} roughness={0.3} />
+              </mesh>
+              {/* Tower base platform */}
+              <mesh position={[0, 0.5, 0]}>
+                <cylinderGeometry args={[1.5, 1.5, 1, 8]} />
+                <meshStandardMaterial color="#34495E" metalness={0.5} roughness={0.5} />
+              </mesh>
+              {/* Light fixture mounting frame */}
+              <mesh position={[0, 32, 0]}>
+                <boxGeometry args={[4, 1.5, 2]} />
+                <meshStandardMaterial color="#1A1A1A" metalness={0.8} roughness={0.2} />
+              </mesh>
+              {/* Individual floodlight arrays */}
+              <mesh position={[-1.5, 33, -0.5]}>
+                <cylinderGeometry args={[0.4, 0.4, 0.6, 8]} />
+                <meshStandardMaterial color="#FFFF90" emissive="#FFFF50" emissiveIntensity={0.6} />
+              </mesh>
+              <mesh position={[0, 33, -0.5]}>
+                <cylinderGeometry args={[0.4, 0.4, 0.6, 8]} />
+                <meshStandardMaterial color="#FFFF90" emissive="#FFFF50" emissiveIntensity={0.6} />
+              </mesh>
+              <mesh position={[1.5, 33, -0.5]}>
+                <cylinderGeometry args={[0.4, 0.4, 0.6, 8]} />
+                <meshStandardMaterial color="#FFFF90" emissive="#FFFF50" emissiveIntensity={0.6} />
+              </mesh>
+              
+              {/* Simplified Floodlight Illumination */}
+              <pointLight
+                position={[0, 33, 0]}
+                intensity={200}
+                distance={80}
+                color="#FFFFFF"
+              />
+            </group>
+            
+            {/* Tower 2: Northwest Diagonal */}
+            <group position={[-70, 0, 70]}>
+              <mesh position={[0, 17, 0]}>
+                <cylinderGeometry args={[0.4, 0.7, 34, 12]} />
+                <meshStandardMaterial color="#2C3E50" metalness={0.6} roughness={0.3} />
+              </mesh>
+              <mesh position={[0, 0.5, 0]}>
+                <cylinderGeometry args={[1.5, 1.5, 1, 8]} />
+                <meshStandardMaterial color="#34495E" metalness={0.5} roughness={0.5} />
+              </mesh>
+              <mesh position={[0, 32, 0]}>
+                <boxGeometry args={[4, 1.5, 2]} />
+                <meshStandardMaterial color="#1A1A1A" metalness={0.8} roughness={0.2} />
+              </mesh>
+              <mesh position={[-1.5, 33, -0.5]}>
+                <cylinderGeometry args={[0.4, 0.4, 0.6, 8]} />
+                <meshStandardMaterial color="#FFFF90" emissive="#FFFF50" emissiveIntensity={0.6} />
+              </mesh>
+              <mesh position={[0, 33, -0.5]}>
+                <cylinderGeometry args={[0.4, 0.4, 0.6, 8]} />
+                <meshStandardMaterial color="#FFFF90" emissive="#FFFF50" emissiveIntensity={0.6} />
+              </mesh>
+              <mesh position={[1.5, 33, -0.5]}>
+                <cylinderGeometry args={[0.4, 0.4, 0.6, 8]} />
+                <meshStandardMaterial color="#FFFF90" emissive="#FFFF50" emissiveIntensity={0.6} />
+              </mesh>
+              
+              {/* Simplified Floodlight Illumination */}
+              <pointLight
+                position={[0, 33, 0]}
+                intensity={200}
+                distance={80}
+                color="#FFFFFF"
+              />
+            </group>
+            
+            {/* Tower 3: Southeast Diagonal */}
+            <group position={[70, 0, -70]}>
+              <mesh position={[0, 17, 0]}>
+                <cylinderGeometry args={[0.4, 0.7, 34, 12]} />
+                <meshStandardMaterial color="#2C3E50" metalness={0.6} roughness={0.3} />
+              </mesh>
+              <mesh position={[0, 0.5, 0]}>
+                <cylinderGeometry args={[1.5, 1.5, 1, 8]} />
+                <meshStandardMaterial color="#34495E" metalness={0.5} roughness={0.5} />
+              </mesh>
+              <mesh position={[0, 32, 0]}>
+                <boxGeometry args={[4, 1.5, 2]} />
+                <meshStandardMaterial color="#1A1A1A" metalness={0.8} roughness={0.2} />
+              </mesh>
+              <mesh position={[-1.5, 33, 0.5]}>
+                <cylinderGeometry args={[0.4, 0.4, 0.6, 8]} />
+                <meshStandardMaterial color="#FFFF90" emissive="#FFFF50" emissiveIntensity={0.6} />
+              </mesh>
+              <mesh position={[0, 33, 0.5]}>
+                <cylinderGeometry args={[0.4, 0.4, 0.6, 8]} />
+                <meshStandardMaterial color="#FFFF90" emissive="#FFFF50" emissiveIntensity={0.6} />
+              </mesh>
+              <mesh position={[1.5, 33, 0.5]}>
+                <cylinderGeometry args={[0.4, 0.4, 0.6, 8]} />
+                <meshStandardMaterial color="#FFFF90" emissive="#FFFF50" emissiveIntensity={0.6} />
+              </mesh>
+              
+              {/* Simplified Floodlight Illumination */}
+              <pointLight
+                position={[0, 33, 0]}
+                intensity={200}
+                distance={80}
+                color="#FFFFFF"
+              />
+            </group>
+            
+            {/* Tower 4: Southwest Diagonal */}
+            <group position={[-70, 0, -70]}>
+              <mesh position={[0, 17, 0]}>
+                <cylinderGeometry args={[0.4, 0.7, 34, 12]} />
+                <meshStandardMaterial color="#2C3E50" metalness={0.6} roughness={0.3} />
+              </mesh>
+              <mesh position={[0, 0.5, 0]}>
+                <cylinderGeometry args={[1.5, 1.5, 1, 8]} />
+                <meshStandardMaterial color="#34495E" metalness={0.5} roughness={0.5} />
+              </mesh>
+              <mesh position={[0, 32, 0]}>
+                <boxGeometry args={[4, 1.5, 2]} />
+                <meshStandardMaterial color="#1A1A1A" metalness={0.8} roughness={0.2} />
+              </mesh>
+              <mesh position={[-1.5, 33, 0.5]}>
+                <cylinderGeometry args={[0.4, 0.4, 0.6, 8]} />
+                <meshStandardMaterial color="#FFFF90" emissive="#FFFF50" emissiveIntensity={0.6} />
+              </mesh>
+              <mesh position={[0, 33, 0.5]}>
+                <cylinderGeometry args={[0.4, 0.4, 0.6, 8]} />
+                <meshStandardMaterial color="#FFFF90" emissive="#FFFF50" emissiveIntensity={0.6} />
+              </mesh>
+              <mesh position={[1.5, 33, 0.5]}>
+                <cylinderGeometry args={[0.4, 0.4, 0.6, 8]} />
+                <meshStandardMaterial color="#FFFF90" emissive="#FFFF50" emissiveIntensity={0.6} />
+              </mesh>
+              
+              {/* Simplified Floodlight Illumination */}
+              <pointLight
+                position={[0, 33, 0]}
+                intensity={200}
+                distance={80}
+                color="#FFFFFF"
+              />
+            </group>
+          </group>
+
+
+
+          {/* Stadium Flags and Banners */}
+          <group>
+            {/* Team flags around the stadium */}
+            <mesh position={[35, 8, 0]} rotation={[0, Math.PI/2, 0]}>
+              <planeGeometry args={[3, 2]} />
+              <meshStandardMaterial color="#FF6B6B" />
+            </mesh>
+            <mesh position={[-35, 8, 0]} rotation={[0, -Math.PI/2, 0]}>
+              <planeGeometry args={[3, 2]} />
+              <meshStandardMaterial color="#4ECDC4" />
+            </mesh>
+            <mesh position={[0, 8, 35]} rotation={[0, Math.PI, 0]}>
+              <planeGeometry args={[3, 2]} />
+              <meshStandardMaterial color="#45B7D1" />
+            </mesh>
+            <mesh position={[0, 8, -35]} rotation={[0, 0, 0]}>
+              <planeGeometry args={[3, 2]} />
+              <meshStandardMaterial color="#96CEB4" />
+            </mesh>
+          </group>
           
           {/* Creases (swapped positions) */}
           <mesh position={[0, 0.16, -11]}> {/* Adjusted for larger field */}
@@ -516,7 +646,7 @@ const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorAc
       
       {/* Wagon Wheel Overlay (shown in both stadium modes) */}
       <WagonWheel 
-        radius={field.radius * 0.9} 
+        radius={boundaries.playingRadius * 0.9} // Use playing boundary for wagon wheel
         visible={showWagonWheel}
         strikerPosition={currentPlayerPositions?.striker?.position || [0, 0, -9]}
       />
@@ -527,6 +657,8 @@ const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorAc
         onGameStateChange={onGameStateChange}
         currentPlayerPositions={currentPlayerPositions}
         isPositionEditorActive={isPositionEditorActive}
+        dummyGameData={dummyGameData}
+        isDummyDataActive={isDummyDataActive}
       />
     </group>
   );

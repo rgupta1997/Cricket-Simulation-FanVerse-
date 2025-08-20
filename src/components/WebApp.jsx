@@ -297,10 +297,19 @@ const FixturesPage = ({ onMatchClick }) => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Separate state for API calls (actual date range used for API)
   const [dateRange, setDateRange] = useState({
     startDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Previous day
     endDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]   // Next day
   });
+  
+  // Separate state for UI inputs (temporary date selection before Apply is clicked)
+  const [tempDateRange, setTempDateRange] = useState({
+    startDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Previous day
+    endDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]   // Next day
+  });
+  
   const [selectedSeries, setSelectedSeries] = useState(['all']); // Changed to array for multi-select
   const [showSeriesDropdown, setShowSeriesDropdown] = useState(false);
   
@@ -380,10 +389,18 @@ const FixturesPage = ({ onMatchClick }) => {
   };
 
   const handleDateChange = (field, value) => {
-    setDateRange(prev => ({
+    setTempDateRange(prev => ({
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleApplyDateFilter = () => {
+    setDateRange({
+      startDate: tempDateRange.startDate,
+      endDate: tempDateRange.endDate
+    });
+    // Note: The useEffect will automatically trigger fetchFixtures when dateRange changes
   };
 
   const handleSeriesChange = (series) => {
@@ -486,7 +503,7 @@ const FixturesPage = ({ onMatchClick }) => {
             <label style={{ fontSize: '14px', color: '#6b7280', fontWeight: '500', whiteSpace: 'nowrap' }}>Start Date:</label>
             <input
               type="date"
-              value={dateRange.startDate}
+              value={tempDateRange.startDate}
               onChange={(e) => handleDateChange('startDate', e.target.value)}
               style={{
                 padding: '6px 10px',
@@ -502,7 +519,7 @@ const FixturesPage = ({ onMatchClick }) => {
             <label style={{ fontSize: '14px', color: '#6b7280', fontWeight: '500', whiteSpace: 'nowrap' }}>End Date:</label>
             <input
               type="date"
-              value={dateRange.endDate}
+              value={tempDateRange.endDate}
               onChange={(e) => handleDateChange('endDate', e.target.value)}
               style={{
                 padding: '6px 10px',
@@ -515,7 +532,7 @@ const FixturesPage = ({ onMatchClick }) => {
             />
           </div>
           <button
-            onClick={fetchFixtures}
+            onClick={handleApplyDateFilter}
             style={{
               padding: '6px 16px',
               backgroundColor: '#dc2626',

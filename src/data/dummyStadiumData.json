@@ -1,0 +1,279 @@
+{
+  "stadiumSimulation": {
+    "metadata": {
+      "description": "Dummy cricket stadium simulation data",
+      "version": "1.0",
+      "created": "2024-01-01",
+      "scenario": "Sample T20 Match - Over 15"
+    },
+    "gameState": {
+      "gameState": "waiting_for_ball",
+      "ballState": "with_bowler",
+      "canBat": false,
+      "score": {
+        "runs": 127,
+        "wickets": 3,
+        "overs": 14,
+        "balls": 5,
+        "target": 185,
+        "runRate": 8.6,
+        "requiredRunRate": 11.2
+      },
+      "currentBall": {
+        "position": [0, 0.5, 15],
+        "velocity": [0, 0, 0],
+        "isMoving": false,
+        "trajectory": []
+      },
+      "lastAction": {
+        "type": "boundary",
+        "runs": 4,
+        "description": "Driven through covers for four"
+      }
+    },
+    "players": {
+      "striker": {
+        "id": "striker",
+        "name": "Virat Kohli",
+        "position": [0, 0, -9],
+        "state": "ready",
+        "isOnStrike": true,
+        "animation": null,
+        "stats": {
+          "runs": 45,
+          "balls": 32,
+          "fours": 5,
+          "sixes": 1
+        }
+      },
+      "nonStriker": {
+        "id": "non_striker",
+        "name": "KL Rahul",
+        "position": [1.5, 0, 9],
+        "state": "idle",
+        "isOnStrike": false,
+        "animation": null,
+        "stats": {
+          "runs": 28,
+          "balls": 24,
+          "fours": 3,
+          "sixes": 0
+        }
+      },
+      "bowler": {
+        "id": "bowler",
+        "name": "Jasprit Bumrah",
+        "position": [0, 0, 15],
+        "state": "ready",
+        "animation": null,
+        "runUpDistance": 0,
+        "stats": {
+          "overs": 2.5,
+          "runs": 18,
+          "wickets": 1,
+          "economy": 7.2
+        }
+      },
+      "wicketKeeper": {
+        "id": "wicket_keeper",
+        "name": "MS Dhoni",
+        "position": [0, 0, -11],
+        "state": "ready",
+        "animation": null
+      },
+      "umpires": {
+        "bowlersEnd": {
+          "id": "bowlers_end_umpire",
+          "name": "Nitin Menon",
+          "position": [0, 0, 11],
+          "state": "idle"
+        },
+        "point": {
+          "id": "point_umpire",
+          "name": "Anil Chaudhary",
+          "position": [12, 0, -8],
+          "state": "idle"
+        }
+      },
+      "fielders": [
+        {
+          "id": "mid_off",
+          "name": "Rohit Sharma",
+          "position": [10, 0, -5],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "mid_on",
+          "name": "Hardik Pandya",
+          "position": [-10, 0, -5],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "cover",
+          "name": "Shubman Gill",
+          "position": [15, 0, 0],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "mid_wicket",
+          "name": "Ravindra Jadeja",
+          "position": [-15, 0, 0],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "third_man",
+          "name": "Mohammed Shami",
+          "position": [8, 0, 10],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "fine_leg",
+          "name": "Yuzvendra Chahal",
+          "position": [-8, 0, 10],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "point",
+          "name": "Suryakumar Yadav",
+          "position": [12, 0, -8],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "square_leg",
+          "name": "Rishabh Pant",
+          "position": [-12, 0, -8],
+          "role": "fielding",
+          "state": "ready"
+        },
+                 {
+           "id": "long_off",
+           "name": "Washington Sundar",
+           "position": [12, 0, 30],
+           "role": "fielding",
+           "state": "ready"
+         },
+         {
+           "id": "deep_cover",
+           "name": "Ishan Kishan",
+           "position": [35, 0, 5],
+           "role": "fielding",
+           "state": "ready"
+         },
+         {
+           "id": "deep_point",
+           "name": "Axar Patel",
+           "position": [30, 0, -15],
+           "role": "fielding",
+           "state": "ready"
+         }
+      ]
+    },
+    "controls": {
+      "bowling": {
+        "velocity": 145.2,
+        "ball_axis_x": 30.15,
+        "ball_axis_y": 22.40,
+        "length_axis_x": 58.89,
+        "length_axis_z": 6.07,
+        "line_axis_x": 35.04,
+        "line_axis_z": 25.93,
+        "bounceHeight": 0.7,
+        "useDirectCoordinates": true,
+        "release_x": 0.2,
+        "release_y": 2.1,
+        "release_z": 11.5,
+        "bounce_x": 0.1,
+        "bounce_y": 0.3,
+        "bounce_z": 4.2,
+        "final_x": 0.0,
+        "final_y": 1.3,
+        "final_z": -9.8,
+        "speed": 145.2,
+        "line": 0.2,
+        "length": 6.2,
+        "pitch": 0.7
+      },
+      "ballShot": {
+        "lofted": true,
+        "degree": 45,
+        "distance": 13,
+        "autoPlay": true,
+        "power": 0.85,
+        "timing": 0.95,
+        "keeperAutoCollect": true,
+        "keeperCollectionRadius": 2.5,
+        "keeperSpeedThreshold": 4.0,
+        "usePhysicsMode": true
+      },
+      "batting": {
+        "footwork": "front",
+        "shot": "drive",
+        "timing": 0.95
+      },
+      "fielding": {
+        "selectedFielder": null,
+        "throwTarget": "keeper"
+      }
+    },
+    "animations": {
+      "active": [],
+      "queue": [
+        {
+          "type": "ball_delivery",
+          "player": "bowler",
+          "duration": 2000
+        },
+        {
+          "type": "bat_swing",
+          "player": "striker",
+          "duration": 500
+        }
+      ]
+    },
+    "stadium": {
+      "weather": "Clear",
+      "temperature": "28°C", 
+      "humidity": "65%",
+      "windSpeed": "12 km/h",
+      "windDirection": "North-East",
+      "pitchCondition": "Good for batting",
+      "dew": false,
+      "crowd": {
+        "attendance": "15,250",
+        "capacity": "16,000", 
+        "atmosphere": "Electric",
+        "noise_level": "Loud",
+        "support": "Home team favored"
+      },
+      "infrastructure": {
+        "floodlights": "On",
+        "roof": "Covered seating",
+        "flags": "Team colors displayed"
+      }
+    },
+    "commentary": [
+      {
+        "ball": "14.6",
+        "text": "Bumrah to Kohli, FOUR! What a shot! Driven beautifully through covers",
+        "type": "boundary"
+      },
+      {
+        "ball": "14.5",
+        "text": "Bumrah to Kohli, 1 run, worked away to mid-wicket",
+        "type": "single"
+      },
+      {
+        "ball": "14.4",
+        "text": "Bumrah to Rahul, 1 run, tucked off the pads to fine leg",
+        "type": "single"
+      }
+    ]
+  }
+}

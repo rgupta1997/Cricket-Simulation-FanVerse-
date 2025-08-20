@@ -24,7 +24,7 @@ import {
 } from '../constants/playerPositions';
 import ZoneMarkers from './ZoneMarkers';
 
-const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEditorActive = false, isEmbedded = false, matchId = null }) => {
+const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEditorActive = false, isEmbedded = false, matchId = null, dummyGameData = null, isDummyDataActive = false }) => {
   const [gameState, setGameState] = useState(createInitialGameState());
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedShotDirection, setSelectedShotDirection] = useState('straight');
@@ -34,10 +34,10 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
   const [keysPressed, setKeysPressed] = useState(new Set());
 
   // Pitch guide visibility states
-  const [showPitchMarkers, setShowPitchMarkers] = useState(true);
+  const [showPitchMarkers, setShowPitchMarkers] = useState(false); // Disabled for cleaner stadium view
   const [showZoneMarkers, setShowZoneMarkers] = useState(false);
-  const [showCoordinateDisplay, setShowCoordinateDisplay] = useState(true);
-  const [showPitchGrid, setShowPitchGrid] = useState(true);
+  const [showCoordinateDisplay, setShowCoordinateDisplay] = useState(false); // Disabled for cleaner view
+  const [showPitchGrid, setShowPitchGrid] = useState(false); // Disabled for cleaner view
   const [useCompactUI, setUseCompactUI] = useState(true); // Toggle between full and compact UI
   
   // Camera controls integration
@@ -72,6 +72,54 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       }
     }));
   }, [gameState.controls.ballShot]);
+
+  // Function to apply dummy data to game state
+  const applyDummyData = useCallback((dummyData) => {
+    if (!dummyData) return;
+
+    console.log('Applying dummy data to cricket game:', dummyData);
+    
+    // Create new game state based on dummy data
+    const newGameState = {
+      ...createInitialGameState(),
+      gameState: dummyData.gameState.gameState,
+      ballState: dummyData.gameState.ballState,
+      canBat: dummyData.gameState.canBat,
+      score: dummyData.gameState.score,
+      currentBall: dummyData.gameState.currentBall,
+      players: {
+        ...dummyData.players,
+        fielders: dummyData.players.fielders || []
+      },
+      controls: dummyData.controls,
+      lastAction: dummyData.gameState.lastAction,
+      animations: dummyData.animations || { active: [], queue: [] }
+    };
+
+    setGameState(newGameState);
+    
+    // Update other UI states based on dummy data
+    if (dummyData.controls?.ballShot?.degree !== undefined) {
+      setShotAngle(dummyData.controls.ballShot.degree);
+    }
+    if (dummyData.controls?.batting?.shot) {
+      setSelectedShotType(dummyData.controls.batting.shot);
+    }
+  }, []);
+
+  // Effect to handle dummy data loading
+  useEffect(() => {
+    if (isDummyDataActive && dummyGameData) {
+      applyDummyData(dummyGameData);
+    } else if (!isDummyDataActive) {
+      // Reset to initial state when dummy data is cleared
+      setGameState(createInitialGameState());
+      setShotAngle(0);
+      setSelectedShotType('drive');
+      setSelectedShotDirection('straight');
+      setIsPlaying(false);
+    }
+  }, [isDummyDataActive, dummyGameData, applyDummyData]);
 
   useEffect(() => {}, []);
 
@@ -698,6 +746,19 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
 
   return (
     <group>
+      {/* Dummy Data Visual Indicator */}
+      {isDummyDataActive && dummyGameData && (
+        <group position={[0, 8, 0]}>
+          <mesh>
+            <planeGeometry args={[12, 2]} />
+            <meshBasicMaterial color="#22c55e" transparent opacity={0.8} />
+          </mesh>
+          <mesh position={[0, 0, 0.1]}>
+            <meshBasicMaterial color="#ffffff" />
+          </mesh>
+        </group>
+      )}
+
       {/* Players */}
       
       {/* Striker (on strike) */}
