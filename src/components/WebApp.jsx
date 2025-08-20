@@ -18,7 +18,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import Stadium from './Stadium';
 import PredictionSection from './PredictionSection.jsx';
-
+import SeasonalLeaderboard from './SeasonalLeaderboard.jsx';
 
 // Import responsive styles
 import '../styles/responsive.css';
@@ -155,12 +155,16 @@ const ModernMatchCard = ({ match, onClick }) => {
         backgroundColor: statusConfig.backgroundColor,
         border: `2px solid ${statusConfig.borderColor}`,
         borderRadius: '12px',
-        padding: '20px',
-        marginBottom: '16px',
+        padding: '12px',
+        margin: '6px',
         cursor: 'pointer',
         transition: 'all 0.3s ease',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        width: '420px',
+        height: '180px',
+        float: 'left',
+        display: 'inline-block'
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-2px)';
@@ -174,30 +178,31 @@ const ModernMatchCard = ({ match, onClick }) => {
       {/* Status Badge */}
       <div style={{
         position: 'absolute',
-        top: '16px',
-        right: '16px',
+        top: '12px',
+        right: '12px',
         backgroundColor: statusConfig.badge.backgroundColor,
         color: statusConfig.badge.color,
-        padding: '6px 12px',
-        borderRadius: '20px',
-        fontSize: '12px',
+        padding: '4px 8px',
+        borderRadius: '12px',
+        fontSize: '10px',
         fontWeight: '600',
         display: 'flex',
         alignItems: 'center',
-        gap: '6px'
+        gap: '4px'
       }}>
         <span>{statusConfig.badge.icon}</span>
         {statusConfig.badge.text}
-        </div>
+      </div>
 
       {/* Centered Content */}
       <div style={{ textAlign: 'center' }}>
         {/* Match Name - Primary Focus */}
-        <div style={{ marginBottom: '16px' }}>
+        <div>
+          <br />
           <h3 style={{
-            margin: '0 0 8px 0',
+            margin: '0 0 6px 0',
             color: '#1f2937',
-            fontSize: '18px',
+            fontSize: '16px',
             fontWeight: '700',
             lineHeight: '1.3'
           }}>
@@ -207,7 +212,7 @@ const ModernMatchCard = ({ match, onClick }) => {
             <p style={{
               margin: '0',
               color: '#6b7280',
-              fontSize: '14px',
+              fontSize: '12px',
               lineHeight: '1.4'
             }}>
               {match.matchFullName}
@@ -216,22 +221,22 @@ const ModernMatchCard = ({ match, onClick }) => {
         </div>
 
         {/* Match Status */}
-        <div style={{ marginBottom: '16px' }}>
+        <div>
           <div style={{
             color: '#dc2626',
-            fontSize: '14px',
+            fontSize: '12px',
             fontWeight: '500',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '8px',
+            gap: '6px',
             backgroundColor: '#fef2f2',
-            padding: '8px 16px',
-            borderRadius: '20px',
+            padding: '6px 12px',
+            borderRadius: '16px',
             border: '1px solid #fecaca'
           }}>
             <span style={{
-              width: '8px',
-              height: '8px',
+              width: '6px',
+              height: '6px',
               backgroundColor: '#dc2626',
               borderRadius: '50%'
             }}></span>
@@ -241,55 +246,50 @@ const ModernMatchCard = ({ match, onClick }) => {
         
         {/* Match Start Time */}
         <div style={{
-          padding: '12px 16px',
+          padding: '8px 12px',
           backgroundColor: '#fef2f2',
-          borderRadius: '8px',
+          borderRadius: '6px',
           border: '1px solid #fecaca',
           display: 'inline-block'
         }}>
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '6px'
           }}>
             <span style={{
               color: '#dc2626',
-              fontSize: '16px'
+              fontSize: '14px'
             }}>🕐</span>
             <span style={{
               color: '#991b1b',
-              fontSize: '14px',
+              fontSize: '12px',
               fontWeight: '500'
             }}>
               {match.time || 'Time not specified'}
             </span>
-                </div>
+          </div>
         </div>
       </div>
       
-               {/* Series Name - Left Aligned */}
-         <div style={{ 
-           position: 'absolute', 
-           top: '16px', 
-           left: '16px',
-           marginBottom: '16px'
-         }}>
-           <span style={{
-             backgroundColor: '#fef2f2',
-             color: '#dc2626',
-             padding: '6px 12px',
-             borderRadius: '16px',
-             fontSize: '12px',
-             fontWeight: '500',
-             border: '1px solid #fecaca'
-           }}>
-             {match.seriesName || 'Cricket Series'}
-           </span>
-         </div>
-
-                   {/* Chat Button Removed - Now only on match detail pages */}
-
-         
+      {/* Series Name - Left Aligned */}
+      <div style={{ 
+        position: 'absolute', 
+        top: '12px', 
+        left: '12px'
+      }}>
+        <span style={{
+          backgroundColor: '#fef2f2',
+          color: '#dc2626',
+          padding: '4px 8px',
+          borderRadius: '12px',
+          fontSize: '10px',
+          fontWeight: '500',
+          border: '1px solid #fecaca'
+        }}>
+          {match.seriesName || 'Cricket Series'}
+        </span>
+      </div>
     </div>
   );
 };
@@ -465,70 +465,45 @@ const FixturesPage = ({ onMatchClick }) => {
 
   return (
     <div className="cricket-app" style={{ backgroundColor: '#fef2f2', minHeight: '100vh', maxHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Compact Header */}
-      <div style={{
-        background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
-        padding: '16px 32px',
-        borderBottom: '1px solid #b91c1c',
-        boxShadow: '0 2px 10px rgba(220, 38, 38, 0.2)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            background: 'linear-gradient(135deg, #ffffff, #fef2f2)',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '18px',
-            border: '2px solid #ffffff'
-          }}>
-            🏏
-          </div>
-          <h1 style={{ margin: 0, color: 'white', fontSize: '20px', fontWeight: '700' }}>
-            FIXTURE
-          </h1>
-        </div>
-      </div>
+
 
       {/* Date Range Filter */}
       <div style={{
-        margin: '16px 32px 0',
-        padding: '16px',
+        margin: '12px 24px 0',
+        padding: '12px',
         backgroundColor: '#ffffff',
         borderRadius: '12px',
         border: '1px solid #fecaca',
         boxShadow: '0 2px 8px rgba(220, 38, 38, 0.1)'
       }}>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <label style={{ fontSize: '14px', color: '#6b7280', fontWeight: '500', whiteSpace: 'nowrap' }}>Start Date:</label>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <label style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500', whiteSpace: 'nowrap' }}>Start Date:</label>
             <input
               type="date"
               value={tempDateRange.startDate}
               onChange={(e) => handleDateChange('startDate', e.target.value)}
               style={{
-                padding: '6px 10px',
+                padding: '4px 8px',
                 border: '1px solid #d1d5db',
                 borderRadius: '6px',
-                fontSize: '14px',
+                fontSize: '12px',
                 outline: 'none',
                 borderColor: '#fecaca'
               }}
             />
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <label style={{ fontSize: '14px', color: '#6b7280', fontWeight: '500', whiteSpace: 'nowrap' }}>End Date:</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <label style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500', whiteSpace: 'nowrap' }}>End Date:</label>
             <input
               type="date"
               value={tempDateRange.endDate}
               onChange={(e) => handleDateChange('endDate', e.target.value)}
               style={{
-                padding: '6px 10px',
+                padding: '4px 8px',
                 border: '1px solid #d1d5db',
                 borderRadius: '6px',
-                fontSize: '14px',
+                fontSize: '12px',
                 outline: 'none',
                 borderColor: '#fecaca'
               }}
@@ -537,13 +512,13 @@ const FixturesPage = ({ onMatchClick }) => {
           <button
             onClick={handleApplyDateFilter}
             style={{
-              padding: '6px 16px',
+              padding: '4px 12px',
               backgroundColor: '#dc2626',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
-              fontSize: '14px',
+              fontSize: '12px',
               fontWeight: '500'
             }}
           >
@@ -553,18 +528,18 @@ const FixturesPage = ({ onMatchClick }) => {
       </div>
 
       {/* Tab Navigation */}
-      <div style={{ display: 'flex', margin: '16px 32px 0', backgroundColor: '#ffffff', borderRadius: '12px', padding: '4px', border: '1px solid #fecaca', boxShadow: '0 2px 8px rgba(220, 38, 38, 0.1)' }}>
+      <div style={{ display: 'flex', margin: '12px 24px 0', backgroundColor: '#ffffff', borderRadius: '12px', padding: '3px', border: '1px solid #fecaca', boxShadow: '0 2px 8px rgba(220, 38, 38, 0.1)' }}>
         <button
           onClick={() => setActiveTab('all')}
           style={{
             flex: 1,
-            padding: '12px 16px',
+            padding: '8px 12px',
             backgroundColor: activeTab === 'all' ? '#dc2626' : 'transparent',
             color: activeTab === 'all' ? 'white' : '#6b7280',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
-            fontSize: '14px',
+            fontSize: '12px',
             fontWeight: '600',
             transition: 'all 0.2s ease'
           }}
@@ -575,13 +550,13 @@ const FixturesPage = ({ onMatchClick }) => {
           onClick={() => setActiveTab('live')}
           style={{
             flex: 1,
-            padding: '12px 16px',
+            padding: '8px 12px',
             backgroundColor: activeTab === 'live' ? '#dc2626' : 'transparent',
             color: activeTab === 'live' ? 'white' : '#6b7280',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
-            fontSize: '14px',
+            fontSize: '12px',
             fontWeight: '600',
             transition: 'all 0.2s ease'
           }}
@@ -592,13 +567,13 @@ const FixturesPage = ({ onMatchClick }) => {
           onClick={() => setActiveTab('upcoming')}
           style={{
             flex: 1,
-            padding: '12px 16px',
+            padding: '8px 12px',
             backgroundColor: activeTab === 'upcoming' ? '#dc2626' : 'transparent',
             color: activeTab === 'upcoming' ? 'white' : '#6b7280',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
-            fontSize: '14px',
+            fontSize: '12px',
             fontWeight: '600',
             transition: 'all 0.2s ease'
           }}
@@ -609,13 +584,13 @@ const FixturesPage = ({ onMatchClick }) => {
           onClick={() => setActiveTab('completed')}
           style={{
             flex: 1,
-            padding: '12px 16px',
+            padding: '8px 12px',
             backgroundColor: activeTab === 'completed' ? '#dc2626' : 'transparent',
             color: activeTab === 'completed' ? 'white' : '#6b7280',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
-            fontSize: '14px',
+            fontSize: '12px',
             fontWeight: '600',
             transition: 'all 0.2s ease'
           }}
@@ -626,8 +601,8 @@ const FixturesPage = ({ onMatchClick }) => {
 
       {/* Series Filter - Multi-Select Dropdown */}
         <div style={{ 
-        margin: '16px 32px 0',
-        paddingBottom: '5px',
+        margin: '12px 24px 0',
+        paddingBottom: '3px',
           display: 'flex',
         justifyContent: 'flex-start',
         alignItems: 'center'
@@ -793,8 +768,12 @@ const FixturesPage = ({ onMatchClick }) => {
         )}
       </div>
 
-      {/* Matches List */}
-      <div style={{ flex: 1, padding: '0 32px 32px', overflowY: 'auto' }}>
+            {/* Matches List */}
+      <div style={{ 
+        padding: '0 24px 24px', 
+        overflowY: 'auto',
+        clear: 'both'
+      }}>
         {filteredMatches.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 20px' }}>
             <div style={{ fontSize: '48px', marginBottom: '16px', color: '#9ca3af' }}>📅</div>
@@ -806,13 +785,15 @@ const FixturesPage = ({ onMatchClick }) => {
             </div>
           </div>
         ) : (
-                     filteredMatches.map((match) => (
-             <ModernMatchCard
-             key={match.matchId} 
-             match={match} 
-             onClick={handleMatchClick}
-           />
-           ))
+          <div style={{ clear: 'both' }}>
+            {filteredMatches.map((match) => (
+              <ModernMatchCard
+                key={match.matchId} 
+                match={match} 
+                onClick={handleMatchClick}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>
@@ -1311,6 +1292,7 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetai
 
 const WebApp = () => {
   const [currentView, setCurrentView] = useState('fixtures');
+  const [activeNav, setActiveNav] = useState('fixtures');
 
   const [selectedMatchId, setSelectedMatchId] = useState(null);
   const [selectedMatchDetails, setSelectedMatchDetails] = useState(null);
@@ -1359,6 +1341,7 @@ const WebApp = () => {
       setSelectedMatchId(matchId);
       setSelectedMatchDetails(matchDetails);
       setCurrentView('matchDetail');
+      setActiveNav('fixtures'); // Keep fixtures nav active when viewing match details
       setError(null); // Clear any previous errors
     } catch (err) {
       setError(err.message);
@@ -1367,12 +1350,32 @@ const WebApp = () => {
 
   const handleBackClick = () => {
     setCurrentView('fixtures');
+    setActiveNav('fixtures');
     setSelectedMatchId(null);
     setError(null);
     // Close chat when going back to fixtures
     setIsChatOpen(false);
     setChatMatchId(null);
     setChatMatchName('');
+  };
+
+  const handleNavClick = (navItem) => {
+    setActiveNav(navItem);
+    if (navItem === 'fixtures') {
+      setCurrentView('fixtures');
+      setSelectedMatchId(null);
+      setError(null);
+      setIsChatOpen(false);
+      setChatMatchId(null);
+      setChatMatchName('');
+    } else if (navItem === 'leaderboard') {
+      setCurrentView('leaderboard');
+      setSelectedMatchId(null);
+      setError(null);
+      setIsChatOpen(false);
+      setChatMatchId(null);
+      setChatMatchName('');
+    }
   };
 
   const openMatchChat = (matchId, matchName) => {
@@ -1559,10 +1562,79 @@ const WebApp = () => {
     );
   }
 
-    return (
-    <div className="cricket-app">
-                   {/* Floating Session Popup - Top Right Corner */}
-      {currentUser && (
+        return (
+      <div className="cricket-app">
+        {/* Navigation Header - Shared across all views */}
+        <div style={{
+          background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+          padding: '16px 32px',
+          borderBottom: '1px solid #b91c1c',
+          boxShadow: '0 2px 10px rgba(220, 38, 38, 0.2)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+            {/* Navigation Tabs */}
+            <div style={{ display: 'flex', gap: '4px' }}>
+
+              <button
+                onClick={() => handleNavClick('fixtures')}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: activeNav === 'fixtures' ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                  color: 'white',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  transition: 'all 0.3s ease',
+                  backdropFilter: 'blur(10px)'
+                }}
+                onMouseEnter={(e) => {
+                  if (activeNav !== 'fixtures') {
+                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (activeNav !== 'fixtures') {
+                    e.target.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                📅 Fixtures
+              </button>
+              <button
+                onClick={() => handleNavClick('leaderboard')}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: activeNav === 'leaderboard' ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                  color: 'white',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  transition: 'all 0.3s ease',
+                  backdropFilter: 'blur(10px)'
+                }}
+                onMouseEnter={(e) => {
+                  if (activeNav !== 'leaderboard') {
+                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (activeNav !== 'leaderboard') {
+                    e.target.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                🏆 Seasonal Leaderboard
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Floating Session Popup - Top Right Corner */}
+        {currentUser && (
         <div style={{
           position: 'fixed',
           top: '8px',
@@ -1642,8 +1714,17 @@ const WebApp = () => {
         </div>
       )}
 
+
       {currentView === 'fixtures' && (
-        <FixturesPage onMatchClick={handleMatchClick} />
+        <FixturesPage 
+          onMatchClick={handleMatchClick}
+        />
+      )}
+      {currentView === 'leaderboard' && (
+        <SeasonalLeaderboard 
+          currentUser={currentUser}
+          onLoginClick={() => setIsLoginOpen(true)}
+        />
       )}
       {currentView === 'matchDetail' && selectedMatchId && (
         <React.Suspense fallback={
