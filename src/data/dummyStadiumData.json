@@ -186,6 +186,7 @@
         "line_axis_z": 25.93,
         "bounceHeight": 0.7,
         "useDirectCoordinates": true,
+        "side": "R",
         "release_x": 0.2,
         "release_y": 2.1,
         "release_z": 11.5,
@@ -198,17 +199,26 @@
         "speed": 145.2,
         "line": 0.2,
         "length": 6.2,
-        "pitch": 0.7
+        "pitch": 0.7,
+        "alternativeExample": {
+          "note": "Example for Around the Wicket bowling",
+          "side": "R",
+          "release_x": -0.5,
+          "release_y": 2.1,
+          "release_z": 11.5,
+          "bounce_x": -0.2,
+          "final_x": 0.3
+        }
       },
       "ballShot": {
-        "lofted": true,
-        "degree": 45,
-        "distance": 13,
+        "lofted": false,
+        "degree": 270,
+        "distance": 50,
         "autoPlay": true,
-        "power": 0.85,
+        "power": 0.8,
         "timing": 0.95,
         "keeperAutoCollect": true,
-        "keeperCollectionRadius": 2.5,
+        "keeperCollectionRadius": 0.0,
         "keeperSpeedThreshold": 4.0,
         "usePhysicsMode": true
       },

@@ -1,13 +1,34 @@
 /* eslint-disable react/no-unknown-property */
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import CricketCamera from './Camera';
+import Lighting from './Lighting';
 import Stadium from './Stadium';
 import dummyStadiumData from '../data/dummyStadiumData.json';
 
 const EmbeddedSimulator = ({ matchId, onExpand }) => {
   const [isDummyDataLoaded, setIsDummyDataLoaded] = useState(false);
   const [currentGameData, setCurrentGameData] = useState(null);
+  
+  // Ball Following Camera State for embedded simulator
+  const [ballPosition, setBallPosition] = useState(null);
+  const [isFollowingBall, setIsFollowingBall] = useState(false);
+  const [ballFollowConfig, setBallFollowConfig] = useState({
+    distance: 12.0, // Slightly further for embedded view
+    height: 6.0,    // Higher for better overview
+    smoothness: 0.08,
+    lookAtBall: true,
+    autoFollow: false,  // ✅ DEFAULT OFF - Only follow when manually enabled
+    legSideMode: true,  // ✅ ENHANCED: Enable leg-side special view by default
+    fastTracking: true  // ✅ ENHANCED: Enable fast shot tracking by default
+  });
+
+  // Default camera view for embedded simulator
+  const defaultCameraView = {
+    position: [45, 35, 45],
+    target: [0, 0, 0],
+    fov: 75
+  };
 
   const handleExpand = () => {
     if (onExpand) {
@@ -31,6 +52,25 @@ const EmbeddedSimulator = ({ matchId, onExpand }) => {
     console.log('Dummy data cleared, back to default simulation');
   };
 
+  // Handle ball position updates for camera following
+  const handleBallPositionUpdate = useCallback((position) => {
+    setBallPosition(position);
+    
+    // Auto-enable following when ball starts moving if autoFollow is enabled
+    if (ballFollowConfig.autoFollow && position && !isFollowingBall) {
+      // Check if ball is actually moving (not at default position)
+      const isMoving = position[0] !== 0 || position[2] !== 0;
+      if (isMoving) {
+        setIsFollowingBall(true);
+      }
+    }
+  }, [ballFollowConfig.autoFollow, isFollowingBall]);
+
+  // Handle disabling ball following when user manually interacts with camera
+  const handleDisableFollowing = useCallback(() => {
+    setIsFollowingBall(false);
+  }, []);
+
   return (
     <div style={{
       position: 'relative',
@@ -46,37 +86,39 @@ const EmbeddedSimulator = ({ matchId, onExpand }) => {
         height: '100%',
         overflow: 'hidden'
       }}>
-                 <Canvas
-           camera={{ 
-             position: [45, 35, 45], // Adjusted for 60m stadium (was 50,40,50)
-             fov: 75, // FOV perfect for 60m stadium
-             near: 0.1,
-             far: 1200 // Adjusted far plane for 60m stadium
-           }}
-           shadows
-         >
-          {/* Backup basic lighting to ensure stadium is always visible */}
-          <ambientLight intensity={0.3} />
-          <directionalLight position={[10, 20, 10]} intensity={1.0} />
+        <Canvas
+          shadows
+          gl={{ 
+            antialias: true, 
+            alpha: false,
+            powerPreference: "high-performance"
+          }}
+          onCreated={({ gl }) => {
+            gl.setClearColor('#1a1a1a');
+            gl.shadowMap.enabled = true;
+            gl.shadowMap.type = 2; // PCFSoftShadowMap
+          }}
+        >
+          {/* Custom Cricket Camera with Ball Following */}
+          <CricketCamera 
+            view={defaultCameraView}
+            ballPosition={ballPosition}
+            ballFollowConfig={ballFollowConfig}
+            isFollowingBall={isFollowingBall}
+            onDisableFollowing={handleDisableFollowing}
+          />
+          
+          {/* Stadium lighting */}
+          <Lighting intensity={1.2} />
+          
+          {/* Stadium with ball position updates */}
           <Stadium 
             isEmbedded={true}
             matchId={matchId}
             dummyGameData={currentGameData}
             isDummyDataActive={isDummyDataLoaded}
+            onBallPositionUpdate={handleBallPositionUpdate}
           />
-                     <OrbitControls 
-             enablePan={true}
-             enableZoom={true}
-             enableRotate={true}
-             minDistance={15} // Adjusted for 60m stadium
-             maxDistance={120} // Adjusted for 60m stadium (was 150)
-             maxPolarAngle={Math.PI / 2.2}
-             enableDamping={true} // Smooth camera controls
-             dampingFactor={0.1} // Faster damping for responsiveness
-             panSpeed={1.2} // Slightly faster panning
-             zoomSpeed={1.0} // Standard zoom speed
-             rotateSpeed={0.8} // Slightly slower rotation for precision
-           />
         </Canvas>
       </div>
 
@@ -86,9 +128,35 @@ const EmbeddedSimulator = ({ matchId, onExpand }) => {
         top: '20px',
         right: '20px',
         display: 'flex',
+        flexDirection: 'column',
         gap: '10px',
         zIndex: 1000
       }}>
+        {/* Ball Following Toggle */}
+        <button
+          onClick={() => setIsFollowingBall(!isFollowingBall)}
+          style={{
+            padding: '8px 12px',
+            background: isFollowingBall ? 'rgba(0, 170, 0, 0.9)' : 'rgba(170, 0, 0, 0.9)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            transition: 'all 0.3s ease',
+            backdropFilter: 'blur(10px)',
+            boxShadow: isFollowingBall ? '0 0 12px rgba(0, 170, 0, 0.5)' : 'none'
+          }}
+          title="Toggle Ball Following Camera"
+        >
+          <span>🎬</span>
+          {isFollowingBall ? '✅ Following' : '❌ Stopped'}
+        </button>
+        
         {/* Dummy Data Button */}
         {!isDummyDataLoaded ? (
           <button

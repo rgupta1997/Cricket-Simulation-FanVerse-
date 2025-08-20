@@ -17,7 +17,16 @@ const RightDockedPanel = ({
   showPitchGrid,
   setShowPitchGrid,
   currentView,
-  switchToView
+  switchToView,
+  // Ball following props
+  isFollowingBall = false,
+  ballFollowConfig = {},
+  handleBallFollowToggle = () => {},
+  handleBallFollowConfigUpdate = () => {},
+  // Demo data props
+  isDummyDataActive = false,
+  onLoadDummyData = () => {},
+  onClearDummyData = () => {}
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
@@ -177,6 +186,13 @@ const RightDockedPanel = ({
               setShowGrid={setShowPitchGrid}
               currentCameraView={currentView}
               onCameraViewChange={switchToView}
+              isFollowingBall={isFollowingBall || false}
+              ballFollowConfig={ballFollowConfig || {}}
+              onBallFollowToggle={handleBallFollowToggle || (() => {})}
+              onBallFollowConfigUpdate={handleBallFollowConfigUpdate || (() => {})}
+              isDummyDataActive={isDummyDataActive}
+              onLoadDummyData={onLoadDummyData}
+              onClearDummyData={onClearDummyData}
             />
           ) : (
             <CricketUIAccordion 
@@ -191,6 +207,13 @@ const RightDockedPanel = ({
               setShowPitchGrid={setShowPitchGrid}
               currentCameraView={currentView}
               onCameraViewChange={switchToView}
+              isFollowingBall={isFollowingBall || false}
+              ballFollowConfig={ballFollowConfig || {}}
+              onBallFollowToggle={handleBallFollowToggle || (() => {})}
+              onBallFollowConfigUpdate={handleBallFollowConfigUpdate || (() => {})}
+              isDummyDataActive={isDummyDataActive}
+              onLoadDummyData={onLoadDummyData}
+              onClearDummyData={onClearDummyData}
             />
           )}
         </div>

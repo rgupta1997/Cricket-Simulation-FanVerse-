@@ -47,13 +47,13 @@ export const CAMERA_VIEWS = {
 // Stadium dimensions and positions
 export const STADIUM_CONFIG = {
   field: {
-    radius: 50, // Green playing field - EXTENDED to full playable area (50m radius)
+    radius: 50, // ✅ CORRECTED: Green playing field - back to 50m radius to match boundary
     height: 0.1
   },
   boundaries: {
-    innerRadius: 50, // Inner advertising boundary - MOVED IN 5m (55m → 50m)
-    outerRadius: 60, // Outer boundary wall - MOVED IN 5m (65m → 60m)
-    playingRadius: 50 // Actual playing boundary for simulation - 50m
+    innerRadius: 50, // ✅ CORRECTED: Inner advertising boundary - back to 50m
+    outerRadius: 60, // ✅ CORRECTED: Outer boundary wall - back to 60m  
+    playingRadius: 50 // ✅ CORRECTED: Actual playing boundary for simulation - 50m
   },
   pitch: {
     width: 3,

@@ -108,6 +108,7 @@ export const createInitialGameState = () => ({
       
       // Direct 3D World Coordinates (X, Y, Z)
       useDirectCoordinates: false,  // Toggle between pitch analysis and direct coordinates
+      side: "L",           // Cricket bowling side: "L" = Over the wicket, "R" = Around the wicket
       release_x: 0.0,      // Direct release X coordinate (meters)
       release_y: 2.0,      // Direct release Y coordinate (meters)
       release_z: 11.0,     // Direct release Z coordinate (meters)
@@ -157,11 +158,15 @@ export const updateGameState = (currentState, action) => {
         gameState: GAME_STATES.BOWLING,
         ballState: BALL_STATES.BOWLING,
         canBat: false, // Reset batting availability when bowling starts
+        bowlingAnimation: 'runUp', // Always start with run-up
+        bowlingSequenceActive: true, // Flag to indicate bowling sequence is running
+        pendingBallData: action.ballData, // Store trajectory for release
         players: {
           ...currentState.players,
           bowler: {
             ...currentState.players.bowler,
-            state: PLAYER_STATES.BOWLING
+            state: PLAYER_STATES.BOWLING,
+            animation: 'runUp' // Start with run-up only
           }
         }
       };
@@ -171,12 +176,20 @@ export const updateGameState = (currentState, action) => {
         ...currentState,
         gameState: GAME_STATES.BALL_IN_PLAY,
         ballState: BALL_STATES.BOWLING,
+        bowlingAnimation: null, // Clear bowling animation
+        bowlingSequenceActive: false, // Bowling sequence complete
+        pendingBallData: null, // Clear pending data
         currentBall: {
           ...action.ballData,
           isMoving: true
         },
         players: {
           ...currentState.players,
+          bowler: {
+            ...currentState.players.bowler,
+            state: PLAYER_STATES.IDLE,
+            animation: null // Let the bowler component manage its own animation sequence
+          },
           striker: {
             ...currentState.players.striker,
             state: PLAYER_STATES.BATTING
@@ -361,6 +374,7 @@ export const calculateBallTrajectory = (bowlingControls) => {
     line_axis_x, 
     line_axis_z,
     useDirectCoordinates,
+    side,
     release_x,
     release_y,
     release_z,
@@ -388,6 +402,15 @@ export const calculateBallTrajectory = (bowlingControls) => {
     finalX = final_x;
     finalY = final_y;
     finalZ = final_z;
+    
+    // 🏏 CRICKET BOWLING SIDES: Adjust release position based on side
+    // "L" = Over the wicket (left side from batsman's perspective) 
+    // "R" = Around the wicket (right side from batsman's perspective)
+    if (side === "L") {
+      releaseX = releaseX - 1.0; // Move 1 meter to the left (over the wicket)
+    } else if (side === "R") {
+      releaseX = releaseX + 1.0; // Move 1 meter to the right (around the wicket)
+    }
   } else {
     // Convert pitch analysis coordinates to 3D world coordinates
     // BOWLING: Always targets batsman position - independent of shot distance
@@ -398,6 +421,15 @@ export const calculateBallTrajectory = (bowlingControls) => {
     releaseX = (line_axis_x - 50) * CONVERSION_FACTOR; // Center around pitch middle
     releaseY = 2.0; // Standard bowling release height
     releaseZ = 11; // Bowler's end of the pitch
+    
+    // 🏏 CRICKET BOWLING SIDES: Adjust release position based on side
+    // "L" = Over the wicket (left side from batsman's perspective) 
+    // "R" = Around the wicket (right side from batsman's perspective)
+    if (side === "L") {
+      releaseX = releaseX - 1.0; // Move 1 meter to the left (over the wicket)
+    } else if (side === "R") {
+      releaseX = releaseX + 1.0; // Move 1 meter to the right (around the wicket)
+    }
     
     // Bounce position (where ball hits the pitch)
     bounceX = (length_axis_x - 50) * CONVERSION_FACTOR;

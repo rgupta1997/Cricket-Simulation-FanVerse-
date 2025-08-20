@@ -23,7 +23,7 @@ const ZoneMarkers = ({
 
   // Boundary distances for different angles (using actual playable boundary)
   const calculateBoundaryDistance = (angleDegrees) => {
-    const PLAYABLE_BOUNDARY_RADIUS = 25.5;
+    const PLAYABLE_BOUNDARY_RADIUS = 50.0;  // ✅ CORRECTED: Back to 50m boundary
     const STRIKER_POS = [0, 0, -9];
     
     const angleRad = (angleDegrees * Math.PI) / 180;

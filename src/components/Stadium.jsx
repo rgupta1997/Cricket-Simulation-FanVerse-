@@ -208,7 +208,7 @@ const Wicket = ({ position }) => (
 const StadiumSeating = () => {
   const seats = [];
   const crowd = [];
-  const baseRadius = 52; // Start just outside 50m green field
+  const baseRadius = 53; // ✅ CORRECTED: Start outside 50m playing boundary
   const sections = 16; // Reduced sections for better performance
   const rowCount = 12; // Reduced rows for better performance  
   const rowHeight = 0.5; // Tighter row spacing
@@ -360,7 +360,7 @@ const StadiumSeating = () => {
 };
 
 // Main Stadium component
-const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorActive = false, dummyGameData = null, isDummyDataActive = false }) => {
+const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorActive = false, dummyGameData = null, isDummyDataActive = false, onBallPositionUpdate }) => {
   const { field, pitch, boundaries } = STADIUM_CONFIG;
   const [useCustomModel, setUseCustomModel] = useState(false);
   const [showWagonWheel, setShowWagonWheel] = useState(false);
@@ -659,6 +659,7 @@ const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorAc
         isPositionEditorActive={isPositionEditorActive}
         dummyGameData={dummyGameData}
         isDummyDataActive={isDummyDataActive}
+        onBallPositionUpdate={onBallPositionUpdate}
       />
     </group>
   );

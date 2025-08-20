@@ -7,17 +7,19 @@ const BallShotControl = ({ onUpdateConfig, currentConfig, gameState, onResetBall
     distance: 15,                   // Default to 15 meters (reasonable shot distance)
     useDirectControl: false,
     autoPlay: false,
-    keeperAutoCollect: true,        // Whether keeper should auto-collect balls
+    keeperAutoCollect: true,        // ✅ DEFAULT TRUE - Auto-collect for normal cricket workflow
     keeperCollectionRadius: 2.0,    // Distance within which keeper collects (meters)
     keeperSpeedThreshold: 3.0,      // Maximum speed for keeper to collect (m/s)
-    resetDelay: 3.0,                // Delay in seconds before resetting ball after shot completes
+    autoCollectStoppedBall: false,  // ✅ NEW - Don't auto-collect when ball stops
+    autoResetAfterTarget: false,    // ✅ NEW - Don't auto-reset after reaching target
+    resetDelay: 2.0,                // ✅ Delay in seconds for keeper → bowler return
     ...currentConfig
   });
 
   const handleUpdate = (field, value) => {
     const newConfig = { 
       ...shotConfig, 
-      [field]: ['lofted', 'useDirectControl', 'autoPlay', 'keeperAutoCollect'].includes(field)
+      [field]: ['lofted', 'useDirectControl', 'autoPlay', 'keeperAutoCollect', 'autoCollectStoppedBall', 'autoResetAfterTarget'].includes(field)
         ? value 
         : parseFloat(value) 
     };
@@ -44,7 +46,7 @@ const BallShotControl = ({ onUpdateConfig, currentConfig, gameState, onResetBall
     
     // Calculate boundary for reference
     const calculateBoundaryDistance = (angleDegrees) => {
-      const PLAYABLE_BOUNDARY_RADIUS = 25.5;
+      const PLAYABLE_BOUNDARY_RADIUS = 50.0;  // ✅ CORRECTED: Back to 50m boundary
       const STRIKER_POS = [0, 0, -9];
       
       const angleRad = (angleDegrees * Math.PI) / 180;
@@ -261,7 +263,7 @@ const BallShotControl = ({ onUpdateConfig, currentConfig, gameState, onResetBall
           <input
             type="number"
             min="0.1"
-            max="40"
+            max="60" // ✅ CORRECTED: Max distance for 50m boundary stadium
             step="0.1"
             value={shotConfig.distance}
             onChange={(e) => handleUpdate('distance', e.target.value)}
@@ -276,7 +278,7 @@ const BallShotControl = ({ onUpdateConfig, currentConfig, gameState, onResetBall
             }}
           />
           <div style={{ fontSize: '9px', color: '#aaa', marginTop: '2px' }}>
-            0.1-40m: FINAL stopping distance after physics (bounce/roll). Ball lands closer, then rolls to target.
+            0.1-100m: FINAL stopping distance after physics (bounce/roll). Ball lands closer, then rolls to target.
           </div>
         </div>
       </div>
@@ -445,6 +447,100 @@ const BallShotControl = ({ onUpdateConfig, currentConfig, gameState, onResetBall
       </div>
 
       {/* Status Display */}
+      {/* Ball Collection & Reset Settings */}
+      <div style={{ 
+        padding: '8px', 
+        background: 'rgba(100, 200, 100, 0.1)', 
+        borderRadius: '4px',
+        border: '1px solid #66CC66'
+      }}>
+        <div style={{ fontWeight: 'bold', color: '#66CC66', marginBottom: '8px', fontSize: '11px' }}>
+          ⚙️ Ball Collection & Reset Settings
+        </div>
+        
+        {/* Keeper Auto Collect */}
+        <div style={{ marginBottom: '8px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={shotConfig.keeperAutoCollect}
+              onChange={(e) => handleUpdate('keeperAutoCollect', e.target.checked)}
+              style={{ transform: 'scale(1.1)' }}
+            />
+            <span style={{ fontSize: '10px', color: shotConfig.keeperAutoCollect ? '#66CC66' : '#aaa' }}>
+              🧤 Keeper Auto-Collect Ball
+            </span>
+          </label>
+          <div style={{ fontSize: '8px', color: '#aaa', marginLeft: '20px', marginTop: '2px' }}>
+            Wicketkeeper automatically collects ball when near and slow → Returns to bowler
+          </div>
+          <div style={{ fontSize: '8px', color: '#66CC66', marginLeft: '20px', marginTop: '2px' }}>
+            ✅ Manual collection: Ball within 2m of keeper + speed {'<'} 5 m/s
+          </div>
+        </div>
+
+        {/* Auto Collect Stopped Ball */}
+        <div style={{ marginBottom: '8px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={shotConfig.autoCollectStoppedBall}
+              onChange={(e) => handleUpdate('autoCollectStoppedBall', e.target.checked)}
+              style={{ transform: 'scale(1.1)' }}
+            />
+            <span style={{ fontSize: '10px', color: shotConfig.autoCollectStoppedBall ? '#66CC66' : '#aaa' }}>
+              ⏹️ Auto-Collect Stopped Ball
+            </span>
+          </label>
+          <div style={{ fontSize: '8px', color: '#aaa', marginLeft: '20px', marginTop: '2px' }}>
+            Automatically collect ball when it stops moving (velocity {'<'} 0.1 m/s)
+          </div>
+        </div>
+
+        {/* Auto Reset After Target */}
+        <div style={{ marginBottom: '8px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={shotConfig.autoResetAfterTarget}
+              onChange={(e) => handleUpdate('autoResetAfterTarget', e.target.checked)}
+              style={{ transform: 'scale(1.1)' }}
+            />
+            <span style={{ fontSize: '10px', color: shotConfig.autoResetAfterTarget ? '#66CC66' : '#aaa' }}>
+              🔄 Auto-Reset After Target
+            </span>
+          </label>
+          <div style={{ fontSize: '8px', color: '#aaa', marginLeft: '20px', marginTop: '2px' }}>
+            Automatically reset ball to keeper after reaching target coordinates
+          </div>
+        </div>
+
+        {/* Reset Delay */}
+        <div>
+          <label style={{ display: 'block', marginBottom: '4px', fontSize: '10px', fontWeight: 'bold', color: '#66CC66' }}>
+            ⏰ Keeper → Bowler Delay: {shotConfig.resetDelay}s
+          </label>
+          <input
+            type="range"
+            min="0.5"
+            max="5"
+            step="0.5"
+            value={shotConfig.resetDelay}
+            onChange={(e) => handleUpdate('resetDelay', e.target.value)}
+            style={{
+              width: '100%',
+              height: '4px',
+              background: '#333',
+              borderRadius: '2px',
+              outline: 'none'
+            }}
+          />
+          <div style={{ fontSize: '8px', color: '#aaa', marginTop: '2px' }}>
+            Delay between keeper collection and ball returning to bowler
+          </div>
+        </div>
+      </div>
+
       {gameState && (
         <div style={{ 
           padding: '6px', 
