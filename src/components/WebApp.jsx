@@ -12,6 +12,7 @@ import WagonWheelTab from './tabs/WagonWheelTab.jsx';
 import PointsTableTab from './tabs/PointsTableTab.jsx';
 import MatchChat from './MatchChat.jsx';
 import LoginModal from './LoginModal.jsx';
+import PredictionSection from './PredictionSection.jsx';
 
 // Import responsive styles
 import '../styles/responsive.css';
@@ -806,7 +807,7 @@ const FixturesPage = ({ onMatchClick }) => {
 };
 
 // Match Detail Page Component  
-const MatchDetailPage = ({ matchId, onBackClick, onChatClick }) => {
+const MatchDetailPage = ({ matchId, onBackClick, onChatClick, currentUser, onLoginClick, latestBallEvent }) => {
   const [activeTab, setActiveTab] = useState('commentary');
   const [match, setMatch] = useState(null);
   const [matchDetail, setMatchDetail] = useState(null);
@@ -815,6 +816,7 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick }) => {
   const [liveData, setLiveData] = useState(null);
   const [commentary, setCommentary] = useState(null);
   const [isLoadingData, setIsLoadingData] = useState(false);
+  const [isPredictionOpen, setIsPredictionOpen] = useState(false);
   
   useEffect(() => {
     fetchMatchData();
@@ -825,6 +827,7 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick }) => {
   const fetchMatchData = async () => {
     try {
       setIsLoadingData(true);
+      setError(null); // Clear any previous errors
       console.log('🔍 Looking for match with ID:', matchId, typeof matchId);
       
       // First get the match from fixtures with a wider date range
@@ -956,14 +959,55 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick }) => {
 
 
 
-  if (error || !match) {
+  // Show loading state while fetching data
+  if (isLoadingData) {
+    return (
+      <div className="cricket-app match-detail-page" style={{ padding: '20px', textAlign: 'center' }}>
+        <div style={{ 
+          width: '60px', 
+          height: '60px', 
+          border: '4px solid #f3f3f3',
+          borderTop: '4px solid #3b82f6',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+          margin: '0 auto 20px auto'
+        }}></div>
+        <div style={{ color: '#3b82f6', fontSize: '18px', fontWeight: '500' }}>
+          Loading match details...
+        </div>
+      </div>
+    );
+  }
+
+  // Show error only after loading is complete and there's an actual error
+  if (error && !isLoadingData) {
     return (
       <div className="cricket-app match-detail-page" style={{ padding: '20px', textAlign: 'center' }}>
         <div style={{ color: '#ef4444', marginBottom: '20px' }}>
           <h2>Error</h2>
-          <p>{error || 'Match not found'}</p>
+          <p>{error}</p>
         </div>
         <button onClick={onBackClick} className="back-button">Go Back</button>
+      </div>
+    );
+  }
+
+  // Show loading if no match data yet
+  if (!match && !isLoadingData) {
+    return (
+      <div className="cricket-app match-detail-page" style={{ padding: '20px', textAlign: 'center' }}>
+        <div style={{ 
+          width: '60px', 
+          height: '60px', 
+          border: '4px solid #f3f3f3',
+          borderTop: '4px solid #3b82f6',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+          margin: '0 auto 20px auto'
+        }}></div>
+        <div style={{ color: '#3b82f6', fontSize: '18px', fontWeight: '500' }}>
+          Initializing match...
+        </div>
       </div>
     );
   }
@@ -1062,7 +1106,7 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick }) => {
               animation: 'spin 1s linear infinite'
             }}></div>
             <span style={{ color: '#0c4a6e', fontSize: '14px' }}>
-              Loading match data in background...
+              Fetching match details...
             </span>
           </div>
         )}
@@ -1146,6 +1190,40 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick }) => {
         </div>
       </div>
 
+      {/* Prediction Section Toggle */}
+      <div style={{ padding: '0 20px', marginBottom: '20px' }}>
+        <button
+          onClick={() => setIsPredictionOpen(!isPredictionOpen)}
+          style={{
+            backgroundColor: '#3b82f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '10px 20px',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+        >
+          <span>🎯</span>
+          {isPredictionOpen ? 'Hide Predictions' : 'Show Predictions'}
+        </button>
+      </div>
+
+      {/* Prediction Section */}
+      <div style={{ padding: '0 20px' }}>
+        <PredictionSection
+          currentUser={currentUser}
+          onLoginClick={onLoginClick}
+          latestBallEvent={latestBallEvent}
+          isOpen={isPredictionOpen}
+          onToggle={() => setIsPredictionOpen(!isPredictionOpen)}
+        />
+      </div>
+
       {/* Tab Navigation */}
       <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
@@ -1212,13 +1290,15 @@ const WebApp = () => {
   const [chatMatchName, setChatMatchName] = useState('');
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [latestBallEvent, setLatestBallEvent] = useState(null);
+  const [socket, setSocket] = useState(null);
 
   const handleMatchClick = (matchId) => {
     try {
       console.log('🚀 WebApp handleMatchClick - Received ID:', matchId, 'Type:', typeof matchId);
       setSelectedMatchId(matchId);
       setCurrentView('matchDetail');
-      setError(null);
+      setError(null); // Clear any previous errors
     } catch (err) {
       setError(err.message);
     }
@@ -1268,8 +1348,113 @@ const WebApp = () => {
     setChatMatchName('');
   };
 
-  // Error boundary
-  if (error) {
+  // Socket.IO connection for live ball events
+  useEffect(() => {
+    if (selectedMatchId) {
+      // Connect to Socket.IO for live commentary
+      const connectToSocketIO = async () => {
+        try {
+          // Import Socket.IO client dynamically
+          const { io } = await import('socket.io-client');
+          
+          // Using the same Socket.IO connection as test-user-types.html
+          const socket = io('http://localhost:3001');
+          
+          socket.on('connect', () => {
+            console.log('🔌 Socket.IO connected for predictions - listening for ball events');
+            console.log('🎯 Listening for events: commentary_data_update, ball_event, match_update');
+            
+            // Connect as commentary user with hardcoded match ID (same as test-user-types.html)
+           
+          });
+
+          socket.emit('join_match', {
+            userType: 'commentaryuser',
+            matchId: 'stbovl08182025256492', // Hardcoded match ID
+            username: 'CommentaryUser' // Hardcoded username
+          });
+          
+          // Listen for commentary updates (main event for ball data)
+          socket.on('commentary_data_update', (data) => {
+            console.log('📊 Received commentary update:', data);
+            if (data.latestBallEvent) {
+              console.log('🎯 Setting latest ball event:', data.latestBallEvent);
+              setLatestBallEvent(data.latestBallEvent);
+            }
+          });
+          
+          // Listen for other potential ball event types
+          /* socket.on('ball_event', (data) => {
+            console.log('🏏 Received ball event:', data);
+            if (data) {
+              setLatestBallEvent(data);
+            }
+          });
+          
+          socket.on('match_update', (data) => {
+            console.log('📈 Received match update:', data);
+            if (data.latestBallEvent) {
+              setLatestBallEvent(data.latestBallEvent);
+            }
+          });
+          
+          // Additional event listeners from test-user-types.html
+          socket.on('ball_event_update', (data) => {
+            console.log('🏏 Received ball_event_update:', data);
+            if (data) {
+              setLatestBallEvent(data);
+            }
+          });
+          
+          socket.on('match_ball_update', (data) => {
+            console.log('🎯 Received match_ball_update:', data);
+            if (data) {
+              setLatestBallEvent(data);
+            }
+          });
+          
+          socket.on('match_data_update', (data) => {
+            console.log('📊 Received match_data_update:', data);
+            if (data.latestBallEvent) {
+              setLatestBallEvent(data.latestBallEvent);
+            }
+          }); */
+          
+          socket.on('disconnect', () => {
+            console.log('Socket.IO connection disconnected');
+          });
+          
+          socket.on('connect_error', (error) => {
+            console.error('Socket.IO connection error:', error);
+          });
+          
+          // Listen for successful match join confirmation
+          socket.on('joined_match', (data) => {
+            console.log('✅ Successfully joined match:', data);
+          });
+          
+          // Debug: Log connection success
+          console.log('🔌 Socket.IO connection established successfully');
+          
+          setSocket(socket);
+        } catch (error) {
+          console.error('Failed to connect to Socket.IO:', error);
+        }
+      };
+      
+      connectToSocketIO();
+      
+      // Cleanup on unmount
+      return () => {
+        if (socket) {
+          socket.disconnect();
+        }
+      };
+    }
+  }, [selectedMatchId]);
+
+  // Error boundary - only show for critical errors, not MatchDetailPage errors
+  if (error && currentView === 'fixtures') {
     return (
       <div className="cricket-app" style={{ padding: '20px', textAlign: 'center' }}>
         <div style={{ color: '#ef4444', marginBottom: '20px' }}>
@@ -1301,12 +1486,46 @@ const WebApp = () => {
         <FixturesPage onMatchClick={handleMatchClick} />
       )}
       {currentView === 'matchDetail' && selectedMatchId && (
-        <React.Suspense fallback={<div>Loading match details...</div>}>
-          <ErrorBoundary onError={(error) => setError(error.message)}>
+        <React.Suspense fallback={
+          <div style={{ 
+            padding: '40px', 
+            textAlign: 'center',
+            backgroundColor: '#f8fafc',
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <div style={{ 
+              width: '60px', 
+              height: '60px', 
+              border: '4px solid #f3f3f3',
+              borderTop: '4px solid #3b82f6',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              marginBottom: '20px'
+            }}></div>
+            <div style={{ color: '#3b82f6', fontSize: '18px', fontWeight: '500' }}>
+              Loading match details...
+            </div>
+          </div>
+        }>
+          <ErrorBoundary onError={(error) => {
+            // Only set critical errors, let MatchDetailPage handle its own errors
+            if (error.message.includes('Match not found') || error.message.includes('Error fetching match data')) {
+              console.warn('MatchDetailPage error handled internally:', error.message);
+              return;
+            }
+            setError(error.message);
+          }}>
             <MatchDetailPage 
               matchId={selectedMatchId} 
               onBackClick={handleBackClick} 
               onChatClick={openMatchChat}
+              currentUser={currentUser}
+              onLoginClick={() => setIsLoginOpen(true)}
+              latestBallEvent={latestBallEvent}
             />
           </ErrorBoundary>
         </React.Suspense>
@@ -1331,23 +1550,27 @@ const WebApp = () => {
         />
       )}
       
-      <style>{`
-        @keyframes pulse {
-          0% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.5;
-          }
-          100% {
-            opacity: 1;
-          }
-        }
-        
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
+             <style>{`
+         @keyframes pulse {
+           0% {
+             opacity: 1;
+           }
+           50% {
+             opacity: 0.5;
+           }
+           100% {
+             opacity: 1;
+           }
+         }
+         
+         @keyframes spin {
+           0% { transform: rotate(0deg); }
+           100% { transform: rotate(360deg); }
+         }
+         
+         .cricket-app .match-detail-page .loading-spinner {
+           animation: spin 1s linear infinite;
+         }
         
         .match-info-upcoming {
           padding: 20px;

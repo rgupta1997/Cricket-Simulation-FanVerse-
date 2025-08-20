@@ -1,0 +1,2067 @@
+{
+  "matchId": "stbovl08182025256492",
+  "lastUpdated": "2025-08-20T05:14:08.284Z",
+  "apiUrl": "https://demo.sportz.io/sifeeds/repo/cricket/live/json/stbovl08182025256492.json",
+  "data": {
+    "Timestamp": "08/19/2025T02:02:51.886+05:30",
+    "Matchdetail": {
+      "Awards": [
+        {
+          "Player_Id": "65584",
+          "Player_Name": "Sam Curran",
+          "Team_Id": "2041",
+          "Team_Name": "Oval Invincibles",
+          "Award_Type": 1,
+          "Inning_Detail": [
+            {
+              "Inn_no": "First",
+              "Wickets": "3",
+              "Balls_Bowled": "18",
+              "Overs_Bowled": "3.3",
+              "Runs_Conceded": "21"
+            },
+            {
+              "Inn_no": "Second",
+              "Runs": "50",
+              "Balls": "32",
+              "Fours": "4",
+              "Sixes": "2"
+            }
+          ],
+          "Runs": "50",
+          "Balls": "32",
+          "Fours": "4",
+          "Sixes": "2",
+          "Wickets": "3",
+          "Balls_Bowled": "18",
+          "Overs_Bowled": "3.3",
+          "Runs_Conceded": "21"
+        }
+      ],
+      "Team_Home": "2042",
+      "Team_Away": "2041",
+      "Match": {
+        "Livecoverage": "yes",
+        "Id": "256492",
+        "Code": "stbovl08182025256492",
+        "League": "english_domestic",
+        "League_Id": "7",
+        "Number": "Match 19",
+        "Type": "100 ball",
+        "Date": "8/18/2025",
+        "Time": "18:30",
+        "Revised_time_utc": "",
+        "Offset": "+01:00",
+        "Group": "",
+        "Coverage_level_id": "8",
+        "Coverage_level": "Live Scorecard, Ball-by-Ball and Commentary",
+        "Match_ordinal": "19",
+        "Daynight": "yes",
+        "Comp_type_id": "78",
+        "End_date": "8/18/2025",
+        "End_time": "21:12",
+        "Upcoming": false,
+        "Live": false,
+        "Recent": true,
+        "StartDate": "8/18/2025T17:30+00:00",
+        "is_provisional_date": false,
+        "is_provisional_time": false,
+        "match_in_progress": true,
+        "is_rescheduled": false,
+        "first_ball_bowled": true
+      },
+      "Series": {
+        "Id": "9924",
+        "Name": "The Hundred, 2025",
+        "Series_short_display_name": "The Hundred, 2025",
+        "Series_start_date": "8/5/2025",
+        "Series_end_date": "8/31/2025",
+        "Series_end_date_ist": null,
+        "Series_end_date_gmt": null,
+        "Series_start_date_ist": null,
+        "Series_start_date_gmt": null,
+        "Series_type": "Tournament",
+        "Status": "",
+        "Tour": "8650",
+        "Tour_Name": "The Hundred, 2025",
+        "Has_standings": "true",
+        "Calendar_file_name": "calendar_new_domestic_english",
+        "Streaming_platform": [],
+        "Broadcasting_platform": [],
+        "is_provisional_date": false,
+        "Series_match_count": 0,
+        "Series_completed": false
+      },
+      "Venue": {
+        "Id": "159",
+        "Name": "Utilita Bowl, Southampton",
+        "Country": "England",
+        "City": "Southampton",
+        "Latitude": "50.924334",
+        "Longitude": "-1.322286",
+        "Venue_Weather": {
+          "Weather_Id": "16",
+          "Weather": "Clouds",
+          "Description": "overcast clouds",
+          "Humidity": "69%",
+          "Temperature": "19.45C",
+          "Visibility": "10000 meter",
+          "Wind_Speed": "3.29 meter/sec",
+          "Rain": ""
+        },
+        "Pitch_Detail": {
+          "Pitch_Suited_For_Id": "1",
+          "Pitch_Suited_For": "Batting friendly",
+          "Pitch_Surface_Id": "3",
+          "Pitch_Surface": "Dry"
+        },
+        "Neutralvenue": ""
+      },
+      "Officials": {
+        "Umpires": "Mark Newell (ENG), Benjamin Debenham (ENG) and Neil Bainton (ENG)",
+        "Referee": "Sarah Bartlett (ENG)",
+        "Referee_Id": "87210",
+        "Umpire1_Name": "Mark Newell (ENG)",
+        "Umpire2_Name": "Benjamin Debenham (ENG)",
+        "Umpire3_Name": "Neil Bainton (ENG)",
+        "Umpire1_Id": "34611",
+        "Umpire2_Id": "57331",
+        "Umpire3_Id": "32983"
+      },
+      "Weather": "Clear",
+      "Tosswonby": "2041",
+      "Toss_elected_to": "field",
+      "Status": "Match Ended",
+      "Status_Id": "114",
+      "Match_display_status": "Result",
+      "Player_Match": "Sam Curran",
+      "Player_Match_Id": "65584",
+      "Player_Match_TeamId": "2041",
+      "Result": "Oval Invincibles beat Southern Brave by 7 wickets",
+      "Winningteam": "2041",
+      "Winmargin": "7 wickets",
+      "Equation": "Oval Invincibles beat Southern Brave by 7 wickets",
+      "Raw_matchresult": "w",
+      "Raw_margin_value": "7",
+      "Raw_result_extras": "",
+      "Required_Runrate": "",
+      "Required_Rpb": "",
+      "Verification_Completed": true,
+      "Lineup_status": 2,
+      "Verification_Completed_Until": {
+        "Inning_no": "2",
+        "Overs": "18"
+      }
+    },
+    "Nuggets": [],
+    "Innings": [
+      {
+        "Number": "First",
+        "Battingteam": "2042",
+        "Bowlingteam": "2041",
+        "Total": "133",
+        "Wickets": "10",
+        "Overs": "19.3",
+        "Total_Balls_Bowled": "98",
+        "AllotedBalls": "100",
+        "Runrate": "6.79",
+        "Runsperball": "1.35",
+        "Byes": "0",
+        "Legbyes": "2",
+        "Wides": "7",
+        "Noballs": "0",
+        "Penalty": "0",
+        "AllottedOvers": "20.0",
+        "Batsmen": [
+          {
+            "Batsman": "64757",
+            "Runs": "13",
+            "Balls": "7",
+            "Fours": "1",
+            "Sixes": "1",
+            "Dots": "2",
+            "Strikerate": "185.71",
+            "Dismissal": "caught",
+            "Howout": "c Tom Curran b Jason Behrendorff",
+            "Howout_short": "c T Curran b J Behrendorff",
+            "Bowler": "57041",
+            "Fielder": "64149",
+            "RunScoredInLastBalls": {},
+            "Number": 1,
+            "DismissalType": "caught",
+            "DismissalId": "ct"
+          },
+          {
+            "Batsman": "10131",
+            "Runs": "7",
+            "Balls": "7",
+            "Fours": "1",
+            "Sixes": "0",
+            "Dots": "4",
+            "Strikerate": "100",
+            "Dismissal": "caught",
+            "Howout": "c Tom Curran b Jason Behrendorff",
+            "Howout_short": "c T Curran b J Behrendorff",
+            "Bowler": "57041",
+            "Fielder": "64149",
+            "RunScoredInLastBalls": {},
+            "Number": 2,
+            "DismissalType": "caught",
+            "DismissalId": "ct"
+          },
+          {
+            "Batsman": "33031",
+            "Runs": "5",
+            "Balls": "11",
+            "Fours": "0",
+            "Sixes": "0",
+            "Dots": "7",
+            "Strikerate": "45.45",
+            "Dismissal": "caught",
+            "Howout": "c Sam Billings b Rashid Khan",
+            "Howout_short": "c S Billings b R Khan",
+            "Bowler": "65748",
+            "Fielder": "58285",
+            "RunScoredInLastBalls": {
+              "10": "5"
+            },
+            "Number": 3,
+            "DismissalType": "caught wicket keeper",
+            "DismissalId": "cwk"
+          },
+          {
+            "Batsman": "4841",
+            "Runs": "8",
+            "Balls": "7",
+            "Fours": "2",
+            "Sixes": "0",
+            "Dots": "5",
+            "Strikerate": "114.28",
+            "Dismissal": "bowled",
+            "Howout": "b Tom Curran",
+            "Howout_short": "b T Curran",
+            "Bowler": "64149",
+            "Fielder": "",
+            "RunScoredInLastBalls": {},
+            "Number": 4,
+            "DismissalType": "bowled",
+            "DismissalId": "b"
+          },
+          {
+            "Batsman": "85735",
+            "Runs": "7",
+            "Balls": "6",
+            "Fours": "0",
+            "Sixes": "0",
+            "Dots": "1",
+            "Strikerate": "116.66",
+            "Dismissal": "lbw",
+            "Howout": "lbw b Rashid Khan",
+            "Howout_short": "lbw b R Khan",
+            "Bowler": "65748",
+            "Fielder": "",
+            "RunScoredInLastBalls": {},
+            "Number": 5,
+            "DismissalType": "lbw",
+            "DismissalId": "lbw"
+          },
+          {
+            "Batsman": "62325",
+            "Runs": "0",
+            "Balls": "1",
+            "Fours": "0",
+            "Sixes": "0",
+            "Dots": "1",
+            "Strikerate": "0",
+            "Dismissal": "bowled",
+            "Howout": "b Rashid Khan",
+            "Howout_short": "b R Khan",
+            "Bowler": "65748",
+            "Fielder": "",
+            "RunScoredInLastBalls": {},
+            "Number": 6,
+            "DismissalType": "bowled",
+            "DismissalId": "b"
+          },
+          {
+            "Batsman": "63348",
+            "Runs": "42",
+            "Balls": "30",
+            "Fours": "4",
+            "Sixes": "1",
+            "Dots": "9",
+            "Strikerate": "140",
+            "Dismissal": "bowled",
+            "Howout": "b Sam Curran",
+            "Howout_short": "b S Curran",
+            "Bowler": "65584",
+            "Fielder": "",
+            "RunScoredInLastBalls": {
+              "10": "11",
+              "20": "31",
+              "30": "42"
+            },
+            "Number": 7,
+            "DismissalType": "bowled",
+            "DismissalId": "b"
+          },
+          {
+            "Batsman": "66321",
+            "Runs": "24",
+            "Balls": "13",
+            "Fours": "3",
+            "Sixes": "1",
+            "Dots": "4",
+            "Strikerate": "184.61",
+            "Dismissal": "caught",
+            "Howout": "c Sam Billings b Sam Curran",
+            "Howout_short": "c S Billings b S Curran",
+            "Bowler": "65584",
+            "Fielder": "58285",
+            "RunScoredInLastBalls": {
+              "10": "19"
+            },
+            "Number": 8,
+            "DismissalType": "caught wicket keeper",
+            "DismissalId": "cwk"
+          },
+          {
+            "Batsman": "57368",
+            "Runs": "9",
+            "Balls": "11",
+            "Fours": "0",
+            "Sixes": "0",
+            "Dots": "3",
+            "Strikerate": "81.81",
+            "Dismissal": "not out",
+            "Howout": "not out",
+            "Howout_short": "not out",
+            "Bowler": "",
+            "Fielder": "",
+            "RunScoredInLastBalls": {
+              "10": "9"
+            },
+            "Number": 9,
+            "DismissalType": "not out",
+            "DismissalId": "no"
+          },
+          {
+            "Batsman": "64254",
+            "Runs": "5",
+            "Balls": "3",
+            "Fours": "1",
+            "Sixes": "0",
+            "Dots": "1",
+            "Strikerate": "166.66",
+            "Dismissal": "caught",
+            "Howout": "c Donovan Ferreira b Sam Curran",
+            "Howout_short": "c D Ferreira b S Curran",
+            "Bowler": "65584",
+            "Fielder": "23487",
+            "RunScoredInLastBalls": {},
+            "Number": 10,
+            "DismissalType": "caught",
+            "DismissalId": "ct"
+          },
+          {
+            "Batsman": "58351",
+            "Runs": "4",
+            "Balls": "2",
+            "Fours": "1",
+            "Sixes": "0",
+            "Dots": "1",
+            "Strikerate": "200",
+            "Dismissal": "run out",
+            "Howout": "run out (Sam Billings / Sam Curran)",
+            "Howout_short": "run out (S Billings / S Curran)",
+            "Bowler": "65584",
+            "Fielder": "58285",
+            "Fielder1": "58285",
+            "Fielder2": "65584",
+            "RunScoredInLastBalls": {},
+            "Number": 11,
+            "DismissalType": "run out",
+            "DismissalId": "ro"
+          }
+        ],
+        "Partnership_Current": {
+          "Runs": "4",
+          "Balls": "2",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "58351",
+              "Runs": "4",
+              "Balls": "2"
+            },
+            {
+              "Batsman": "57368",
+              "Runs": "0",
+              "Balls": "0"
+            }
+          ],
+          "ForWicket": 10,
+          "Runrate": "10",
+          "Runsperball": "2"
+        },
+        "Bowlers": [
+          {
+            "Bowler": "57041",
+            "Overs": "4",
+            "Balls_Bowled": "20",
+            "Maidens": "0",
+            "Runs": "20",
+            "Wickets": "2",
+            "Fours": "2",
+            "Sixes": "0",
+            "Economyrate": "5.00",
+            "Runsperball": "1.00",
+            "Noballs": "0",
+            "Wides": "0",
+            "Dots": "9",
+            "RungivenInLastBalls": {
+              "10": "11",
+              "20": "20"
+            },
+            "Number": 1,
+            "Hattrick_Count": 0,
+            "Avg_Speed": 127.2
+          },
+          {
+            "Bowler": "58475",
+            "Overs": "2",
+            "Balls_Bowled": "10",
+            "Maidens": "0",
+            "Runs": "13",
+            "Wickets": "0",
+            "Fours": "1",
+            "Sixes": "1",
+            "Economyrate": "6.50",
+            "Runsperball": "1.30",
+            "Noballs": "0",
+            "Wides": "0",
+            "Dots": "5",
+            "RungivenInLastBalls": {
+              "10": "13"
+            },
+            "Number": 2,
+            "Hattrick_Count": 0,
+            "Avg_Speed": 133.49
+          },
+          {
+            "Bowler": "64149",
+            "Overs": "4",
+            "Balls_Bowled": "20",
+            "Maidens": "0",
+            "Runs": "37",
+            "Wickets": "1",
+            "Fours": "4",
+            "Sixes": "1",
+            "Economyrate": "9.25",
+            "Runsperball": "1.85",
+            "Noballs": "0",
+            "Wides": "2",
+            "Dots": "4",
+            "RungivenInLastBalls": {
+              "10": "18",
+              "20": "37"
+            },
+            "Number": 3,
+            "Hattrick_Count": 0,
+            "Avg_Speed": 120.41
+          },
+          {
+            "Bowler": "65748",
+            "Overs": "4",
+            "Balls_Bowled": "20",
+            "Maidens": "0",
+            "Runs": "20",
+            "Wickets": "3",
+            "Fours": "2",
+            "Sixes": "0",
+            "Economyrate": "5.00",
+            "Runsperball": "1.00",
+            "Noballs": "0",
+            "Wides": "2",
+            "Dots": "10",
+            "RungivenInLastBalls": {
+              "10": "10",
+              "20": "20"
+            },
+            "Number": 4,
+            "Hattrick_Count": 0,
+            "Avg_Speed": 89.62
+          },
+          {
+            "Bowler": "65565",
+            "Overs": "2",
+            "Balls_Bowled": "10",
+            "Maidens": "0",
+            "Runs": "20",
+            "Wickets": "0",
+            "Fours": "2",
+            "Sixes": "1",
+            "Economyrate": "10.00",
+            "Runsperball": "2.00",
+            "Noballs": "0",
+            "Wides": "2",
+            "Dots": "3",
+            "RungivenInLastBalls": {
+              "10": "20"
+            },
+            "Number": 5,
+            "Hattrick_Count": 0,
+            "Avg_Speed": 86.6
+          },
+          {
+            "Bowler": "65584",
+            "Overs": "3.3",
+            "Balls_Bowled": "18",
+            "Maidens": "0",
+            "Runs": "21",
+            "Wickets": "3",
+            "Fours": "2",
+            "Sixes": "0",
+            "Economyrate": "5.83",
+            "Runsperball": "1.16",
+            "Noballs": "0",
+            "Wides": "1",
+            "Dots": "7",
+            "RungivenInLastBalls": {
+              "10": "10"
+            },
+            "Number": 6,
+            "Hattrick_Count": 0,
+            "Avg_Speed": 105.87
+          }
+        ],
+        "FallofWickets": [
+          {
+            "Batsman": "10131",
+            "Score": "11",
+            "Overs": "2",
+            "Wicket_No": 1,
+            "Review_status_id": 0,
+            "Ball_number": "10"
+          },
+          {
+            "Batsman": "64757",
+            "Score": "23",
+            "Overs": "3.1",
+            "Wicket_No": 2,
+            "Review_status_id": 0,
+            "Ball_number": "16"
+          },
+          {
+            "Batsman": "4841",
+            "Score": "32",
+            "Overs": "5",
+            "Wicket_No": 3,
+            "Review_status_id": 0,
+            "Ball_number": "25"
+          },
+          {
+            "Batsman": "33031",
+            "Score": "42",
+            "Overs": "7.2",
+            "Wicket_No": 4,
+            "Review_status_id": 0,
+            "Ball_number": "37"
+          },
+          {
+            "Batsman": "62325",
+            "Score": "42",
+            "Overs": "7.3",
+            "Wicket_No": 5,
+            "Review_status_id": 0,
+            "Ball_number": "38"
+          },
+          {
+            "Batsman": "85735",
+            "Score": "44",
+            "Overs": "8",
+            "Wicket_No": 6,
+            "Review_status_id": 3,
+            "Ball_number": "40"
+          },
+          {
+            "Batsman": "66321",
+            "Score": "81",
+            "Overs": "12.3",
+            "Wicket_No": 7,
+            "Review_status_id": 0,
+            "Ball_number": "63"
+          },
+          {
+            "Batsman": "63348",
+            "Score": "120",
+            "Overs": "18",
+            "Wicket_No": 8,
+            "Review_status_id": 0,
+            "Ball_number": "90"
+          },
+          {
+            "Batsman": "64254",
+            "Score": "129",
+            "Overs": "19.1",
+            "Wicket_No": 9,
+            "Review_status_id": 0,
+            "Ball_number": "96"
+          },
+          {
+            "Batsman": "58351",
+            "Score": "133",
+            "Overs": "19.3",
+            "Wicket_No": 10,
+            "Review_status_id": 0,
+            "Ball_number": "98"
+          }
+        ],
+        "Partnerships": [
+          {
+            "Runs": "11",
+            "Balls": "10",
+            "ExtraRuns": "2",
+            "Batsmen": [
+              {
+                "Batsman": "10131",
+                "Runs": "7",
+                "Balls": "7"
+              },
+              {
+                "Batsman": "64757",
+                "Runs": "2",
+                "Balls": "3"
+              }
+            ],
+            "ForWicket": 1
+          },
+          {
+            "Runs": "12",
+            "Balls": "6",
+            "ExtraRuns": "0",
+            "Batsmen": [
+              {
+                "Batsman": "33031",
+                "Runs": "1",
+                "Balls": "2"
+              },
+              {
+                "Batsman": "64757",
+                "Runs": "11",
+                "Balls": "4"
+              }
+            ],
+            "ForWicket": 2
+          },
+          {
+            "Runs": "9",
+            "Balls": "9",
+            "ExtraRuns": "0",
+            "Batsmen": [
+              {
+                "Batsman": "33031",
+                "Runs": "1",
+                "Balls": "2"
+              },
+              {
+                "Batsman": "4841",
+                "Runs": "8",
+                "Balls": "7"
+              }
+            ],
+            "ForWicket": 3
+          },
+          {
+            "Runs": "10",
+            "Balls": "12",
+            "ExtraRuns": "0",
+            "Batsmen": [
+              {
+                "Batsman": "33031",
+                "Runs": "3",
+                "Balls": "7"
+              },
+              {
+                "Batsman": "85735",
+                "Runs": "7",
+                "Balls": "5"
+              }
+            ],
+            "ForWicket": 4
+          },
+          {
+            "Runs": "0",
+            "Balls": "1",
+            "ExtraRuns": "0",
+            "Batsmen": [
+              {
+                "Batsman": "62325",
+                "Runs": "0",
+                "Balls": "1"
+              },
+              {
+                "Batsman": "85735",
+                "Runs": "0",
+                "Balls": "0"
+              }
+            ],
+            "ForWicket": 5
+          },
+          {
+            "Runs": "2",
+            "Balls": "2",
+            "ExtraRuns": "1",
+            "Batsmen": [
+              {
+                "Batsman": "63348",
+                "Runs": "1",
+                "Balls": "1"
+              },
+              {
+                "Batsman": "85735",
+                "Runs": "0",
+                "Balls": "1"
+              }
+            ],
+            "ForWicket": 6
+          },
+          {
+            "Runs": "37",
+            "Balls": "23",
+            "ExtraRuns": "2",
+            "Batsmen": [
+              {
+                "Batsman": "63348",
+                "Runs": "11",
+                "Balls": "10"
+              },
+              {
+                "Batsman": "66321",
+                "Runs": "24",
+                "Balls": "13"
+              }
+            ],
+            "ForWicket": 7
+          },
+          {
+            "Runs": "39",
+            "Balls": "27",
+            "ExtraRuns": "4",
+            "Batsmen": [
+              {
+                "Batsman": "63348",
+                "Runs": "30",
+                "Balls": "19"
+              },
+              {
+                "Batsman": "57368",
+                "Runs": "5",
+                "Balls": "8"
+              }
+            ],
+            "ForWicket": 8
+          },
+          {
+            "Runs": "9",
+            "Balls": "6",
+            "ExtraRuns": "0",
+            "Batsmen": [
+              {
+                "Batsman": "64254",
+                "Runs": "5",
+                "Balls": "3"
+              },
+              {
+                "Batsman": "57368",
+                "Runs": "4",
+                "Balls": "3"
+              }
+            ],
+            "ForWicket": 9
+          },
+          {
+            "Runs": "4",
+            "Balls": "2",
+            "ExtraRuns": "0",
+            "Batsmen": [
+              {
+                "Batsman": "58351",
+                "Runs": "4",
+                "Balls": "2"
+              },
+              {
+                "Batsman": "57368",
+                "Runs": "0",
+                "Balls": "0"
+              }
+            ],
+            "ForWicket": 10,
+            "Runrate": "10",
+            "Runsperball": "2"
+          }
+        ],
+        "PowerPlay": {
+          "PP1": "1-25",
+          "PP2": "-",
+          "PP3": "-"
+        },
+        "PowerPlayDetails": [
+          {
+            "Name": "PP1",
+            "Overs": "",
+            "Runs": "32",
+            "Wickets": "3",
+            "Balls": "1-25"
+          }
+        ],
+        "LastOvers": {},
+        "StatusId": 4,
+        "ReviewDetails": {
+          "Batting_review_count": 1,
+          "Bowling_review_count": 1,
+          "Reviews": [
+            {
+              "Team_id": 2041,
+              "Over": "7.5",
+              "Batsman_id": 85735,
+              "Bowler_id": 65748,
+              "Review_type": "bowl",
+              "Review_for_id": 3,
+              "Review_for": "lbw",
+              "Review_output_id": 1,
+              "Review_output": "Successful",
+              "review_status_id": 3,
+              "Balls": "40"
+            }
+          ]
+        },
+        "StartTimeStamp": "2025-08-18T23:00:36.000+0:00",
+        "OverNo": "20",
+        "BallNo": "3",
+        "Best_Performers": {
+          "Batsmen": [
+            {
+              "Player_Id": "63348",
+              "Player_Name": "Hilton Cartwright",
+              "Team_Id": "2042",
+              "Team_Name": "Southern Brave",
+              "Runs": "42",
+              "Balls": "30",
+              "Fours": "4",
+              "Sixes": "1",
+              "Strikerate": "140"
+            },
+            {
+              "Player_Id": "66321",
+              "Player_Name": "Jordan Thompson",
+              "Team_Id": "2042",
+              "Team_Name": "Southern Brave",
+              "Runs": "24",
+              "Balls": "13",
+              "Fours": "3",
+              "Sixes": "1",
+              "Strikerate": "184.61"
+            }
+          ],
+          "Bowlers": [
+            {
+              "Player_Id": "65748",
+              "Player_Name": "Rashid Khan",
+              "Team_Id": "2041",
+              "Team_Name": "Oval Invincibles",
+              "Wickets": "3",
+              "Balls_Bowled": "20",
+              "Economyrate": "5.00",
+              "Overs": "4",
+              "Runs": "20",
+              "Fours": "2",
+              "Sixes": "0"
+            },
+            {
+              "Player_Id": "65584",
+              "Player_Name": "Sam Curran",
+              "Team_Id": "2041",
+              "Team_Name": "Oval Invincibles",
+              "Wickets": "3",
+              "Balls_Bowled": "18",
+              "Economyrate": "5.83",
+              "Overs": "3.3",
+              "Runs": "21",
+              "Fours": "2",
+              "Sixes": "0"
+            }
+          ]
+        }
+      },
+      {
+        "Number": "Second",
+        "Battingteam": "2041",
+        "Bowlingteam": "2042",
+        "Total": "134",
+        "Wickets": "3",
+        "Overs": "17.4",
+        "Total_Balls_Bowled": "89",
+        "AllotedBalls": "100",
+        "Runrate": "7.53",
+        "Runsperball": "1.50",
+        "Byes": "1",
+        "Legbyes": "1",
+        "Wides": "3",
+        "Noballs": "0",
+        "Penalty": "0",
+        "AllottedOvers": "20.0",
+        "Target": "134",
+        "Batsmen": [
+          {
+            "Batsman": "66927",
+            "Runs": "1",
+            "Balls": "4",
+            "Fours": "0",
+            "Sixes": "0",
+            "Dots": "3",
+            "Strikerate": "25",
+            "Dismissal": "caught",
+            "Howout": "c Jofra Archer b Craig Overton",
+            "Howout_short": "c J Archer b C Overton",
+            "Bowler": "57368",
+            "Fielder": "64254",
+            "RunScoredInLastBalls": {},
+            "Number": 1,
+            "DismissalType": "caught",
+            "DismissalId": "ct"
+          },
+          {
+            "Batsman": "85247",
+            "Runs": "9",
+            "Balls": "9",
+            "Fours": "2",
+            "Sixes": "0",
+            "Dots": "6",
+            "Strikerate": "100",
+            "Dismissal": "caught",
+            "Howout": "c Jofra Archer b Craig Overton",
+            "Howout_short": "c J Archer b C Overton",
+            "Bowler": "57368",
+            "Fielder": "64254",
+            "RunScoredInLastBalls": {},
+            "Number": 2,
+            "DismissalType": "caught",
+            "DismissalId": "ct"
+          },
+          {
+            "Batsman": "70925",
+            "Runs": "56",
+            "Balls": "37",
+            "Fours": "7",
+            "Sixes": "2",
+            "Dots": "14",
+            "Strikerate": "151.35",
+            "Dismissal": "caught",
+            "Howout": "c Hilton Cartwright b Tymal Mills",
+            "Howout_short": "c H Cartwright b T Mills",
+            "Bowler": "58351",
+            "Fielder": "63348",
+            "RunScoredInLastBalls": {
+              "10": "8",
+              "20": "28",
+              "30": "49"
+            },
+            "Number": 3,
+            "DismissalType": "caught",
+            "DismissalId": "ct"
+          },
+          {
+            "Batsman": "65584",
+            "Runs": "50",
+            "Balls": "32",
+            "Fours": "4",
+            "Sixes": "2",
+            "Dots": "8",
+            "Strikerate": "156.25",
+            "Dismissal": "not out",
+            "Howout": "not out",
+            "Howout_short": "not out",
+            "Bowler": "",
+            "Fielder": "",
+            "RunScoredInLastBalls": {
+              "10": "19",
+              "20": "32",
+              "30": "44"
+            },
+            "Number": 4,
+            "DismissalType": "not out",
+            "DismissalId": "no"
+          },
+          {
+            "Batsman": "58285",
+            "Runs": "13",
+            "Balls": "7",
+            "Fours": "3",
+            "Sixes": "0",
+            "Dots": "3",
+            "Strikerate": "185.71",
+            "Dismissal": "not out",
+            "Howout": "not out",
+            "Howout_short": "not out",
+            "Bowler": "",
+            "Fielder": "",
+            "RunScoredInLastBalls": {},
+            "Number": 5,
+            "DismissalType": "not out",
+            "DismissalId": "no"
+          },
+          {
+            "Batsman": "23487",
+            "Runs": "",
+            "Balls": "",
+            "Fours": "",
+            "Sixes": "",
+            "Dots": "",
+            "Strikerate": "",
+            "Dismissal": "",
+            "Howout": "",
+            "Howout_short": "",
+            "Bowler": "",
+            "Fielder": "",
+            "Number": 6,
+            "DismissalType": "",
+            "DismissalId": ""
+          },
+          {
+            "Batsman": "64149",
+            "Runs": "",
+            "Balls": "",
+            "Fours": "",
+            "Sixes": "",
+            "Dots": "",
+            "Strikerate": "",
+            "Dismissal": "",
+            "Howout": "",
+            "Howout_short": "",
+            "Bowler": "",
+            "Fielder": "",
+            "Number": 7,
+            "DismissalType": "",
+            "DismissalId": ""
+          },
+          {
+            "Batsman": "65748",
+            "Runs": "",
+            "Balls": "",
+            "Fours": "",
+            "Sixes": "",
+            "Dots": "",
+            "Strikerate": "",
+            "Dismissal": "",
+            "Howout": "",
+            "Howout_short": "",
+            "Bowler": "",
+            "Fielder": "",
+            "Number": 8,
+            "DismissalType": "",
+            "DismissalId": ""
+          },
+          {
+            "Batsman": "58475",
+            "Runs": "",
+            "Balls": "",
+            "Fours": "",
+            "Sixes": "",
+            "Dots": "",
+            "Strikerate": "",
+            "Dismissal": "",
+            "Howout": "",
+            "Howout_short": "",
+            "Bowler": "",
+            "Fielder": "",
+            "Number": 9,
+            "DismissalType": "",
+            "DismissalId": ""
+          },
+          {
+            "Batsman": "65565",
+            "Runs": "",
+            "Balls": "",
+            "Fours": "",
+            "Sixes": "",
+            "Dots": "",
+            "Strikerate": "",
+            "Dismissal": "",
+            "Howout": "",
+            "Howout_short": "",
+            "Bowler": "",
+            "Fielder": "",
+            "Number": 10,
+            "DismissalType": "",
+            "DismissalId": ""
+          },
+          {
+            "Batsman": "57041",
+            "Runs": "",
+            "Balls": "",
+            "Fours": "",
+            "Sixes": "",
+            "Dots": "",
+            "Strikerate": "",
+            "Dismissal": "",
+            "Howout": "",
+            "Howout_short": "",
+            "Bowler": "",
+            "Fielder": "",
+            "Number": 11,
+            "DismissalType": "",
+            "DismissalId": ""
+          }
+        ],
+        "Partnership_Current": {
+          "Runs": "15",
+          "Balls": "8",
+          "ExtraRuns": "0",
+          "Batsmen": [
+            {
+              "Batsman": "58285",
+              "Runs": "13",
+              "Balls": "7"
+            },
+            {
+              "Batsman": "65584",
+              "Runs": "2",
+              "Balls": "1"
+            }
+          ],
+          "ForWicket": 4,
+          "Runrate": "9.37",
+          "Runsperball": "1.87"
+        },
+        "Bowlers": [
+          {
+            "Bowler": "57368",
+            "Overs": "4",
+            "Balls_Bowled": "20",
+            "Maidens": "0",
+            "Runs": "21",
+            "Wickets": "2",
+            "Fours": "3",
+            "Sixes": "0",
+            "Economyrate": "5.25",
+            "Runsperball": "1.05",
+            "Noballs": "0",
+            "Wides": "0",
+            "Dots": "9",
+            "RungivenInLastBalls": {
+              "10": "14",
+              "20": "21"
+            },
+            "Number": 1,
+            "Hattrick_Count": 0,
+            "Avg_Speed": 124.2
+          },
+          {
+            "Bowler": "64254",
+            "Overs": "4",
+            "Balls_Bowled": "20",
+            "Maidens": "0",
+            "Runs": "19",
+            "Wickets": "0",
+            "Fours": "2",
+            "Sixes": "0",
+            "Economyrate": "4.75",
+            "Runsperball": "0.95",
+            "Noballs": "0",
+            "Wides": "3",
+            "Dots": "10",
+            "RungivenInLastBalls": {
+              "10": "11",
+              "20": "19"
+            },
+            "Number": 2,
+            "Hattrick_Count": 0,
+            "Avg_Speed": 144.16
+          },
+          {
+            "Bowler": "58351",
+            "Overs": "3",
+            "Balls_Bowled": "15",
+            "Maidens": "0",
+            "Runs": "37",
+            "Wickets": "1",
+            "Fours": "5",
+            "Sixes": "2",
+            "Economyrate": "12.33",
+            "Runsperball": "2.46",
+            "Noballs": "0",
+            "Wides": "0",
+            "Dots": "5",
+            "RungivenInLastBalls": {
+              "10": "23"
+            },
+            "Number": 3,
+            "Hattrick_Count": 0,
+            "Avg_Speed": 135
+          },
+          {
+            "Bowler": "66321",
+            "Overs": "2.4",
+            "Balls_Bowled": "14",
+            "Maidens": "0",
+            "Runs": "31",
+            "Wickets": "0",
+            "Fours": "6",
+            "Sixes": "0",
+            "Economyrate": "11.07",
+            "Runsperball": "2.21",
+            "Noballs": "0",
+            "Wides": "0",
+            "Dots": "2",
+            "RungivenInLastBalls": {
+              "10": "18"
+            },
+            "Number": 4,
+            "Hattrick_Count": 0,
+            "Avg_Speed": 129.6
+          },
+          {
+            "Bowler": "85735",
+            "Overs": "3",
+            "Balls_Bowled": "15",
+            "Maidens": "0",
+            "Runs": "16",
+            "Wickets": "0",
+            "Fours": "0",
+            "Sixes": "1",
+            "Economyrate": "5.33",
+            "Runsperball": "1.06",
+            "Noballs": "0",
+            "Wides": "0",
+            "Dots": "6",
+            "RungivenInLastBalls": {
+              "10": "11"
+            },
+            "Number": 5,
+            "Hattrick_Count": 0,
+            "Avg_Speed": 95.04
+          },
+          {
+            "Bowler": "62325",
+            "Overs": "1",
+            "Balls_Bowled": "5",
+            "Maidens": "0",
+            "Runs": "8",
+            "Wickets": "0",
+            "Fours": "0",
+            "Sixes": "1",
+            "Economyrate": "8.00",
+            "Runsperball": "1.60",
+            "Noballs": "0",
+            "Wides": "0",
+            "Dots": "2",
+            "RungivenInLastBalls": {},
+            "Number": 6,
+            "Hattrick_Count": 0,
+            "Avg_Speed": 85.6
+          }
+        ],
+        "FallofWickets": [
+          {
+            "Batsman": "66927",
+            "Score": "2",
+            "Overs": "1",
+            "Wicket_No": 1,
+            "Review_status_id": 0,
+            "Ball_number": "5"
+          },
+          {
+            "Batsman": "85247",
+            "Score": "18",
+            "Overs": "3.2",
+            "Wicket_No": 2,
+            "Review_status_id": 0,
+            "Ball_number": "17"
+          },
+          {
+            "Batsman": "70925",
+            "Score": "119",
+            "Overs": "16.1",
+            "Wicket_No": 3,
+            "Review_status_id": 0,
+            "Ball_number": "81"
+          }
+        ],
+        "Partnerships": [
+          {
+            "Runs": "2",
+            "Balls": "5",
+            "ExtraRuns": "1",
+            "Batsmen": [
+              {
+                "Batsman": "66927",
+                "Runs": "1",
+                "Balls": "4"
+              },
+              {
+                "Batsman": "85247",
+                "Runs": "0",
+                "Balls": "1"
+              }
+            ],
+            "ForWicket": 1
+          },
+          {
+            "Runs": "16",
+            "Balls": "12",
+            "ExtraRuns": "1",
+            "Batsmen": [
+              {
+                "Batsman": "70925",
+                "Runs": "6",
+                "Balls": "4"
+              },
+              {
+                "Batsman": "85247",
+                "Runs": "9",
+                "Balls": "8"
+              }
+            ],
+            "ForWicket": 2
+          },
+          {
+            "Runs": "101",
+            "Balls": "64",
+            "ExtraRuns": "3",
+            "Batsmen": [
+              {
+                "Batsman": "70925",
+                "Runs": "50",
+                "Balls": "33"
+              },
+              {
+                "Batsman": "65584",
+                "Runs": "48",
+                "Balls": "31"
+              }
+            ],
+            "ForWicket": 3
+          },
+          {
+            "Runs": "15",
+            "Balls": "8",
+            "ExtraRuns": "0",
+            "Batsmen": [
+              {
+                "Batsman": "58285",
+                "Runs": "13",
+                "Balls": "7"
+              },
+              {
+                "Batsman": "65584",
+                "Runs": "2",
+                "Balls": "1"
+              }
+            ],
+            "ForWicket": 4,
+            "Runrate": "9.37",
+            "Runsperball": "1.87"
+          }
+        ],
+        "PowerPlay": {
+          "PP1": "1-25",
+          "PP2": "-",
+          "PP3": "-"
+        },
+        "PowerPlayDetails": [
+          {
+            "Name": "PP1",
+            "Overs": "",
+            "Runs": "27",
+            "Wickets": "2",
+            "Balls": "1-25"
+          }
+        ],
+        "LastOvers": {},
+        "StatusId": 4,
+        "ReviewDetails": {
+          "Batting_review_count": 1,
+          "Bowling_review_count": 1,
+          "Reviews": []
+        },
+        "StartTimeStamp": "2025-08-19T00:34:36.000+0:00",
+        "At_this_stage": "120/7",
+        "OverNo": "18",
+        "BallNo": "4",
+        "Best_Performers": {
+          "Batsmen": [
+            {
+              "Player_Id": "70925",
+              "Player_Name": "Jordan Cox",
+              "Team_Id": "2041",
+              "Team_Name": "Oval Invincibles",
+              "Runs": "56",
+              "Balls": "37",
+              "Fours": "7",
+              "Sixes": "2",
+              "Strikerate": "151.35"
+            },
+            {
+              "Player_Id": "65584",
+              "Player_Name": "Sam Curran",
+              "Team_Id": "2041",
+              "Team_Name": "Oval Invincibles",
+              "Runs": "50",
+              "Balls": "32",
+              "Fours": "4",
+              "Sixes": "2",
+              "Strikerate": "156.25"
+            }
+          ],
+          "Bowlers": [
+            {
+              "Player_Id": "57368",
+              "Player_Name": "Craig Overton",
+              "Team_Id": "2042",
+              "Team_Name": "Southern Brave",
+              "Wickets": "2",
+              "Balls_Bowled": "20",
+              "Economyrate": "5.25",
+              "Overs": "4",
+              "Runs": "21",
+              "Fours": "3",
+              "Sixes": "0"
+            },
+            {
+              "Player_Id": "58351",
+              "Player_Name": "Tymal Mills",
+              "Team_Id": "2042",
+              "Team_Name": "Southern Brave",
+              "Wickets": "1",
+              "Balls_Bowled": "15",
+              "Economyrate": "12.33",
+              "Overs": "3",
+              "Runs": "37",
+              "Fours": "5",
+              "Sixes": "2"
+            }
+          ]
+        }
+      }
+    ],
+    "Teams": {
+      "2041": {
+        "Name_Full": "Oval Invincibles",
+        "Name_Short": "OVI",
+        "Players": {
+          "23487": {
+            "Position": "6",
+            "Name_Full": "Donovan Ferreira",
+            "Name_Short": "D Ferreira",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Confirm_XI": true,
+            "Matches": "14",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "26.50",
+              "Strikerate": "192.72",
+              "Runs": "212"
+            },
+            "Bowling": {
+              "Style": "OB",
+              "Average": "0",
+              "Economyrate": "0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 7,
+            "nationality": "South Africa"
+          },
+          "57041": {
+            "Position": "11",
+            "Name_Full": "Jason Behrendorff",
+            "Name_Short": "J Behrendorff",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Confirm_XI": true,
+            "Matches": "5",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "0",
+              "Strikerate": "0",
+              "Runs": "0"
+            },
+            "Bowling": {
+              "Style": "LFM",
+              "Average": "10.87",
+              "Economyrate": "5.11",
+              "Wickets": "8"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "58285": {
+            "Position": "5",
+            "Name_Full": "Sam Billings",
+            "Name_Short": "S Billings",
+            "Iskeeper": true,
+            "Iscaptain": true,
+            "Skill": "4",
+            "Skill_Name": "Wicket Keeper",
+            "Role": "Wicket Keeper",
+            "Confirm_XI": true,
+            "Matches": "38",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "19.87",
+              "Strikerate": "134.74",
+              "Runs": "477"
+            },
+            "Bowling": {
+              "Style": "",
+              "Average": "0",
+              "Economyrate": "0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "58475": {
+            "Position": "9",
+            "Name_Full": "Jordan Clark",
+            "Name_Short": "J Clark",
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Confirm_XI": true,
+            "Matches": "11",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "2.33",
+              "Strikerate": "63.63",
+              "Runs": "7"
+            },
+            "Bowling": {
+              "Style": "RMF",
+              "Average": "28.40",
+              "Economyrate": "8.35",
+              "Wickets": "5"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "64149": {
+            "Position": "7",
+            "Name_Full": "Tom Curran",
+            "Name_Short": "T Curran",
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Confirm_XI": true,
+            "Matches": "32",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "37.90",
+              "Strikerate": "173.02",
+              "Runs": "417"
+            },
+            "Bowling": {
+              "Style": "RFM",
+              "Average": "23.58",
+              "Economyrate": "7.39",
+              "Wickets": "34"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "65565": {
+            "Position": "10",
+            "Name_Full": "Nathan Sowter",
+            "Name_Short": "N Sowter",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Confirm_XI": true,
+            "Matches": "28",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "4.80",
+              "Strikerate": "126.31",
+              "Runs": "24"
+            },
+            "Bowling": {
+              "Style": "LB",
+              "Average": "25.18",
+              "Economyrate": "6.99",
+              "Wickets": "22"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "65584": {
+            "Position": "4",
+            "Name_Full": "Sam Curran",
+            "Name_Short": "S Curran",
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Confirm_XI": true,
+            "Matches": "33",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "25.24",
+              "Strikerate": "144.39",
+              "Runs": "631"
+            },
+            "Bowling": {
+              "Style": "LMF",
+              "Average": "18.65",
+              "Economyrate": "6.94",
+              "Wickets": "43"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "65748": {
+            "Position": "8",
+            "Name_Full": "Rashid Khan",
+            "Name_Short": "R Khan",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Confirm_XI": true,
+            "Matches": "21",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "10.60",
+              "Strikerate": "147.22",
+              "Runs": "106"
+            },
+            "Bowling": {
+              "Style": "LBG",
+              "Average": "17.17",
+              "Economyrate": "7.05",
+              "Wickets": "34"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 262,
+            "nationality": "Afghanistan"
+          },
+          "66927": {
+            "Position": "1",
+            "Name_Full": "Will Jacks",
+            "Name_Short": "W Jacks",
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Confirm_XI": true,
+            "Matches": "38",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "25.38",
+              "Strikerate": "160.07",
+              "Runs": "914"
+            },
+            "Bowling": {
+              "Style": "OB",
+              "Average": "14.14",
+              "Economyrate": "5.50",
+              "Wickets": "14"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "70925": {
+            "Position": "3",
+            "Name_Full": "Jordan Cox",
+            "Name_Short": "J Cox",
+            "Skill": "4",
+            "Skill_Name": "Wicket Keeper",
+            "Role": "Wicket Keeper",
+            "Confirm_XI": true,
+            "Matches": "25",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "45.35",
+              "Strikerate": "152.07",
+              "Runs": "771"
+            },
+            "Bowling": {
+              "Style": "",
+              "Average": "0",
+              "Economyrate": "0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "85247": {
+            "Position": "2",
+            "Name_Full": "Tawanda Muyeye",
+            "Name_Short": "T Muyeye",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Confirm_XI": true,
+            "Matches": "10",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "21.50",
+              "Strikerate": "142.14",
+              "Runs": "172"
+            },
+            "Bowling": {
+              "Style": "OB",
+              "Average": "0",
+              "Economyrate": "0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          }
+        }
+      },
+      "2042": {
+        "Name_Full": "Southern Brave",
+        "Name_Short": "SOB",
+        "Players": {
+          "4841": {
+            "Position": "5",
+            "Name_Full": "Laurie Evans",
+            "Name_Short": "L Evans",
+            "Iskeeper": true,
+            "Skill": "4",
+            "Skill_Name": "Wicket Keeper",
+            "Role": "Wicket Keeper",
+            "Confirm_XI": true,
+            "Matches": "43",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "19.75",
+              "Strikerate": "151.09",
+              "Runs": "553"
+            },
+            "Bowling": {
+              "Style": "OB",
+              "Average": "0",
+              "Economyrate": "0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "10131": {
+            "Position": "1",
+            "Name_Full": "James Vince",
+            "Name_Short": "J Vince",
+            "Iscaptain": true,
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Confirm_XI": true,
+            "Matches": "41",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "30.79",
+              "Strikerate": "138.49",
+              "Runs": "1047"
+            },
+            "Bowling": {
+              "Style": "RM",
+              "Average": "0",
+              "Economyrate": "0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "33031": {
+            "Position": "3",
+            "Name_Full": "Jason Roy",
+            "Name_Short": "J Roy",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Confirm_XI": true,
+            "Matches": "28",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "19.91",
+              "Strikerate": "128.15",
+              "Runs": "478"
+            },
+            "Bowling": {
+              "Style": "RMF",
+              "Average": "0",
+              "Economyrate": "0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "57368": {
+            "Position": "9",
+            "Name_Full": "Craig Overton",
+            "Name_Short": "C Overton",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Confirm_XI": true,
+            "Matches": "23",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "64",
+              "Strikerate": "145.45",
+              "Runs": "64"
+            },
+            "Bowling": {
+              "Style": "RMF",
+              "Average": "20.19",
+              "Economyrate": "6.06",
+              "Wickets": "26"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "58351": {
+            "Position": "10",
+            "Name_Full": "Tymal Mills",
+            "Name_Short": "T Mills",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Confirm_XI": true,
+            "Matches": "35",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "3",
+              "Strikerate": "133.33",
+              "Runs": "12"
+            },
+            "Bowling": {
+              "Style": "LF",
+              "Average": "17.13",
+              "Economyrate": "6.77",
+              "Wickets": "51"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "62325": {
+            "Position": "7",
+            "Name_Full": "Michael Bracewell",
+            "Name_Short": "M Bracewell",
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Confirm_XI": true,
+            "Matches": "5",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "15",
+              "Strikerate": "136.36",
+              "Runs": "45"
+            },
+            "Bowling": {
+              "Style": "OB",
+              "Average": "21.75",
+              "Economyrate": "6.69",
+              "Wickets": "4"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 5,
+            "nationality": "New Zealand"
+          },
+          "63348": {
+            "Position": "6",
+            "Name_Full": "Hilton Cartwright",
+            "Name_Short": "H Cartwright",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Confirm_XI": true,
+            "Matches": "10",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "19",
+              "Strikerate": "128.08",
+              "Runs": "114"
+            },
+            "Bowling": {
+              "Style": "RM",
+              "Average": "0",
+              "Economyrate": "0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "64254": {
+            "Position": "11",
+            "Name_Full": "Jofra Archer",
+            "Name_Short": "J Archer",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Confirm_XI": true,
+            "Matches": "12",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "6.75",
+              "Strikerate": "112.50",
+              "Runs": "27"
+            },
+            "Bowling": {
+              "Style": "RF",
+              "Average": "22.92",
+              "Economyrate": "6.20",
+              "Wickets": "13"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "64757": {
+            "Position": "2",
+            "Name_Full": "Leus du Plooy",
+            "Name_Short": "du Plooy",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Confirm_XI": true,
+            "Matches": "34",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "23.48",
+              "Strikerate": "128.34",
+              "Runs": "634"
+            },
+            "Bowling": {
+              "Style": "SLO",
+              "Average": "0",
+              "Economyrate": "16",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "66321": {
+            "Position": "8",
+            "Name_Full": "Jordan Thompson",
+            "Name_Short": "J Thompson",
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Confirm_XI": true,
+            "Matches": "23",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "7.86",
+              "Strikerate": "124.21",
+              "Runs": "118"
+            },
+            "Bowling": {
+              "Style": "RMF",
+              "Average": "24.60",
+              "Economyrate": "7.73",
+              "Wickets": "20"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "85735": {
+            "Position": "4",
+            "Name_Full": "James Coles",
+            "Name_Short": "J Coles",
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Confirm_XI": true,
+            "Matches": "13",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "25.80",
+              "Strikerate": "130.30",
+              "Runs": "129"
+            },
+            "Bowling": {
+              "Style": "SLO",
+              "Average": "54",
+              "Economyrate": "6",
+              "Wickets": "2"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          }
+        }
+      }
+    },
+    "Notes": {
+      "1": [
+        "Mandatory Power play (Balls 1-25): Southern Brave 32/3",
+        "Southern Brave 50/6 in 41 Balls",
+        "Southern Brave 100/7 in 77 Balls",
+        "Strategic Timeout: Southern Brave 107/7 in 80 balls",
+        "Innings Break: Southern Brave 133/10 in 98 balls"
+      ],
+      "2": [
+        "Mandatory Power play (Balls 1-25): Oval Invincibles 27/2",
+        "Oval Invincibles 50/2 in 33 balls",
+        "Strategic Timeout: Oval Invincibles 58/2 in 40 balls",
+        "Oval Invincibles 100/2 in 69 balls",
+        "J Cox fifty: 50 runs in 33 balls (6x4) (2x6)",
+        "S Curran fifty: 50 runs in 32 balls (4x4) (2x6)"
+      ]
+    },
+    "Matchequation": {
+      "Team1_id": 2041,
+      "Team2_id": 2042,
+      "Team1_name": "Oval Invincibles",
+      "Team2_Name": "Southern Brave",
+      "Wickets": 7,
+      "Raw_eq_type": 13,
+      "Equation": "Oval Invincibles beat Southern Brave by 7 wickets",
+      "Eq_type": "match_ended"
+    },
+    "SerialNumber": 366
+  }
+}

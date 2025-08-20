@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import cricketData from '../../data/cricketData.json';
+import PredictionSection from '../PredictionSection';
 
-const MatchDetailPage = ({ matchId, onBackClick }) => {
+const MatchDetailPage = ({ matchId, onBackClick, currentUser, onLoginClick, latestBallEvent }) => {
   const [activeTab, setActiveTab] = useState('scorecard');
+  const [isPredictionOpen, setIsPredictionOpen] = useState(false);
   
   const match = cricketData.matches.find(m => m.matchId === parseInt(matchId));
   const matchDetail = cricketData.matchDetails[matchId];
@@ -357,6 +359,54 @@ const MatchDetailPage = ({ matchId, onBackClick }) => {
         </div>
       </div>
 
+      {/* Prediction Section Toggle */}
+      <div style={{ padding: '0 20px', marginBottom: '20px' }}>
+        <button
+          onClick={() => setIsPredictionOpen(!isPredictionOpen)}
+          style={{
+            backgroundColor: '#3b82f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '10px 20px',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+        >
+          <span>🎯</span>
+          {isPredictionOpen ? 'Hide Predictions' : 'Show Predictions'}
+        </button>
+      </div>
+
+      {/* Prediction Section */}
+      <div style={{ padding: '0 20px' }}>
+        <PredictionSection
+          currentUser={currentUser}
+          onLoginClick={onLoginClick}
+          latestBallEvent={latestBallEvent}
+          isOpen={isPredictionOpen}
+          onToggle={() => setIsPredictionOpen(!isPredictionOpen)}
+        />
+        
+        {/* Debug Info */}
+        <div style={{ 
+          padding: '10px', 
+          marginTop: '10px', 
+          backgroundColor: 'rgba(255,255,255,0.1)', 
+          borderRadius: '8px',
+          fontSize: '12px',
+          color: 'white'
+        }}>
+          <strong>Debug Info:</strong><br/>
+          Latest Ball Event: {latestBallEvent ? JSON.stringify(latestBallEvent) : 'None'}<br/>
+          Current User: {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Not logged in'}
+        </div>
+      </div>
+
       {/* Tabs */}
       <div style={{
         padding: '20px',
@@ -382,14 +432,14 @@ const MatchDetailPage = ({ matchId, onBackClick }) => {
         />
       </div>
 
-      {/* Content */}
-      <div style={{ minHeight: '400px' }}>
-        {activeTab === 'scorecard' && <ScorecardView />}
-        {activeTab === 'wagon-wheel' && <WagonWheelView />}
-        {activeTab === 'commentary' && <CommentaryView />}
-      </div>
-    </div>
-  );
-};
+             {/* Content */}
+       <div style={{ minHeight: '400px' }}>
+         {activeTab === 'scorecard' && <ScorecardView />}
+         {activeTab === 'wagon-wheel' && <WagonWheelView />}
+         {activeTab === 'commentary' && <CommentaryView />}
+       </div>
+     </div>
+   );
+ };
 
 export default MatchDetailPage;

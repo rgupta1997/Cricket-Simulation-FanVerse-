@@ -1,0 +1,421 @@
+/* Prediction Section Styles */
+.prediction-toggle {
+  margin-bottom: 20px;
+}
+
+.prediction-toggle-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.prediction-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.prediction-section {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.prediction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.prediction-header h3 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.close-prediction-btn {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #6b7280;
+  transition: all 0.2s ease;
+}
+
+.close-prediction-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+/* Login Required */
+.login-required {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.login-required p {
+  color: #6b7280;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.login-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* Prediction Form */
+.prediction-form {
+  margin-bottom: 32px;
+  padding: 24px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.prediction-form h4 {
+  margin: 0 0 20px 0;
+  color: #1f2937;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.prediction-options {
+  margin-bottom: 24px;
+}
+
+.runs-predictions {
+  margin-bottom: 20px;
+}
+
+.runs-predictions label {
+  display: block;
+  margin-bottom: 12px;
+  color: #374151;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.runs-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+  display: none;
+}
+
+.radio-custom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  color: #374151;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.radio-option input[type="radio"]:checked + .radio-custom {
+  border-color: #3b82f6;
+  background: #3b82f6;
+  color: white;
+  transform: scale(1.05);
+}
+
+.radio-custom.wicket {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: white;
+}
+
+.radio-option input[type="radio"]:checked + .radio-custom.wicket {
+  background: #dc2626;
+  border-color: #dc2626;
+  transform: scale(1.05);
+}
+
+.wicket-prediction {
+  margin-top: 16px;
+}
+
+.submit-prediction-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.submit-prediction-btn:hover:not(:disabled) {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.submit-prediction-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Prediction Stats */
+.prediction-stats {
+  margin-bottom: 32px;
+  padding: 20px;
+  background: #f0f9ff;
+  border-radius: 12px;
+  border: 1px solid #bae6fd;
+}
+
+.prediction-stats h4 {
+  margin: 0 0 16px 0;
+  color: #0369a1;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e0f2fe;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #0369a1;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.stat-value.correct {
+  color: #059669;
+}
+
+/* Prediction History */
+.prediction-history {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 24px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.history-header h4 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.clear-btn {
+  background: #f3f4f6;
+  color: #6b7280;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.predictions-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.prediction-item {
+  padding: 16px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.prediction-item.checked {
+  border-left: 4px solid #10b981;
+}
+
+.prediction-item.pending {
+  border-left: 4px solid #f59e0b;
+}
+
+.prediction-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.prediction-value {
+  color: #1f2937;
+  font-size: 14px;
+}
+
+.ball-number {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.prediction-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.prediction-result.correct {
+  background: #f0fdf4;
+  color: #059669;
+}
+
+.prediction-result.incorrect {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.result-icon {
+  font-size: 16px;
+}
+
+.prediction-status {
+  padding: 8px 12px;
+  background: #fef3c7;
+  color: #d97706;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.status-pending {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.no-predictions {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+}
+
+.no-predictions p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .prediction-section {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .runs-buttons {
+    gap: 6px;
+  }
+  
+  .radio-custom {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .prediction-header h3 {
+    font-size: 18px;
+  }
+  
+  .prediction-form {
+    padding: 16px;
+  }
+  
+  .runs-buttons {
+    justify-content: center;
+  }
+}
