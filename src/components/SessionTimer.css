@@ -1,0 +1,239 @@
+/* Session Timer Styles */
+.session-timer {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  z-index: 1000;
+  min-width: 200px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.session-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.session-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 14px;
+}
+
+.session-time {
+  font-weight: 700;
+  font-size: 16px;
+  text-align: center;
+  padding: 4px 8px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.refresh-session-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.refresh-session-btn:hover {
+  background: #2563eb;
+  transform: scale(1.05);
+}
+
+.logout-btn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.logout-btn:hover {
+  background: #b91c1c;
+  transform: scale(1.05);
+}
+
+.session-status-bar {
+  width: 100%;
+  height: 4px;
+  background: #f1f5f9;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.session-progress {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+/* Session Warning Modal */
+.session-warning-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.session-warning-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.warning-header {
+  margin-bottom: 20px;
+}
+
+.warning-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.warning-header h3 {
+  margin: 0;
+  color: #dc2626;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.warning-content {
+  margin-bottom: 24px;
+}
+
+.warning-content p {
+  margin: 8px 0;
+  color: #374151;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.warning-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.extend-session-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.extend-session-btn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.dismiss-warning-btn {
+  background: #f3f4f6;
+  color: #6b7280;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dismiss-warning-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .session-timer {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    min-width: auto;
+  }
+  
+  .warning-actions {
+    flex-direction: column;
+  }
+  
+  .extend-session-btn,
+  .dismiss-warning-btn {
+    width: 100%;
+  }
+}
+
+/* Animation for session timer */
+.session-timer {
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Pulse animation for critical time */
+.session-time[style*="#dc2626"] {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}

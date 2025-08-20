@@ -130,3 +130,15 @@ body {
 .cricket-app div {
   color: #000000 !important;
 }
+
+/* Session Popup Animation */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

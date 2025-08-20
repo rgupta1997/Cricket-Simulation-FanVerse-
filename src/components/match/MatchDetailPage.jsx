@@ -311,30 +311,38 @@ const MatchDetailPage = ({ matchId, onBackClick, currentUser, onLoginClick, late
         backgroundColor: 'rgba(0, 0, 0, 0.2)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
       }}>
-        <button
-          onClick={onBackClick}
-          style={{
-            backgroundColor: 'transparent',
-            border: '2px solid white',
-            color: 'white',
-            padding: '10px 20px',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '1rem',
-            marginBottom: '20px',
-            transition: 'all 0.3s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = 'white';
-            e.target.style.color = '#1e3c72';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-            e.target.style.color = 'white';
-          }}
-        >
-          ← Back to Fixtures
-        </button>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: '20px'
+        }}>
+          <button
+            onClick={onBackClick}
+            style={{
+              backgroundColor: 'transparent',
+              border: '2px solid white',
+              color: 'white',
+              padding: '10px 20px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '1rem',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = 'white';
+              e.target.style.color = '#1e3c72';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = 'white';
+            }}
+          >
+            ← Back to Fixtures
+          </button>
+
+
+        </div>
 
         <div style={{ textAlign: 'center' }}>
           <h1 style={{
@@ -391,6 +399,7 @@ const MatchDetailPage = ({ matchId, onBackClick, currentUser, onLoginClick, late
           latestBallEvent={latestBallEvent}
           isOpen={isPredictionOpen}
           onToggle={() => setIsPredictionOpen(!isPredictionOpen)}
+          matchId={matchId}
         />
         
         {/* Debug Info */}
@@ -406,6 +415,37 @@ const MatchDetailPage = ({ matchId, onBackClick, currentUser, onLoginClick, late
           Latest Ball Event: {latestBallEvent ? JSON.stringify(latestBallEvent) : 'None'}<br/>
           Current User: {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Not logged in'}
         </div>
+
+        {/* User Actions */}
+        {currentUser && (
+          <div style={{ 
+            padding: '10px', 
+            marginTop: '10px', 
+            backgroundColor: 'rgba(255,255,255,0.1)', 
+            borderRadius: '8px',
+            fontSize: '12px',
+            color: 'white',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <span>Logged in as: <strong>{currentUser.firstName} {currentUser.lastName}</strong></span>
+            <button
+              onClick={() => window.location.reload()} // Simple logout by refreshing
+              style={{
+                backgroundColor: '#dc2626',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '4px 8px',
+                fontSize: '10px',
+                cursor: 'pointer'
+              }}
+            >
+              Logout
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Tabs */}

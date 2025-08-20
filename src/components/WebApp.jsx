@@ -2,6 +2,7 @@ import React, { useState, useEffect, Component, useCallback } from 'react';
 
 // Import API service instead of hardcoded data
 import webappApiService from '../services/webappApiService.js';
+import authService from '../services/authService.js';
 
 // Import new components
 import TabNavigation from './tabs/TabNavigation.jsx';
@@ -17,6 +18,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import Stadium from './Stadium';
 import PredictionSection from './PredictionSection.jsx';
+
 
 // Import responsive styles
 import '../styles/responsive.css';
@@ -1246,6 +1248,7 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetai
           latestBallEvent={latestBallEvent}
           isOpen={isPredictionOpen}
           onToggle={() => setIsPredictionOpen(!isPredictionOpen)}
+          matchId={matchId}
         />
       </div>
 
@@ -1320,6 +1323,36 @@ const WebApp = () => {
   const [latestBallEvent, setLatestBallEvent] = useState(null);
   const [socket, setSocket] = useState(null);
 
+  // Initialize authentication from localStorage on component mount
+  useEffect(() => {
+    const savedUser = authService.getUser();
+    if (savedUser) {
+      setCurrentUser(savedUser);
+      console.log('✅ User session restored from localStorage');
+    }
+  }, []);
+
+  // Update session display every minute to show current remaining time
+  useEffect(() => {
+    if (currentUser) {
+      const interval = setInterval(() => {
+        // Check if session has expired
+        if (authService.isSessionExpired()) {
+          console.log('⏰ Session expired, logging out user');
+          handleSessionExpired();
+          return;
+        }
+        
+        // Force re-render to update session time display
+        setCurrentUser(prev => ({ ...prev }));
+      }, 60 * 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [currentUser]);
+
+
+
   const handleMatchClick = (matchId, matchDetails) => {
     try {
       console.log('🚀 WebApp handleMatchClick - Received ID:', matchId, 'Type:', typeof matchId);
@@ -1359,7 +1392,12 @@ const WebApp = () => {
   };
 
   const handleLoginSuccess = (userId, firstName, lastName, email) => {
-    setCurrentUser({ userId, firstName, lastName, email });
+    const userData = { userId, firstName, lastName, email };
+    setCurrentUser(userData);
+    
+    // Save user session to localStorage
+    authService.saveUser(userData);
+    
     setIsLoginOpen(false);
     // Open chat after successful login if we're on a match page
     if (currentView === 'matchDetail' && selectedMatchId) {
@@ -1370,10 +1408,25 @@ const WebApp = () => {
   };
 
   const handleLogout = () => {
+    // Clear user session from localStorage
+    authService.logout();
+    
     setCurrentUser(null);
     setIsChatOpen(false);
     setChatMatchId(null);
     setChatMatchName('');
+  };
+
+  const handleSessionExpired = () => {
+    console.log('⏰ Session expired, logging out user');
+    handleLogout();
+  };
+
+  const handleSessionRefresh = () => {
+    if (currentUser) {
+      authService.refreshSession();
+      console.log('✅ Session refreshed manually');
+    }
   };
 
   // Socket.IO connection for live ball events
@@ -1508,6 +1561,87 @@ const WebApp = () => {
 
     return (
     <div className="cricket-app">
+                   {/* Floating Session Popup - Top Right Corner */}
+      {currentUser && (
+        <div style={{
+          position: 'fixed',
+          top: '8px',
+          right: '20px',
+          background: 'rgba(255, 255, 255, 0.98)',
+          padding: '6px 12px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
+          zIndex: 9999,
+          fontSize: '11px',
+          border: '1px solid #e5e7eb',
+          minWidth: '280px',
+          backdropFilter: 'blur(8px)',
+          animation: 'slideInFromRight 0.3s ease-out'
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            gap: '8px'
+          }}>
+            <div style={{ fontWeight: '600', color: '#1f2937', fontSize: '12px', flex: '1' }}>
+              👤 {currentUser.firstName} {currentUser.lastName}
+            </div>
+            <div style={{ 
+              fontSize: '9px', 
+              color: '#6b7280',
+              backgroundColor: '#f3f4f6',
+              padding: '2px 6px',
+              borderRadius: '4px',
+              fontWeight: '500',
+              whiteSpace: 'nowrap'
+            }}>
+              ⏰ {authService.getRemainingSessionTime()}m
+            </div>
+            <button
+              onClick={handleSessionRefresh}
+              style={{
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '4px 8px',
+                fontSize: '9px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontWeight: '600',
+                whiteSpace: 'nowrap'
+              }}
+              title="Extend session by 60 minutes"
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+            >
+              🔄 Extend
+            </button>
+            <button
+              onClick={handleLogout}
+              style={{
+                backgroundColor: '#dc2626',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '4px 8px',
+                fontSize: '9px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontWeight: '600',
+                whiteSpace: 'nowrap'
+              }}
+              title="Logout"
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#b91c1c'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#dc2626'}
+            >
+              🚪 Logout
+            </button>
+          </div>
+        </div>
+      )}
+
       {currentView === 'fixtures' && (
         <FixturesPage onMatchClick={handleMatchClick} />
       )}
@@ -1646,6 +1780,8 @@ const WebApp = () => {
           onLogout={handleLogout}
         />
       )}
+
+
       
              <style>{`
          @keyframes pulse {
