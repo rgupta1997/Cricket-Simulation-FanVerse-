@@ -19,7 +19,8 @@ const getPositionName = (degree) => {
 // Pure component for wagon wheel overlay with 8 sections centered at striker position
 // Now displays X, Y, Z coordinates at intersection points where degree lines cross circles
 const WagonWheel = ({ radius = 28, visible = true, strikerPosition = [0, 0, -9] }) => {
-  console.log('🎯 WagonWheel rendering with coordinates:', { radius, visible, strikerPosition });
+  // Only log when visible changes to avoid spam
+  // console.log('🎯 WagonWheel rendering with coordinates:', { radius, visible, strikerPosition });
   
   if (!visible) return null;
 

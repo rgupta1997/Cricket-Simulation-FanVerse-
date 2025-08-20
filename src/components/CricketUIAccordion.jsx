@@ -5,8 +5,8 @@ import DeliveryInfo from './DeliveryInfo';
 import CameraControlsDisabled from './CameraControlsDisabled';
 import { calculateBallTrajectory } from './CricketGameState';
 import dummyStadiumData from '../data/dummyStadiumData.json';
-import { convertApiToGameCoordinates } from '../utils/coordinateConverter';
-import { SAMPLE_API_DATA } from '../constants/apiData';
+import { convertApiToGameCoordinates, zoneToDistance } from '../utils/coordinateConverter';
+import { SAMPLE_API_DATA, SHOT_SAMPLES } from '../constants/apiData';
 
 const AccordionSection = ({ title, children, isOpen, onToggle, icon, color = '#FFD700' }) => {
   return (
@@ -105,22 +105,34 @@ const CricketUIAccordion = ({
 
   // Handle API data conversion and auto-fill
   const handleApiDataToggle = (checked) => {
-    setBallDelivery(prev => ({
-      ...prev,
-      useApiData: checked
-    }));
-
     if (checked) {
       // Convert API data to our coordinate system and auto-fill
       const convertedRelease = convertApiToGameCoordinates(SAMPLE_API_DATA.release, 'release');
       const convertedBounce = convertApiToGameCoordinates(SAMPLE_API_DATA.bounce, 'bounce');
       const convertedFinal = convertApiToGameCoordinates(SAMPLE_API_DATA.final, 'final');
 
+      // Convert zone to distance using our cricket field layout
+      const shotData = SAMPLE_API_DATA.shotData;
+      const convertedDistance = zoneToDistance(shotData.zone, shotData.angle);
+
+      // Single state update to prevent infinite loop
       setBallDelivery(prev => ({
         ...prev,
+        useApiData: checked,
         releasePosition: convertedRelease,
         bouncePosition: convertedBounce,
-        finalPosition: convertedFinal
+        finalPosition: convertedFinal,
+        shotDegree: shotData.angle,
+        shotDistance: Math.round(convertedDistance * 10) / 10, // Round to 1 decimal
+        isLofted: shotData.zone >= 4 // Lofted if zone 4 or 5
+      }));
+
+      console.log(`🏏 API Data Applied: Zone ${shotData.zone} at ${shotData.angle}° = ${convertedDistance.toFixed(1)}m`);
+    } else {
+      // Just update the useApiData flag when unchecked
+      setBallDelivery(prev => ({
+        ...prev,
+        useApiData: checked
       }));
     }
   };
@@ -207,9 +219,43 @@ const CricketUIAccordion = ({
                   marginTop: '4px',
                   marginLeft: '28px'
                 }}>
-                  Auto-fills coordinates from API sample data
+                  Auto-fills coordinates from API sample data with zone conversion
                 </div>
               </div>
+
+              {/* Random Shot Generator */}
+              <button
+                onClick={() => {
+                  const randomShot = SHOT_SAMPLES[Math.floor(Math.random() * SHOT_SAMPLES.length)];
+                  const convertedDistance = zoneToDistance(randomShot.zone, randomShot.angle);
+                  
+                  setBallDelivery(prev => ({
+                    ...prev,
+                    shotDegree: randomShot.angle,
+                    shotDistance: Math.round(convertedDistance * 10) / 10,
+                    isLofted: randomShot.zone >= 4,
+                    useApiData: true
+                  }));
+                  
+                  console.log(`🎯 Random Shot: ${randomShot.name} - Zone ${randomShot.zone} at ${randomShot.angle}° = ${convertedDistance.toFixed(1)}m`);
+                }}
+                style={{
+                  padding: '8px 12px',
+                  background: 'linear-gradient(135deg, #FF9800, #F57C00)',
+                  border: 'none',
+                  borderRadius: '4px',
+                  color: 'white',
+                  fontSize: '11px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                <span>🎲</span>
+                Random Shot Sample
+              </button>
 
               {/* Reset Button */}
               <button

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Zone to Distance Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #111;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #FFD700;
+        }
+        .header {
+            text-align: center;
+            color: #FFD700;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .zone-display {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .zone-card {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid;
+        }
+        .zone-1 { border-color: #00ff00; }
+        .zone-2 { border-color: #ffff00; }
+        .zone-3 { border-color: #ff8800; }
+        .zone-4 { border-color: #ff4400; }
+        .zone-5 { border-color: #ff0000; }
+        .test-controls {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .controls-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin: 10px 0;
+        }
+        button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #45a049, #4CAF50);
+        }
+        .output {
+            background: #0a2a0a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .field-visualization {
+            width: 300px;
+            height: 200px;
+            border: 2px solid #FFD700;
+            margin: 20px auto;
+            position: relative;
+            background: #0a3a0a;
+            border-radius: 50%;
+        }
+        .zone-ring {
+            position: absolute;
+            border: 1px solid;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+        .striker {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            background: #ff0000;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">🏏 Cricket Zone to Distance Converter Test</div>
+        
+        <div class="zone-display">
+            <div class="zone-card zone-1">
+                <div style="font-size: 18px; font-weight: bold;">Zone 1</div>
+                <div style="font-size: 12px; margin: 5px 0;">0-10m</div>
+                <div style="font-size: 10px; color: #aaa;">Striker to Pitch</div>
+            </div>
+            <div class="zone-card zone-2">
+                <div style="font-size: 18px; font-weight: bold;">Zone 2</div>
+                <div style="font-size: 12px; margin: 5px 0;">10-25m</div>
+                <div style="font-size: 10px; color: #aaa;">1st Circle</div>
+            </div>
+            <div class="zone-card zone-3">
+                <div style="font-size: 18px; font-weight: bold;">Zone 3</div>
+                <div style="font-size: 12px; margin: 5px 0;">25-35m</div>
+                <div style="font-size: 10px; color: #aaa;">2nd Circle</div>
+            </div>
+            <div class="zone-card zone-4">
+                <div style="font-size: 18px; font-weight: bold;">Zone 4</div>
+                <div style="font-size: 12px; margin: 5px 0;">35-50m</div>
+                <div style="font-size: 10px; color: #aaa;">Deep Circle</div>
+            </div>
+            <div class="zone-card zone-5">
+                <div style="font-size: 18px; font-weight: bold;">Zone 5</div>
+                <div style="font-size: 12px; margin: 5px 0;">50-75m</div>
+                <div style="font-size: 10px; color: #aaa;">Boundary</div>
+            </div>
+        </div>
+
+        <div class="field-visualization">
+            <div class="zone-ring" style="width: 50px; height: 30px; top: 50%; left: 50%; transform: translate(-50%, -50%); border-color: #00ff00;"></div>
+            <div class="zone-ring" style="width: 100px; height: 60px; top: 50%; left: 50%; transform: translate(-50%, -50%); border-color: #ffff00;"></div>
+            <div class="zone-ring" style="width: 150px; height: 90px; top: 50%; left: 50%; transform: translate(-50%, -50%); border-color: #ff8800;"></div>
+            <div class="zone-ring" style="width: 200px; height: 120px; top: 50%; left: 50%; transform: translate(-50%, -50%); border-color: #ff4400;"></div>
+            <div class="zone-ring" style="width: 250px; height: 150px; top: 50%; left: 50%; transform: translate(-50%, -50%); border-color: #ff0000;"></div>
+            <div class="striker" title="Striker Position"></div>
+        </div>
+
+        <div class="test-controls">
+            <h3>🧪 Test Zone Conversion</h3>
+            
+            <div class="controls-row">
+                <label>Zone:</label>
+                <select id="zoneSelect">
+                    <option value="1">Zone 1 (0-10m)</option>
+                    <option value="2">Zone 2 (10-25m)</option>
+                    <option value="3" selected>Zone 3 (25-35m)</option>
+                    <option value="4">Zone 4 (35-50m)</option>
+                    <option value="5">Zone 5 (50-75m)</option>
+                </select>
+                
+                <label>Angle:</label>
+                <input type="number" id="angleInput" value="45" min="0" max="360" step="1">
+                <span>degrees</span>
+                
+                <button onclick="testSingleConversion()">🎯 Test Conversion</button>
+            </div>
+            
+            <div class="controls-row">
+                <button onclick="testAllZones()">🔄 Test All Zones</button>
+                <button onclick="testRandomShots()">🎲 Test Random Shots</button>
+                <button onclick="testBoundaryAngles()">🏏 Test Boundary Angles</button>
+                <button onclick="clearOutput()">🗑️ Clear Output</button>
+            </div>
+        </div>
+
+        <div id="output" class="output">Ready to test zone to distance conversion...</div>
+    </div>
+
+    <script>
+        // Zone to distance converter function
+        function zoneToDistance(zone, degrees) {
+            const zoneRanges = {
+                1: [0, 10],    // 0-10m (from striker to the pitch)
+                2: [10, 25],   // 10-25m (1st circle)
+                3: [25, 35],   // 25-35m (2nd circle)
+                4: [35, 50],   // 35-50m (deep circle)
+                5: [50, 75]    // 50-75m (boundary + stands)
+            };
+            
+            if (!zoneRanges[zone]) {
+                console.warn(`Invalid zone: ${zone}, using zone 3 as default`);
+                zone = 3;
+            }
+            
+            const [min, max] = zoneRanges[zone];
+            const normalizedDegrees = ((degrees % 360) + 360) % 360;
+            
+            // Asymmetric oval factor calculation
+            let ovalFactor = 0.8 + 0.4 * Math.abs(Math.cos(normalizedDegrees * Math.PI / 180));
+            
+            // Adjust for asymmetry between bowler side and keeper side
+            const sideAngle = Math.abs(((normalizedDegrees + 90) % 360) - 180) / 180;
+            
+            // Apply asymmetry adjustment
+            if (normalizedDegrees > 180 && normalizedDegrees < 360) {
+                ovalFactor += 0.2 * sideAngle; // Boost bowler side distance
+            } else if (normalizedDegrees > 0 && normalizedDegrees < 180) {
+                ovalFactor -= 0.1 * (1 - sideAngle); // Slightly reduce keeper side
+            }
+            
+            // For zone 5 (boundary), ensure minimum distance is maintained
+            if (zone === 5) {
+                ovalFactor = Math.max(ovalFactor, 0.9);
+            }
+            
+            const randomFactor = Math.random();
+            const distance = min + randomFactor * (max - min) * ovalFactor;
+            
+            return distance;
+        }
+
+        // Shot samples
+        const SHOT_SAMPLES = [
+            { zone: 2, angle: 0,   name: "Straight drive" },
+            { zone: 3, angle: 30,  name: "Off drive" },
+            { zone: 4, angle: 90,  name: "Square cut" },
+            { zone: 5, angle: 135, name: "Late cut" },
+            { zone: 4, angle: 180, name: "Third man edge" },
+            { zone: 3, angle: 225, name: "Fine leg glance" },
+            { zone: 4, angle: 270, name: "Leg glance" },
+            { zone: 5, angle: 315, name: "Midwicket pull" }
+        ];
+
+        function appendOutput(text) {
+            const output = document.getElementById('output');
+            output.textContent += text + '\n';
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function testSingleConversion() {
+            const zone = parseInt(document.getElementById('zoneSelect').value);
+            const angle = parseInt(document.getElementById('angleInput').value);
+            
+            const distance = zoneToDistance(zone, angle);
+            
+            appendOutput(`🎯 Zone ${zone} at ${angle}° = ${distance.toFixed(2)}m`);
+        }
+
+        function testAllZones() {
+            appendOutput('\n🔄 Testing All Zones at 45°:');
+            for (let zone = 1; zone <= 5; zone++) {
+                const distance = zoneToDistance(zone, 45);
+                appendOutput(`   Zone ${zone}: ${distance.toFixed(2)}m`);
+            }
+        }
+
+        function testRandomShots() {
+            appendOutput('\n🎲 Testing Random Shot Samples:');
+            SHOT_SAMPLES.forEach(shot => {
+                const distance = zoneToDistance(shot.zone, shot.angle);
+                appendOutput(`   ${shot.name}: Zone ${shot.zone} at ${shot.angle}° = ${distance.toFixed(2)}m`);
+            });
+        }
+
+        function testBoundaryAngles() {
+            appendOutput('\n🏏 Testing Zone 5 (Boundary) at Different Angles:');
+            const angles = [0, 45, 90, 135, 180, 225, 270, 315];
+            angles.forEach(angle => {
+                const distance = zoneToDistance(5, angle);
+                appendOutput(`   ${angle}°: ${distance.toFixed(2)}m`);
+            });
+        }
+
+        function clearOutput() {
+            document.getElementById('output').textContent = 'Ready to test zone to distance conversion...';
+        }
+
+        // Auto-run a sample test
+        setTimeout(() => {
+            appendOutput('🏏 Cricket Zone to Distance Converter Loaded!\n');
+            testAllZones();
+        }, 100);
+    </script>
+</body>
+</html>

@@ -365,13 +365,16 @@ const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorAc
   const [useCustomModel, setUseCustomModel] = useState(false);
   const [showWagonWheel, setShowWagonWheel] = useState(false);
   
-  console.log("Stadium rendering, useCustomModel:", useCustomModel, "showWagonWheel:", showWagonWheel);
+  // Only log on initial render or when states actually change
+  // console.log("Stadium rendering, useCustomModel:", useCustomModel, "showWagonWheel:", showWagonWheel);
 
   useEffect(() => {
     const handleKeyPress = (event) => {
       if (event.key.toLowerCase() === 'c') {
-        setUseCustomModel(prev => !prev);
-        console.log('Switched stadium model:', !useCustomModel ? '3D Model' : 'Basic');
+        setUseCustomModel(prev => {
+          console.log('Switched stadium model:', !prev ? '3D Model' : 'Basic');
+          return !prev;
+        });
         // Force a re-render of the entire scene
         setTimeout(() => {
           window.dispatchEvent(new Event('resize'));
@@ -380,14 +383,16 @@ const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorAc
       
       // Add 'W' key to toggle wagon wheel
       if (event.key.toLowerCase() === 'w') {
-        setShowWagonWheel(prev => !prev);
-        console.log('Toggled wagon wheel:', !showWagonWheel ? 'ON' : 'OFF');
+        setShowWagonWheel(prev => {
+          console.log('Toggled wagon wheel:', !prev ? 'ON' : 'OFF');
+          return !prev;
+        });
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [useCustomModel, showWagonWheel]);
+  }, []); // Empty dependency array is correct here since we use functional updates
   
   return (
     <group>
