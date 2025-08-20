@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dummy Data Embedded Simulator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .simulator-container {
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid #22c55e;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .feature-list li:before {
+            content: "✓ ";
+            color: #22c55e;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏏 Cricket Embedded Simulator - Dummy Data Test</h1>
+            <p>Testing the new dummy data functionality in the embedded cricket simulator</p>
+        </div>
+        
+        <div class="test-info">
+            <h2>🎯 Test Overview</h2>
+            <p>This page tests the dummy data functionality for the embedded cricket simulator. The simulator below should show:</p>
+            <ul class="feature-list">
+                <li>Default empty stadium view initially</li>
+                <li>Green "Load Demo" button in the top-right corner</li>
+                <li>When clicked, loads realistic T20 match scenario data</li>
+                <li>Shows demo data indicator when active</li>
+                <li>Red "Clear Demo" button to reset to default</li>
+                <li>All player positions from dummy JSON data</li>
+                <li>Score: 127/3 (14.5 overs) from dummy data</li>
+            </ul>
+        </div>
+        
+        <div class="simulator-container">
+            <!-- Embedded Simulator would be here -->
+            <div style="height: 40vh; display: flex; align-items: center; justify-content: center; background: #000; color: #666;">
+                <div style="text-align: center;">
+                    <h3>🚧 Embedded Simulator Component</h3>
+                    <p>The EmbeddedSimulator React component would render here</p>
+                    <p>In a real React app, this would show the 3D cricket stadium</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>🎮 How to Test</h3>
+            <ol>
+                <li><strong>Initial State:</strong> Simulator loads with default empty state</li>
+                <li><strong>Load Demo:</strong> Click the green "Load Demo" button</li>
+                <li><strong>Verify Data:</strong> Check that dummy data is applied:
+                    <ul>
+                        <li>Score shows 127/3 (14.5 overs)</li>
+                        <li>Players positioned according to dummy data</li>
+                        <li>"Demo Mode Active" indicator appears</li>
+                        <li>Green indicator with pulsing dot</li>
+                    </ul>
+                </li>
+                <li><strong>Clear Demo:</strong> Click red "Clear Demo" button to reset</li>
+                <li><strong>Reset State:</strong> Verify simulator returns to default state</li>
+            </ol>
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center; font-size: 0.9em; opacity: 0.7;">
+            <p>Test Page for Cricket Simulation FanVerse - Dummy Data Feature</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -112,6 +112,8 @@ temp/
 # TypeScript
 *.tsbuildinfo
 
+backend/json
+
 # Optional: Uncomment if you want to ignore package-lock.json
 # package-lock.json
 

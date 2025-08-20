@@ -95,16 +95,59 @@ export const FIELDER_POSITIONS = {
   LONG_OFF: {
     id: 'long_off',
     name: 'Long Off',
-    position: [5, 0, 15],
+    position: [12, 0, 30], // Moved back to boundary (30m+)
     role: 'fielding',
     description: 'Boundary, straight off side'
   },
   LONG_ON: {
     id: 'long_on',
     name: 'Long On',
-    position: [-5, 0, 15],
+    position: [-12, 0, 30], // Moved back to boundary (30m+)
     role: 'fielding',
     description: 'Boundary, straight on side'
+  },
+  // Additional boundary fielders for larger ground
+  DEEP_COVER: {
+    id: 'deep_cover',
+    name: 'Deep Cover',
+    position: [35, 0, 5], // Deep cover position
+    role: 'fielding',
+    description: 'Deep cover drive boundary'
+  },
+  DEEP_MID_WICKET: {
+    id: 'deep_mid_wicket',
+    name: 'Deep Mid Wicket',
+    position: [-35, 0, 5], // Deep mid-wicket position
+    role: 'fielding',
+    description: 'Deep leg side boundary'
+  },
+  DEEP_POINT: {
+    id: 'deep_point',
+    name: 'Deep Point',
+    position: [30, 0, -15], // Deep point position
+    role: 'fielding',
+    description: 'Deep square cut boundary'
+  },
+  DEEP_SQUARE_LEG: {
+    id: 'deep_square_leg',
+    name: 'Deep Square Leg',
+    position: [-30, 0, -15], // Deep square leg position
+    role: 'fielding',
+    description: 'Deep square leg boundary'
+  },
+  THIRD_MAN_DEEP: {
+    id: 'third_man_deep',
+    name: 'Deep Third Man',
+    position: [25, 0, 20], // Deep third man boundary
+    role: 'fielding',
+    description: 'Deep third man boundary'
+  },
+  FINE_LEG_DEEP: {
+    id: 'fine_leg_deep',
+    name: 'Deep Fine Leg',
+    position: [-25, 0, 20], // Deep fine leg boundary
+    role: 'fielding',
+    description: 'Deep fine leg boundary'
   }
 };
 
@@ -157,12 +200,12 @@ export const getFieldersArray = () => {
   return Object.values(FIELDER_POSITIONS);
 };
 
-// Position constraints (field boundaries)
+// Position constraints (field boundaries) - Updated for larger 50m playing area
 export const FIELD_CONSTRAINTS = {
-  MIN_X: -30,
-  MAX_X: 30,
-  MIN_Z: -15,
-  MAX_Z: 20,
+  MIN_X: -50, // Extended to 50m for larger ground
+  MAX_X: 50,  // Extended to 50m for larger ground
+  MIN_Z: -25, // Extended backward range
+  MAX_Z: 35,  // Extended forward range
   Y: 0 // Keep all players on ground level
 };
 

@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unknown-property */
-import React, { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Vector3 } from 'three';
 import BallPositionMarker from '../BallPositionMarker';
@@ -12,11 +12,9 @@ const EnhancedBall = ({
   showTrajectory = false 
 }) => {
   const ballRef = useRef();
-  const trajectoryRef = useRef();
   const [trail, setTrail] = useState([]);
   const [bounceCount, setBounceCount] = useState(0);
   const [shotStartPosition, setShotStartPosition] = useState(null); // Track where shot started
-  const [distanceTraveled, setDistanceTraveled] = useState(0); // Track distance from shot start
   
   // Direct coordinate movement state
   const [currentWaypoint, setCurrentWaypoint] = useState(0); // 0=release, 1=bounce, 2=final
@@ -34,6 +32,21 @@ const EnhancedBall = ({
   const GROUND_LEVEL = 0.07; // Ball radius
   const SPIN_FACTOR = 2.5; // Ball spin multiplier
 
+  // Reset trajectory state when coordinates change
+  useEffect(() => {
+    const trajectory = currentBall.trajectory;
+    if (trajectory?.metadata?.useDirectCoordinates) {
+      // Reset all trajectory state when new coordinates are provided
+      setCurrentWaypoint(0);
+      setTrajectoryProgress(0);
+      setPhysicsMode(false);
+      setTrajectoryStartTime(null);
+      setBounceCount(0);
+      setShotStartPosition(null);
+      setTrail([]);
+    }
+  }, [currentBall.trajectory]);
+
   // Reset trajectory state when ball starts moving
   useEffect(() => {
     if (isMoving && !trajectoryStartTime) {
@@ -46,11 +59,7 @@ const EnhancedBall = ({
       // Check if this is a shot (ball state is 'hit')
       if (ballState === 'hit') {
         setShotStartPosition(new Vector3(...position));
-        setDistanceTraveled(0);
-        console.log('🏏 Shot started from position:', position);
       }
-      
-      console.log('🎯 Starting direct coordinate trajectory mode');
     } else if (!isMoving) {
       // Ball stopped - reset trajectory state completely
       setTrajectoryStartTime(null);
@@ -59,8 +68,6 @@ const EnhancedBall = ({
       setTrajectoryProgress(0);
       setBounceCount(0);
       setShotStartPosition(null);
-      setDistanceTraveled(0);
-      console.log('🔄 Ball stopped - resetting trajectory state');
     }
   }, [isMoving, trajectoryStartTime, ballState, position]);
 
@@ -103,8 +110,6 @@ const EnhancedBall = ({
           
           if (newProgress >= 1.0) {
             // Reached next waypoint
-            console.log(`🎯 Reached waypoint ${currentWaypoint + 1}:`, endPoint.toArray());
-            
             if (currentWaypoint === 0) {
               // Reached bounce point
               if (onBounce) {
@@ -118,8 +123,6 @@ const EnhancedBall = ({
               setBounceCount(1);
             } else if (currentWaypoint === 1) {
               // Reached final point - STOP the ball (don't enable physics mode for direct coordinates)
-              console.log('🎯 Reached final coordinate, stopping ball (direct coordinate mode)');
-              
               // Stop the ball completely at final coordinate
               ball.position.copy(endPoint);
               
@@ -158,11 +161,6 @@ const EnhancedBall = ({
         const dummyVelocity = new Vector3(0, 0, 0); // Create Vector3 object instead of array
         checkTargetReached(currentPos, dummyVelocity);
         
-        // Log progress occasionally  
-        if (Math.random() < 0.1) {
-          console.log(`🎯 Direct coordinate movement - Waypoint: ${currentWaypoint}, Progress: ${(trajectoryProgress * 100).toFixed(1)}%, Pos:`, currentPos.toArray());
-        }
-        
         return; // Skip physics when in direct coordinate mode
       }
     }
@@ -173,14 +171,20 @@ const EnhancedBall = ({
     const currentPos = new Vector3(...(Array.isArray(position) ? position : [position.x || 0, position.y || 0.5, position.z || 0]));
     const currentVel = new Vector3(...(Array.isArray(velocity) ? velocity : [velocity.x || 0, velocity.y || 0, velocity.z || 0]));
     
-    // Apply physics only in physics mode or for non-direct coordinates
-    if (physicsMode || !useDirectCoordinates) {
-      console.log('⚙️ Physics mode active');
+    // Apply physics only in physics mode or for non-direct coordinates (but NOT for shots)
+    if ((physicsMode || !useDirectCoordinates) && ballState !== 'hit') {
       ball.position.copy(currentPos);
     }
 
-    // Apply physics for all moving states (only when physics mode is enabled)
-    if (isMoving && (ballState === 'bowling' || ballState === 'hit' || ballState === 'returning') && (physicsMode || !useDirectCoordinates)) {
+    // IMPORTANT: For shots (hit state), use deterministic control WITHOUT physics interference
+    if (ballState === 'hit' && isMoving) {
+      // SHOT MODE: Use deterministic distance control without physics
+      handleShotMovement(ball, currentPos, currentVel, delta);
+      return; // Exit early - no physics for shots
+    }
+    
+    // Apply physics for bowling and returning states only
+    if (isMoving && (ballState === 'bowling' || ballState === 'returning') && (physicsMode || !useDirectCoordinates)) {
       // Apply gravity
       currentVel.y += GRAVITY * delta;
       
@@ -197,7 +201,6 @@ const EnhancedBall = ({
         // Get bounce parameters from game state (enhanced system)
         const bounceHeight = currentBall.bounceHeight || 0.5;
         const bounceData = currentBall.trajectory?.bounce;
-        const pitchAnalysis = currentBall.pitchAnalysis;
         
         if (bounceData && bounceCount === 0) {
           // First bounce - use pre-calculated bounce velocity from pitch analysis
@@ -207,12 +210,7 @@ const EnhancedBall = ({
             bounceData.velocity[2]
           );
           
-          // Log enhanced bounce details
-          if (pitchAnalysis) {
-            console.log('🎯 Enhanced bounce at:', currentPos.toArray(), 
-              'Analysis data:', pitchAnalysis,
-              'Target:', bounceData.position);
-          }
+
         } else {
           // Subsequent bounces use physics based on pitch characteristics
           const pitchBounce = bounceHeight; // 0 = dead pitch, 2 = normal, 4 = very bouncy
@@ -241,7 +239,7 @@ const EnhancedBall = ({
             position: currentPos.toArray(),
             velocity: currentVel.toArray(),
             bounceCount: bounceCount + 1,
-            bounceHeight: bounceHeight
+            bounceHeight
           });
         }
       }
@@ -249,10 +247,12 @@ const EnhancedBall = ({
       // Update ball position
       ball.position.copy(currentPos);
       
-      // Track distance traveled for shots with DETERMINISTIC DISTANCE CONTROL
+      // This section is now handled in handleShotMovement function
+      // Skip distance tracking here as it's moved to shot-specific logic
+      /* Disabled - moved to handleShotMovement
       if (ballState === 'hit' && shotStartPosition) {
         const currentDistance = currentPos.distanceTo(shotStartPosition);
-        setDistanceTraveled(currentDistance);
+
         
         // Get deterministic target information
         const deterministicTarget = typeof window !== 'undefined' ? window.deterministicTarget : null;
@@ -261,8 +261,7 @@ const EnhancedBall = ({
           // Use DETERMINISTIC system for EXACT stopping distance
           const exactStopDistance = deterministicTarget.exactDistance;
           const stopPosition = new Vector3(...deterministicTarget.finalStopPosition);
-          const timeToTarget = deterministicTarget.timeToTarget;
-          const energyRetention = deterministicTarget.energyRetention;
+
           
           console.log('📏 DETERMINISTIC Shot - Current:', currentDistance.toFixed(2), 'Target Stop:', exactStopDistance, 'm');
           
@@ -271,19 +270,27 @@ const EnhancedBall = ({
           const distanceToStopPosition = currentPos.distanceTo(stopPosition);
           const ballSpeed = currentVel.length();
           
-          // PRECISION STOPPING: Apply progressive deceleration as ball approaches target
-          if (progressToTarget > 0.7) { // Start deceleration when 70% of distance covered
-            const decelerationFactor = Math.max(0.1, 1 - ((progressToTarget - 0.7) / 0.3)); // Linear deceleration from 70% to 100%
-            currentVel.multiplyScalar(decelerationFactor);
-            console.log(`🎯 Progressive deceleration: Progress=${(progressToTarget*100).toFixed(1)}%, Decel=${decelerationFactor.toFixed(2)}, Speed=${ballSpeed.toFixed(2)}`);
+          // ENHANCED PRECISION STOPPING: Smoother deceleration curve
+          if (progressToTarget > 0.6) { // Start deceleration earlier at 60%
+            // Use sigmoid function for smoother deceleration
+            const normalizedProgress = (progressToTarget - 0.6) / 0.4; // Normalize to 0-1 range
+            const sigmoid = 1 / (1 + Math.exp(-(normalizedProgress * 6 - 3))); // Smooth S-curve
+            const decelerationFactor = Math.max(0.05, 1 - sigmoid);
+            
+            // Apply stronger deceleration when close to target
+            const finalDecel = progressToTarget > 0.9 ? decelerationFactor * 0.8 : decelerationFactor;
+            currentVel.multiplyScalar(finalDecel);
+            
+            console.log(`🎯 Enhanced deceleration: Progress=${(progressToTarget*100).toFixed(1)}%, Decel=${finalDecel.toFixed(3)}, Speed=${ballSpeed.toFixed(2)}`);
           }
           
-          // EXACT STOPPING: Force stop when ball reaches exact target distance
-          const reachedExactDistance = currentDistance >= exactStopDistance * 0.98; // 98% accuracy threshold
-          const reachedStopPosition = distanceToStopPosition <= 0.5; // Within 0.5m of exact stop position
-          const lowSpeed = ballSpeed < 1.0; // Ball has slowed significantly
+          // EXACT STOPPING: Enhanced precision for final position
+          const reachedExactDistance = currentDistance >= exactStopDistance * 0.99; // 99% accuracy threshold
+          const reachedStopPosition = distanceToStopPosition <= 0.25; // More precise position check (0.25m)
+          const lowSpeed = ballSpeed < 0.5; // Stricter speed requirement
+          const goodTrajectory = Math.abs(currentVel.angleTo(stopPosition.clone().sub(currentPos))) < Math.PI / 4; // Heading toward target
           
-          if ((reachedExactDistance || reachedStopPosition) && (progressToTarget > 0.95 || lowSpeed)) {
+          if ((reachedExactDistance || reachedStopPosition) && (progressToTarget > 0.98 || (lowSpeed && goodTrajectory))) {
             // COMPREHENSIVE DEBUG LOGGING FOR FINAL BALL STOP POSITION
             console.group('🎯 EXACT STOP REACHED - FINAL VERIFICATION');
             
@@ -365,12 +372,13 @@ const EnhancedBall = ({
             return;
           }
           
-          // COURSE CORRECTION: Gently steer ball toward exact stopping position
-          if (progressToTarget > 0.5 && distanceToStopPosition > 1.0) {
+          // COURSE CORRECTION: More precise steering toward exact stopping position
+          if (progressToTarget > 0.5 && distanceToStopPosition > 0.5) {
             const correctionVector = stopPosition.clone().sub(currentPos).normalize();
-            const correctionStrength = Math.min(2.0, distanceToStopPosition * 0.1); // Stronger correction if further from target
+            // Gentler correction with exponential falloff
+            const correctionStrength = Math.min(1.0, distanceToStopPosition * 0.05) * Math.exp(-progressToTarget);
             currentVel.add(correctionVector.multiplyScalar(correctionStrength * delta));
-            console.log('🎯 Course correction toward exact stop position, distance to target:', distanceToStopPosition.toFixed(2));
+            console.log('🎯 Precise course correction, distance:', distanceToStopPosition.toFixed(2), 'strength:', correctionStrength.toFixed(3));
           }
           
         } else {
@@ -385,18 +393,22 @@ const EnhancedBall = ({
           
           if (isNearlyStoppedAtTarget || currentDistance >= maxDistance * 1.2) {
             console.log('🎯 Ball reached fallback target distance:', maxDistance, 'm at distance:', currentDistance.toFixed(2), 'speed:', ballSpeed.toFixed(2));
+            // Add delay for physics-based collection too
             if (onCatch) {
-              onCatch({
-                type: 'collect',
-                playerId: 'bowler',
-                position: currentPos.toArray(),
-                reason: 'target_distance_reached'
-              });
+              setTimeout(() => {
+                onCatch({
+                  type: 'collect',
+                  playerId: 'bowler',
+                  position: currentPos.toArray(),
+                  reason: 'target_distance_reached'
+                });
+              }, 3000); // 3 second delay
             }
             return;
           }
         }
       }
+      */
       
       // Update game state with new position and velocity
       if (onBounce) {
@@ -427,7 +439,6 @@ const EnhancedBall = ({
       }
       
       // Enhanced ball rotation with spin effects
-      const speed = currentVel.length();
       const horizontalSpeed = Math.sqrt(currentVel.x**2 + currentVel.z**2);
       
       // Add spin based on velocity components
@@ -445,25 +456,16 @@ const EnhancedBall = ({
 
       // Check if ball has stopped moving (auto-reset appropriate player)
       if (currentVel.length() < 0.1 && currentPos.y <= GROUND_LEVEL + 0.1) {
-          console.log('🔄 Ball stopped moving at:', currentPos.toArray(), 'velocity:', currentVel.length());
-          
           // Determine who should collect based on ball's final position
           const ballZ = currentPos.z;
           let collector = 'wicket_keeper';
-          let collectorPosition = [0, 0.5, -11];
           
           if (ballZ > -5) {
             // Ball stopped in front area - bowler collects
             collector = 'bowler';
-            collectorPosition = [0, 0.5, 15];
-            console.log('🏃 Ball stopped in front area - bowler will collect');
           } else if (ballZ < -15) {
             // Ball stopped far behind wicket - nearest fielder should collect, but for now use bowler
             collector = 'bowler';
-            collectorPosition = [0, 0.5, 15];
-            console.log('🏃 Ball stopped far behind wicket - bowler will collect');
-          } else {
-            console.log('🧤 Ball stopped near wicket - keeper will collect');
           }
           
           if (onCatch) {
@@ -515,7 +517,6 @@ const EnhancedBall = ({
       const distance = ballPos.distanceTo(fielderPos);
       
       if (distance < 2.0 && ballSpeed < 10) {
-        console.log('🟢 Ball fielded by fielder', index, 'at distance', distance);
         if (onCatch) {
           onCatch({
             playerId: `fielder_${index}`,
@@ -525,6 +526,146 @@ const EnhancedBall = ({
         }
       }
     });
+  };
+
+  // Dedicated handler for shot movement WITHOUT physics interference
+  const handleShotMovement = (ball, currentPos, currentVel, delta) => {
+    if (!shotStartPosition) {
+      setShotStartPosition(currentPos.clone());
+    }
+    
+    const currentDistance = currentPos.distanceTo(shotStartPosition);
+    const deterministicTarget = typeof window !== 'undefined' ? window.deterministicTarget : null;
+    
+    if (deterministicTarget) {
+      const exactStopDistance = deterministicTarget.exactDistance;
+      const stopPosition = new Vector3(...deterministicTarget.finalStopPosition);
+      const progressToTarget = currentDistance / exactStopDistance;
+      const distanceToStopPosition = currentPos.distanceTo(stopPosition);
+      
+      // Check if we've reached the target
+      if (progressToTarget >= 0.99 || distanceToStopPosition <= 0.3) {
+        // Place ball at exact stop position
+        ball.position.copy(stopPosition);
+        
+        // Notify game state
+        if (onBounce) {
+          onBounce({
+            type: 'position_update',
+            position: stopPosition.toArray(),
+            velocity: [0, 0, 0],
+            isMoving: false
+          });
+        }
+        
+        // Add a configurable delay before resetting to bowler
+        const resetDelay = (gameState.controls?.ballShot?.resetDelay || 3.0) * 1000; // Convert to milliseconds
+        
+        if (onCatch) {
+          setTimeout(() => {
+            onCatch({
+              type: 'collect',
+              playerId: 'bowler',
+              position: stopPosition.toArray(),
+              reason: 'shot_distance_reached'
+            });
+          }, resetDelay);
+        }
+        
+        // Clear deterministic target
+        if (typeof window !== 'undefined') {
+          window.deterministicTarget = null;
+        }
+        return;
+      }
+      
+      // Move ball toward target WITHOUT physics
+      const moveDirection = stopPosition.clone().sub(currentPos).normalize();
+      
+      // Calculate speed based on remaining distance (smooth deceleration)
+      let moveSpeed = 20; // Base speed in m/s
+      if (progressToTarget > 0.7) {
+        // Smooth deceleration in final 30%
+        const decelerationFactor = 1 - ((progressToTarget - 0.7) / 0.3);
+        moveSpeed *= Math.max(0.1, decelerationFactor);
+      }
+      
+      // Update position directly (no physics)
+      const movement = moveDirection.multiplyScalar(moveSpeed * delta);
+      currentPos.add(movement);
+      
+      // Handle bounce visually (keep Y at ground level with small bounce effect)
+      if (currentPos.y <= GROUND_LEVEL) {
+        currentPos.y = GROUND_LEVEL;
+        // Add small visual bounce based on speed
+        if (Math.random() < 0.1 && moveSpeed > 5) {
+          currentPos.y += 0.05; // Small bounce effect
+        }
+      }
+      
+      // Update ball position
+      ball.position.copy(currentPos);
+      
+      // Update trail
+      setTrail(prev => {
+        const newTrail = [...prev, currentPos.clone()];
+        return newTrail.slice(-20);
+      });
+      
+      // Check for boundary
+      const boundaryDistance = Math.sqrt(currentPos.x ** 2 + currentPos.z ** 2);
+      if (boundaryDistance > 25.5) {
+        if (onReachTarget) {
+          onReachTarget({
+            target: 'boundary',
+            position: currentPos.toArray(),
+            boundaryDistance,
+            runs: currentPos.y > 1 ? 6 : 4
+          });
+        }
+        // Clear deterministic target
+        if (typeof window !== 'undefined') {
+          window.deterministicTarget = null;
+        }
+        return;
+      }
+      
+      // Notify game state of position update
+      if (onBounce) {
+        onBounce({
+          type: 'position_update',
+          position: currentPos.toArray(),
+          velocity: moveDirection.multiplyScalar(moveSpeed).toArray(),
+          isMoving: true
+        });
+      }
+      
+    } else {
+      // Fallback: Use simple distance-based movement
+      const ballShotConfig = gameState.controls?.ballShot;
+      const targetDistance = ballShotConfig?.distance || 15;
+      
+      if (currentDistance >= targetDistance) {
+        // Add configurable delay before resetting in fallback case too
+        const resetDelay = (gameState.controls?.ballShot?.resetDelay || 3.0) * 1000; // Convert to milliseconds
+        
+        if (onCatch) {
+          setTimeout(() => {
+            onCatch({
+              type: 'collect',
+              playerId: 'bowler',
+              position: currentPos.toArray(),
+              reason: 'target_distance_reached'
+            });
+          }, resetDelay);
+        }
+        return;
+      }
+      
+      // Simple forward movement
+      currentPos.add(currentVel.clone().multiplyScalar(delta));
+      ball.position.copy(currentPos);
+    }
   };
 
   const checkTargetReached = (ballPos, ballVel) => {
@@ -544,17 +685,14 @@ const EnhancedBall = ({
       // Also calculate full 3D distance for reference
       const fullDistance = ballPos.distanceTo(strikerPos);
       
-      console.log('🎯 Ball Z-axis distance to striker:', distanceZ.toFixed(2), 'Full distance:', fullDistance.toFixed(2), 'Ball Z:', ballZ.toFixed(2), 'Striker Z:', strikerZ);
-      
       // Trigger when ball is within 2 meters on Z-axis (approaching striker)
       if (distanceZ <= 2.0 && ballZ > strikerZ) { // Ball must be approaching from bowler's end
-        console.log('⚾ Ball in batting range! Z-distance:', distanceZ.toFixed(2));
         onReachTarget({
           target: 'batsman',
           position: ballPos.toArray(),
           velocity: ballVel.toArray(),
           distance: distanceZ, // Pass Z-axis distance
-          fullDistance: fullDistance // Pass full distance for reference
+          fullDistance // Pass full distance for reference
         });
       }
     }
@@ -562,10 +700,10 @@ const EnhancedBall = ({
     // Ball reaching boundary
     const boundaryDistance = Math.sqrt(ballPos.x ** 2 + ballPos.z ** 2);
     if (boundaryDistance > 25.5) { // Actual playable boundary (inner advertising boundary)
-      console.log('🏟️ Ball reached boundary - resetting to bowler');
       onReachTarget({
         target: 'boundary',
         position: ballPos.toArray(),
+        boundaryDistance,
         runs: ballPos.y > 1 ? 6 : 4
       });
       
@@ -595,11 +733,8 @@ const EnhancedBall = ({
       const keeperCollectionRadius = ballShotConfig?.keeperCollectionRadius ?? 2.0;
       const keeperSpeedThreshold = ballShotConfig?.keeperSpeedThreshold ?? 3.0;
       
-      console.log(`🧤 Keeper check: AutoCollect=${keeperAutoCollect}, Distance=${distanceToKeeper.toFixed(1)}m (limit: ${keeperCollectionRadius}m), Speed=${ballSpeed.toFixed(1)}m/s (limit: ${keeperSpeedThreshold}m/s)`);
-      
       // USER CONTROLLED: Only collect if auto-collect is enabled AND within user-defined limits
       if (keeperAutoCollect && distanceToKeeper < keeperCollectionRadius && ballSpeed < keeperSpeedThreshold) {
-        console.log('🧤 Ball collected by keeper - within user-defined collection parameters');
         if (onCatch) {
           onCatch({
             type: 'collect',
@@ -619,12 +754,6 @@ const EnhancedBall = ({
           }, 1000);
         }
         return;
-      } else if (distanceToKeeper < keeperCollectionRadius) {
-        if (keeperAutoCollect) {
-          console.log(`🏃 Ball too fast (${ballSpeed.toFixed(1)} > ${keeperSpeedThreshold}) - continuing past keeper`);
-        } else {
-          console.log('🏃 Keeper auto-collect disabled - ball continuing to full distance');
-        }
       }
     }
   };
@@ -633,21 +762,17 @@ const EnhancedBall = ({
   const renderTrajectory = () => {
     if (!showTrajectory) return null;
 
-    // Actual trail
-    const trailPoints = trail.map(pos => [pos.x, pos.y, pos.z]);
-    
     // Enhanced predicted trajectory from pitch analysis
     const bounceData = currentBall.trajectory?.bounce;
     const targetData = currentBall.trajectory?.target;
-    const pitchAnalysis = currentBall.pitchAnalysis;
     const predictedPoints = [];
     
     if (bounceData && bounceCount === 0) {
       // Add predicted path after bounce using enhanced trajectory data
       const steps = 20;
       const timeStep = 0.05;
-      let pos = new Vector3(...bounceData.position);
-      let vel = new Vector3(...bounceData.velocity);
+      const pos = new Vector3(...bounceData.position);
+      const vel = new Vector3(...bounceData.velocity);
       
       for (let i = 0; i < steps; i++) {
         predictedPoints.push([pos.x, pos.y, pos.z]);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Component } from 'react';
+import React, { useState, useEffect, Component, useCallback } from 'react';
 
 // Import API service instead of hardcoded data
 import webappApiService from '../services/webappApiService.js';
@@ -12,6 +12,10 @@ import WagonWheelTab from './tabs/WagonWheelTab.jsx';
 import PointsTableTab from './tabs/PointsTableTab.jsx';
 import MatchChat from './MatchChat.jsx';
 import LoginModal from './LoginModal.jsx';
+import EmbeddedSimulator from './EmbeddedSimulator';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import Stadium from './Stadium';
 import PredictionSection from './PredictionSection.jsx';
 
 // Import responsive styles
@@ -28,7 +32,7 @@ class ErrorBoundary extends Component {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error, _errorInfo) {
     if (this.props.onError) {
       this.props.onError(error);
     }
@@ -61,17 +65,7 @@ class ErrorBoundary extends Component {
   }
 }
 
-// Header Component
-const Header = () => {
-  return (
-    <div className="app-header">
-      <div className="header-content">
-        <span className="header-icon">🏏</span>
-        <span className="header-title">Fixtures</span>
-      </div>
-    </div>
-  );
-};
+
 
 // Team Logo Component
 const TeamLogo = ({ team, size = 40 }) => {
@@ -154,7 +148,7 @@ const ModernMatchCard = ({ match, onClick }) => {
 
   return (
     <div 
-      onClick={() => onClick(match.matchId)}
+      onClick={() => onClick(match.matchId, match)}
       style={{
         backgroundColor: statusConfig.backgroundColor,
         border: `2px solid ${statusConfig.borderColor}`,
@@ -304,18 +298,23 @@ const FixturesPage = ({ onMatchClick }) => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Separate state for API calls (actual date range used for API)
   const [dateRange, setDateRange] = useState({
     startDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Previous day
     endDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]   // Next day
   });
+  
+  // Separate state for UI inputs (temporary date selection before Apply is clicked)
+  const [tempDateRange, setTempDateRange] = useState({
+    startDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Previous day
+    endDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]   // Next day
+  });
+  
   const [selectedSeries, setSelectedSeries] = useState(['all']); // Changed to array for multi-select
   const [showSeriesDropdown, setShowSeriesDropdown] = useState(false);
   
-  useEffect(() => {
-    fetchFixtures();
-  }, []); // Only fetch on initial load, not when dateRange changes
-
-  const fetchFixtures = async () => {
+  const fetchFixtures = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -350,7 +349,11 @@ const FixturesPage = ({ onMatchClick }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [dateRange.startDate, dateRange.endDate]);
+
+  useEffect(() => {
+    fetchFixtures();
+  }, [fetchFixtures]);
 
   // Get unique series names for filter
   const uniqueSeries = ['all', ...Array.from(new Set(matches.map(m => m.seriesName).filter(Boolean)))];
@@ -381,16 +384,24 @@ const FixturesPage = ({ onMatchClick }) => {
 
   const filteredMatches = getFilteredMatches();
 
-  const handleMatchClick = (matchId) => {
+  const handleMatchClick = (matchId, matchDetails) => {
     console.log('🎯 Match clicked with ID:', matchId, 'Type:', typeof matchId);
-    onMatchClick(matchId);
+    onMatchClick(matchId, matchDetails);
   };
 
   const handleDateChange = (field, value) => {
-    setDateRange(prev => ({
+    setTempDateRange(prev => ({
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleApplyDateFilter = () => {
+    setDateRange({
+      startDate: tempDateRange.startDate,
+      endDate: tempDateRange.endDate
+    });
+    // Note: The useEffect will automatically trigger fetchFixtures when dateRange changes
   };
 
   const handleSeriesChange = (series) => {
@@ -493,7 +504,7 @@ const FixturesPage = ({ onMatchClick }) => {
             <label style={{ fontSize: '14px', color: '#6b7280', fontWeight: '500', whiteSpace: 'nowrap' }}>Start Date:</label>
             <input
               type="date"
-              value={dateRange.startDate}
+              value={tempDateRange.startDate}
               onChange={(e) => handleDateChange('startDate', e.target.value)}
               style={{
                 padding: '6px 10px',
@@ -509,7 +520,7 @@ const FixturesPage = ({ onMatchClick }) => {
             <label style={{ fontSize: '14px', color: '#6b7280', fontWeight: '500', whiteSpace: 'nowrap' }}>End Date:</label>
             <input
               type="date"
-              value={dateRange.endDate}
+              value={tempDateRange.endDate}
               onChange={(e) => handleDateChange('endDate', e.target.value)}
               style={{
                 padding: '6px 10px',
@@ -522,7 +533,7 @@ const FixturesPage = ({ onMatchClick }) => {
             />
           </div>
           <button
-            onClick={fetchFixtures}
+            onClick={handleApplyDateFilter}
             style={{
               padding: '6px 16px',
               backgroundColor: '#dc2626',
@@ -807,145 +818,151 @@ const FixturesPage = ({ onMatchClick }) => {
 };
 
 // Match Detail Page Component  
-const MatchDetailPage = ({ matchId, onBackClick, onChatClick, currentUser, onLoginClick, latestBallEvent }) => {
+const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetails, setCurrentView }) => {
+  console.log('selectedMatchDetails', selectedMatchDetails)
   const [activeTab, setActiveTab] = useState('commentary');
-  const [match, setMatch] = useState(null);
+  const [match, setMatch] = useState(selectedMatchDetails);
   const [matchDetail, setMatchDetail] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [liveData, setLiveData] = useState(null);
   const [commentary, setCommentary] = useState(null);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [isPredictionOpen, setIsPredictionOpen] = useState(false);
+
   
-  useEffect(() => {
-    fetchMatchData();
-  }, [matchId]);
+  const extractTeamDataFromMatchFile = useCallback((matchFileData) => {
+    try {
+      // Handle the structure from UpdatedMatchFile.json
+      if (matchFileData.Teams) {
+        // Get team IDs from the Teams object
+        const teamIds = Object.keys(matchFileData.Teams);
+        if (teamIds.length >= 2) {
+          const team1Id = teamIds[0];
+          const team2Id = teamIds[1];
+          
+          const team1Data = matchFileData.Teams[team1Id];
+          const team2Data = matchFileData.Teams[team2Id];
+          
+          return {
+            team1: {
+              id: team1Id,
+              name: team1Data.Name_Full,
+              shortName: team1Data.Name_Short,
+              logoUrl: selectedMatchDetails?.team1?.logoUrl || null
+            },
+            team2: {
+              id: team2Id, 
+              name: team2Data.Name_Full,
+              shortName: team2Data.Name_Short,
+              logoUrl: selectedMatchDetails?.team2?.logoUrl || null
+            }
+          };
+        }
+      }
+      
+      // Fallback to existing selectedMatchDetails if Teams data not available
+      return {
+        team1: selectedMatchDetails?.team1 || { 
+          name: `Team ${selectedMatchDetails?.team1Id || '1'}`, 
+          shortName: `T${selectedMatchDetails?.team1Id || '1'}` 
+        },
+        team2: selectedMatchDetails?.team2 || { 
+          name: `Team ${selectedMatchDetails?.team2Id || '2'}`, 
+          shortName: `T${selectedMatchDetails?.team2Id || '2'}` 
+        }
+      };
+    } catch (err) {
+      console.warn('Error extracting team data from match file:', err);
+      return {
+        team1: selectedMatchDetails?.team1 || { 
+          name: `Team ${selectedMatchDetails?.team1Id || '1'}`, 
+          shortName: `T${selectedMatchDetails?.team1Id || '1'}` 
+        },
+        team2: selectedMatchDetails?.team2 || { 
+          name: `Team ${selectedMatchDetails?.team2Id || '2'}`, 
+          shortName: `T${selectedMatchDetails?.team2Id || '2'}` 
+        }
+      };
+    }
+  }, [selectedMatchDetails]); // useCallback dependencies for extractTeamDataFromMatchFile
 
-
-
-  const fetchMatchData = async () => {
+  const fetchMatchData = useCallback(async () => {
     try {
       setIsLoadingData(true);
       setError(null); // Clear any previous errors
-      console.log('🔍 Looking for match with ID:', matchId, typeof matchId);
+      console.log('🔍 Fetching match data for ID:', matchId);
+      console.log('🔍 selectedMatchDetails teams:', {
+        team1: selectedMatchDetails?.team1,
+        team2: selectedMatchDetails?.team2,
+        status: selectedMatchDetails?.status
+      });
       
-      // First get the match from fixtures with a wider date range
-      const fixtures = await webappApiService.getFixtures(
-        new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days ago
-        new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]   // 30 days ahead
-      );
-      
-      console.log('📋 Available fixtures:', fixtures.map(f => ({ id: f.matchId, type: typeof f.matchId, name: f.matchName })));
-      
-      // Try both string and number comparison
-      const foundMatch = fixtures.find(f => f.matchId === matchId || f.matchId == matchId || f.matchId === String(matchId) || f.matchId === Number(matchId));
-      
-      if (!foundMatch) {
-        console.error('❌ Match not found. Available IDs:', fixtures.map(f => f.matchId));
-        console.error('❌ Looking for ID:', matchId, 'Type:', typeof matchId);
-        throw new Error(`Match not found. Looking for ID: ${matchId}, Available: ${fixtures.map(f => f.matchId).join(', ')}`);
-      }
-      
-      console.log('✅ Found match:', foundMatch.matchName, 'ID:', foundMatch.matchId);
+      // Use selectedMatchDetails as the base match data (no fixture API call needed)
+      let enrichedMatch = { ...selectedMatchDetails };
 
-      // Enrich with team and venue data
-      const [team1, team2, venue] = await Promise.all([
-        webappApiService.getTeamDetails(foundMatch.team1Id),
-        webappApiService.getTeamDetails(foundMatch.team2Id),
-        webappApiService.getVenueDetails(foundMatch.venueId)
-      ]);
-
-      const enrichedMatch = {
-        ...foundMatch,
-        team1,
-        team2,
-        venue
-      };
-
-      setMatch(enrichedMatch);
-
-      // If match is completed or live, fetch detailed data
-      if (enrichedMatch.status !== 'upcoming' && enrichedMatch.matchFile) {
+      // Try to extract team data from match file if available (for all match statuses)
+      if (enrichedMatch.matchFile) {
         try {
           const detailData = await webappApiService.getLiveInningsData(enrichedMatch.matchFile);
-          console.log('📄 Match detail data:', detailData);
-          setMatchDetail(detailData);
+          console.log('📄 Match file data loaded for team extraction:', detailData);
           
-          // Determine number of innings from match details
-          let inningsCount = 2; // Default to 2 innings
-          if (detailData.matchDetails && detailData.matchDetails.innings) {
-            inningsCount = detailData.matchDetails.innings.length;
-          } else if (detailData.innings) {
-            inningsCount = detailData.innings.length;
-          }
+          // Extract team data from the match file
+          const teamData = extractTeamDataFromMatchFile(detailData);
           
-          console.log(`🏏 Determined ${inningsCount} innings for match ${enrichedMatch.matchFile}`);
+          // Update match with team data from match file
+          enrichedMatch = {
+            ...enrichedMatch,
+            ...teamData
+          };
           
-          // Fetch commentary for all innings based on actual innings count
-          const commentaryData = await webappApiService.fetchAllInningsCommentary(enrichedMatch.matchFile, inningsCount);
-          setCommentary(commentaryData);
-          
-          // Update match object with real team data from live API
-          console.log('🔍 DEBUG: detailData structure:', Object.keys(detailData));
-          console.log('🔍 DEBUG: detailData.teams structure:', detailData.teams);
-          console.log('🔍 DEBUG: detailData.teams type:', Array.isArray(detailData.teams) ? 'array' : typeof detailData.teams);
-          
-          if (detailData.teams) {
-            let team1Data, team2Data;
+          console.log('✅ Updated match with team data from match file:', {
+            team1: enrichedMatch.team1.name,
+            team2: enrichedMatch.team2.name,
+            status: enrichedMatch.status
+          });
+
+          // For live/completed matches, also set match detail and fetch commentary
+          if (enrichedMatch.status !== 'upcoming') {
+            setMatchDetail(detailData);
             
-            // Check if teams is an array or object
-            if (Array.isArray(detailData.teams)) {
-              console.log('📊 Teams is an array with', detailData.teams.length, 'items');
-              team1Data = detailData.teams[0];
-              team2Data = detailData.teams[1];
-            } else if (detailData.teams.team1 && detailData.teams.team2) {
-              console.log('📊 Teams is an object with team1/team2 properties');
-              team1Data = detailData.teams.team1;
-              team2Data = detailData.teams.team2;
-            } else {
-              console.log('❌ Unknown teams structure:', detailData.teams);
-              return;
+            // Determine number of innings from match details
+            let inningsCount = 2; // Default to 2 innings
+            if (detailData.Innings && Array.isArray(detailData.Innings)) {
+              inningsCount = detailData.Innings.length;
+            } else if (detailData.matchDetails && detailData.matchDetails.innings) {
+              inningsCount = detailData.matchDetails.innings.length;
+            } else if (detailData.innings) {
+              inningsCount = detailData.innings.length;
             }
             
-            console.log('🏏 Team 1 data:', team1Data);
-            console.log('🏏 Team 2 data:', team2Data);
+            console.log(`🏏 Determined ${inningsCount} innings for match ${enrichedMatch.matchFile}`);
             
-            if (team1Data && team2Data) {
-              const updatedMatch = {
-                ...enrichedMatch,
-                team1: {
-                  ...enrichedMatch.team1,
-                  name: team1Data.name,
-                  shortName: team1Data.shortName
-                },
-                team2: {
-                  ...enrichedMatch.team2, 
-                  name: team2Data.name,
-                  shortName: team2Data.shortName
-                }
-              };
-              setMatch(updatedMatch);
-              console.log('✅ Updated match teams:', {
-                team1: updatedMatch.team1.name,
-                team2: updatedMatch.team2.name
-              });
-            }
+            // Fetch commentary for all innings based on actual innings count
+            const commentaryData = await webappApiService.fetchAllInningsCommentary(enrichedMatch.matchFile, inningsCount);
+            setCommentary(commentaryData);
           }
+          
         } catch (err) {
-          console.warn('Could not fetch match details:', err);
+          console.warn('Could not fetch match file data:', err);
+          // Still use selectedMatchDetails even if match file fails
         }
       }
-
-      setError(null);
+      
+      setMatch(enrichedMatch);
     } catch (err) {
       setError(err.message);
       console.error('Error fetching match data:', err);
     } finally {
       setIsLoadingData(false);
     }
-  };
+  }, [matchId, selectedMatchDetails, extractTeamDataFromMatchFile]); // useCallback dependencies
 
+  useEffect(() => {
+    if (selectedMatchDetails) {
+      fetchMatchData();
+    }
+  }, [matchId, selectedMatchDetails, fetchMatchData]);
+
+  
   const fetchLiveData = async () => {
     if (!match?.matchFile) return;
     
@@ -1151,12 +1168,12 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, currentUser, onLog
           <div className="team-summary">
             <TeamLogo team={match.team1} size={50} />
             <div>
-              {liveData?.scores?.team1 ? (
+              {matchDetail?.scores?.team1 ? (
                 <>
                   <div className="team-score-large">
-                    {liveData.scores.team1.runs}/{liveData.scores.team1.wickets}
+                    {matchDetail.scores.team1.runs}/{matchDetail.scores.team1.wickets}
                   </div>
-                  <div className="team-overs-info">{liveData.scores.team1.overs} overs</div>
+                  <div className="team-overs-info">{matchDetail.scores.team1.overs} overs</div>
                 </>
               ) : (
                 <>
@@ -1171,12 +1188,12 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, currentUser, onLog
           
           <div className="team-summary right">
             <div style={{ textAlign: 'right' }}>
-              {liveData?.scores?.team2 ? (
+              {matchDetail?.scores?.team2 ? (
                 <>
                   <div className="team-score-large">
-                    {liveData.scores.team2.runs}/{liveData.scores.team2.wickets}
+                    {matchDetail.scores.team2.runs}/{matchDetail.scores.team2.wickets}
                   </div>
-                  <div className="team-overs-info">{liveData.scores.team2.overs} overs</div>
+                  <div className="team-overs-info">{matchDetail.scores.team2.overs} overs</div>
                 </>
               ) : (
                 <>
@@ -1188,6 +1205,14 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, currentUser, onLog
             <TeamLogo team={match.team2} size={50} />
           </div>
         </div>
+      </div>
+
+      {/* Embedded Simulator Section */}
+      <div style={{ width: '100%', marginBottom: '20px' }}>
+        <EmbeddedSimulator 
+          matchId={matchId} 
+          onExpand={() => setCurrentView('simulator')}
+        />
       </div>
 
       {/* Prediction Section Toggle */}
@@ -1230,10 +1255,10 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, currentUser, onLog
              {/* Tab Content - Scrollable */}
        <div className="tab-content">
          {activeTab === 'commentary' && <CommentaryTab matchDetail={matchDetail} matchId={matchId} commentary={commentary} />}
-         {activeTab === 'scorecard' && <ScorecardTab matchDetail={matchDetail} matchId={matchId} liveData={liveData} />}
-         {activeTab === 'matchInfo' && <MatchInfoTab matchDetail={matchDetail} match={match} />}
+         {activeTab === 'scorecard' && <ScorecardTab matchDetail={matchDetail} matchId={matchId} />}
+         {activeTab === 'matchInfo' && <MatchInfoTab matchDetail={matchDetail} match={match} matchName={match?.matchName } />}
          {activeTab === 'wagonWheel' && <WagonWheelTab matchDetail={matchDetail} match={match} />}
-         {activeTab === 'pointsTable' && <PointsTableTab tournamentId={match.tournamentId} />}
+         {activeTab === 'pointsTable' && <PointsTableTab matchDetail={matchDetail} seriesId={match.tournamentId || '9924'} />}
        </div>
 
        {/* Chat Button - Fixed Bottom Right */}
@@ -1283,7 +1308,9 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, currentUser, onLog
 
 const WebApp = () => {
   const [currentView, setCurrentView] = useState('fixtures');
+
   const [selectedMatchId, setSelectedMatchId] = useState(null);
+  const [selectedMatchDetails, setSelectedMatchDetails] = useState(null);
   const [error, setError] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMatchId, setChatMatchId] = useState(null);
@@ -1293,10 +1320,11 @@ const WebApp = () => {
   const [latestBallEvent, setLatestBallEvent] = useState(null);
   const [socket, setSocket] = useState(null);
 
-  const handleMatchClick = (matchId) => {
+  const handleMatchClick = (matchId, matchDetails) => {
     try {
       console.log('🚀 WebApp handleMatchClick - Received ID:', matchId, 'Type:', typeof matchId);
       setSelectedMatchId(matchId);
+      setSelectedMatchDetails(matchDetails);
       setCurrentView('matchDetail');
       setError(null); // Clear any previous errors
     } catch (err) {
@@ -1480,8 +1508,6 @@ const WebApp = () => {
 
     return (
     <div className="cricket-app">
-
-      
       {currentView === 'fixtures' && (
         <FixturesPage onMatchClick={handleMatchClick} />
       )}
@@ -1523,12 +1549,83 @@ const WebApp = () => {
               matchId={selectedMatchId} 
               onBackClick={handleBackClick} 
               onChatClick={openMatchChat}
+              selectedMatchDetails={selectedMatchDetails}
+              setCurrentView={setCurrentView}
               currentUser={currentUser}
               onLoginClick={() => setIsLoginOpen(true)}
               latestBallEvent={latestBallEvent}
             />
           </ErrorBoundary>
         </React.Suspense>
+      )}
+      {/* eslint-disable react/no-unknown-property */}
+      {currentView === 'simulator' && selectedMatchId && (
+        <div style={{ width: '100vw', height: '100vh', position: 'relative', backgroundColor: '#000' }}>
+          <button
+            onClick={() => {
+              setCurrentView('matchDetail');
+            }}
+            style={{
+              position: 'absolute',
+              top: '20px',
+              left: '20px',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              border: '2px solid white',
+              color: 'white',
+              padding: '8px 16px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.3s ease',
+              backdropFilter: 'blur(4px)',
+              zIndex: 1000
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 13L5 8L10 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Back to Match
+          </button>
+          <Canvas
+            camera={{ 
+              position: [30, 30, 30], 
+              fov: 60,
+              near: 0.1,
+              far: 1000
+            }}
+            shadows
+            style={{ width: '100%', height: '100%' }}
+          >
+            <ambientLight args={[0xffffff, 0.5]} />
+            <directionalLight 
+              args={[0xffffff, 1]}
+              position={[10, 10, 5]} 
+              castShadow 
+              shadow-mapSize={[2048, 2048]}
+            />
+            <Stadium 
+              matchId={selectedMatchId} 
+              isEmbedded={false}
+            />
+            <OrbitControls 
+              enablePan={true}
+              enableZoom={true}
+              enableRotate={true}
+              minDistance={10}
+              maxDistance={100}
+              maxPolarAngle={Math.PI / 2.2}
+            />
+          </Canvas>
+        </div>
       )}
       
       {/* Login Modal */}

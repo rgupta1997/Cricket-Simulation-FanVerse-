@@ -10,6 +10,7 @@ const BallShotControl = ({ onUpdateConfig, currentConfig, gameState, onResetBall
     keeperAutoCollect: true,        // Whether keeper should auto-collect balls
     keeperCollectionRadius: 2.0,    // Distance within which keeper collects (meters)
     keeperSpeedThreshold: 3.0,      // Maximum speed for keeper to collect (m/s)
+    resetDelay: 3.0,                // Delay in seconds before resetting ball after shot completes
     ...currentConfig
   });
 
@@ -406,6 +407,41 @@ const BallShotControl = ({ onUpdateConfig, currentConfig, gameState, onResetBall
             </div>
           </>
         )}
+      </div>
+
+      {/* Reset Delay Setting */}
+      <div style={{ 
+        padding: '8px', 
+        background: 'rgba(100, 100, 255, 0.2)', 
+        borderRadius: '4px',
+        border: '1px solid #6666FF'
+      }}>
+        <div style={{ fontWeight: 'bold', color: '#6666FF', marginBottom: '6px' }}>
+          ⏱️ Reset Delay Setting
+        </div>
+        <div>
+          <label style={{ fontSize: '9px', color: '#ccc' }}>Delay before reset (seconds)</label>
+          <input
+            type="number"
+            min="0.5"
+            max="10"
+            step="0.5"
+            value={shotConfig.resetDelay}
+            onChange={(e) => handleUpdate('resetDelay', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '3px',
+              border: '1px solid #333',
+              borderRadius: '3px',
+              background: 'rgba(100,100,255,0.1)',
+              color: 'white',
+              fontSize: '10px'
+            }}
+          />
+          <div style={{ fontSize: '9px', color: '#aaa', marginTop: '2px' }}>
+            Time to observe ball position before auto-reset ({shotConfig.resetDelay}s)
+          </div>
+        </div>
       </div>
 
       {/* Status Display */}
