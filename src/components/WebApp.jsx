@@ -1439,7 +1439,18 @@ const WebApp = () => {
           const { io } = await import('socket.io-client');
           
           // Using the same Socket.IO connection as test-user-types.html
-          const socket = io('http://localhost:3001');
+          const socket = io('http://localhost:3001', {
+            transports: ['polling', 'websocket'],
+            upgrade: true,
+            rememberUpgrade: true,
+            timeout: 20000,
+            forceNew: true,
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            maxReconnectionAttempts: 5
+          });
           
           socket.on('connect', () => {
             console.log('🔌 Socket.IO connected for predictions - listening for ball events');
@@ -1506,7 +1517,25 @@ const WebApp = () => {
           });
           
           socket.on('connect_error', (error) => {
-            console.error('Socket.IO connection error:', error);
+            console.error('🚨 Socket.IO connection error:', error);
+            console.error('Error details:', {
+              type: error.type,
+              description: error.description,
+              context: error.context,
+              message: error.message
+            });
+          });
+          
+          socket.on('connect_timeout', () => {
+            console.error('⏰ Socket.IO connection timeout');
+          });
+          
+          socket.on('reconnect_attempt', (attemptNumber) => {
+            console.log(`🔄 Socket.IO reconnection attempt: ${attemptNumber}`);
+          });
+          
+          socket.on('reconnect_failed', () => {
+            console.error('❌ Socket.IO reconnection failed');
           });
           
           // Listen for successful match join confirmation

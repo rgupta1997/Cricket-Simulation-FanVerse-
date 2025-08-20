@@ -1,0 +1,69 @@
+.bowling-validation-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.bowling-validation-container {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  border: 2px solid #ffffff;
+  border-radius: 12px;
+  padding: 16px 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: bowlingValidationAppear 0.3s ease-out, bowlingValidationPulse 2s ease-in-out infinite;
+  backdrop-filter: blur(10px);
+}
+
+.bowling-validation-text {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  animation: bowlingValidationGlow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes bowlingValidationAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes bowlingValidationPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes bowlingValidationGlow {
+  0% {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+  100% {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .bowling-validation-container {
+    padding: 12px 20px;
+  }
+  
+  .bowling-validation-text {
+    font-size: 16px;
+  }
+}
+

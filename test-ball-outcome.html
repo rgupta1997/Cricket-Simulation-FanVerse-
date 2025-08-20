@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ball Outcome Graphics Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 10px;
+        }
+        .outcome-display {
+            margin: 20px 0;
+            padding: 20px;
+            background: #333;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎮 Ball Outcome Graphics Test</h1>
+        
+        <div class="test-section">
+            <h2>Test Ball Outcomes</h2>
+            <p>Click the buttons below to test different ball outcomes:</p>
+            
+            <button class="test-button" onclick="testOutcome('six')">Test SIX (6 runs)</button>
+            <button class="test-button" onclick="testOutcome('four')">Test FOUR (4 runs)</button>
+            <button class="test-button" onclick="testOutcome('three')">Test THREE (3 runs)</button>
+            <button class="test-button" onclick="testOutcome('two')">Test TWO (2 runs)</button>
+            <button class="test-button" onclick="testOutcome('one')">Test ONE (1 run)</button>
+            <button class="test-button" onclick="testOutcome('dot')">Test DOT BALL (0 runs)</button>
+            <button class="test-button" onclick="testOutcome('special')">Test SPECIAL</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>Current Ball Outcome Data</h2>
+            <div id="outcome-display" class="outcome-display">
+                No outcome data yet. Click a test button above.
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Results</h2>
+            <div id="test-results">
+                <p>Test results will appear here...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate the BallOutcome data structure
+        const ballOutcomes = {
+            six: {
+                type: 'boundary',
+                runs: 6,
+                description: 'Hit over the boundary for six'
+            },
+            four: {
+                type: 'boundary',
+                runs: 4,
+                description: 'Driven through covers for four'
+            },
+            three: {
+                type: 'shot',
+                runs: 3,
+                description: 'Well placed for three runs'
+            },
+            two: {
+                type: 'shot',
+                runs: 2,
+                description: 'Good running between the wickets for two'
+            },
+            one: {
+                type: 'shot',
+                runs: 1,
+                description: 'Quick single taken'
+            },
+            dot: {
+                type: 'shot',
+                runs: 0,
+                description: 'Defended back to the bowler'
+            },
+            special: {
+                type: 'special',
+                runs: 0,
+                description: 'WICKET! Bowled!'
+            }
+        };
+
+        function testOutcome(outcomeType) {
+            const outcome = ballOutcomes[outcomeType];
+            
+            // Display the outcome data
+            document.getElementById('outcome-display').innerHTML = `
+                <h3>Ball Outcome Data:</h3>
+                <pre>${JSON.stringify(outcome, null, 2)}</pre>
+            `;
+            
+            // Simulate the graphics trigger
+            console.log('🎮 Testing ball outcome:', outcome);
+            
+            // Add test result
+            const testResults = document.getElementById('test-results');
+            const timestamp = new Date().toLocaleTimeString();
+            testResults.innerHTML += `
+                <div style="margin: 10px 0; padding: 10px; background: #444; border-radius: 5px;">
+                    <strong>${timestamp}</strong> - Tested: ${outcomeType.toUpperCase()}<br>
+                    <small>Type: ${outcome.type}, Runs: ${outcome.runs}, Description: ${outcome.description}</small>
+                </div>
+            `;
+            
+            // Simulate what the graphics component would receive
+            const graphicsData = {
+                runs: outcome.runs,
+                isBoundary: outcome.type === 'boundary',
+                details: outcome.description,
+                type: outcome.type
+            };
+            
+            console.log('🎮 Graphics would receive:', graphicsData);
+        }
+
+        // Initialize with a default test
+        console.log('🎮 Ball Outcome Graphics Test initialized');
+        testOutcome('four');
+    </script>
+</body>
+</html>

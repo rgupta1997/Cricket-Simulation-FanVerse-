@@ -364,8 +364,6 @@ const Stadium = ({ onGameStateChange, currentPlayerPositions, isPositionEditorAc
   const { field, pitch, boundaries } = STADIUM_CONFIG;
   const [useCustomModel, setUseCustomModel] = useState(false);
   const [showWagonWheel, setShowWagonWheel] = useState(false);
-  
-  console.log("Stadium rendering, useCustomModel:", useCustomModel, "showWagonWheel:", showWagonWheel);
 
   useEffect(() => {
     const handleKeyPress = (event) => {

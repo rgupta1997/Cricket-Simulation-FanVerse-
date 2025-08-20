@@ -91,6 +91,7 @@ export const createInitialGameState = () => ({
     fielders: []
   },
   lastAction: null,
+  BallOutcome: null,
   animations: {
     active: [],
     queue: []
@@ -161,6 +162,7 @@ export const updateGameState = (currentState, action) => {
         bowlingAnimation: 'runUp', // Always start with run-up
         bowlingSequenceActive: true, // Flag to indicate bowling sequence is running
         pendingBallData: action.ballData, // Store trajectory for release
+        BallOutcome: null, // Clear previous ball outcome
         players: {
           ...currentState.players,
           bowler: {
@@ -199,6 +201,17 @@ export const updateGameState = (currentState, action) => {
 
     case 'BALL_HIT':
       const hitVelocity = action.newVelocity || action.payload?.newVelocity || [0, 5, 10];
+      
+      // ✅ ENHANCED: Comprehensive logging for auto-shot debugging
+      console.log('🎯 BALL_HIT state transition:', {
+        ballState: BALL_STATES.HIT,
+        hitVelocity,
+        trajectory: action.trajectory || action.payload?.trajectory,
+        shotType: action.shotType || action.payload?.shotType,
+        isRunnable: action.isRunnable || action.payload?.isRunnable,
+        source: action.payload?.source || 'manual'
+      });
+      
       return {
         ...currentState,
         ballState: BALL_STATES.HIT,
@@ -212,8 +225,13 @@ export const updateGameState = (currentState, action) => {
         lastAction: {
           type: 'shot',
           shotType: action.shotType || action.payload?.shotType,
-          power: action.power || action.payload?.power
+          power: action.power || action.payload?.power,
+          source: action.payload?.source || 'manual', // Track if it's auto-shot
+          // Note: This will be updated with actual outcome (runs/description) when ball reaches target
+          runs: 0,
+          description: ''
         },
+        BallOutcome: null, // Clear previous ball outcome
         players: {
           ...currentState.players,
           striker: {
@@ -258,8 +276,53 @@ export const updateGameState = (currentState, action) => {
         gameState: GAME_STATES.WAITING_FOR_BALL,
         ballState: BALL_STATES.WITH_KEEPER,
         canBat: false, // Reset batting availability when ball returns to keeper
+        bowlingAnimation: null, // Reset bowling animation
+        bowlingSequenceActive: false, // Reset bowling sequence
+        pendingBallData: null, // Clear pending ball data
         currentBall: {
           position: currentState.players.wicketKeeper.position,
+          velocity: [0, 0, 0],
+          isMoving: false,
+          trajectory: []
+        },
+        players: {
+          ...currentState.players,
+          striker: {
+            ...currentState.players.striker,
+            state: PLAYER_STATES.READY,
+            animation: null
+          },
+          nonStriker: {
+            ...currentState.players.nonStriker,
+            state: PLAYER_STATES.IDLE,
+            animation: null
+          },
+          bowler: {
+            ...currentState.players.bowler,
+            state: PLAYER_STATES.READY,
+            animation: null
+          },
+          wicketKeeper: {
+            ...currentState.players.wicketKeeper,
+            state: PLAYER_STATES.READY,
+            animation: null
+          }
+        },
+        lastAction: null, // Clear last action
+        animations: {
+          active: [],
+          queue: []
+        }
+      };
+
+    case 'BALL_WITH_BOWLER':
+      return {
+        ...currentState,
+        gameState: GAME_STATES.WAITING_FOR_BALL,
+        ballState: BALL_STATES.WITH_BOWLER,
+        canBat: false, // Reset batting availability when ball returns to bowler
+        currentBall: {
+          position: currentState.players.bowler.position,
           velocity: [0, 0, 0],
           isMoving: false,
           trajectory: []
@@ -287,6 +350,16 @@ export const updateGameState = (currentState, action) => {
         score: {
           ...currentState.score,
           ...action.scoreUpdate
+        }
+      };
+
+    case 'SET_BALL_OUTCOME':
+      return {
+        ...currentState,
+        BallOutcome: {
+          type: action.outcome.type,
+          runs: action.outcome.runs,
+          description: action.outcome.description
         }
       };
 

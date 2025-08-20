@@ -58,8 +58,16 @@ const EnhancedBall = ({
       setBounceCount(0);
       
       // Check if this is a shot (ball state is 'hit')
-      if (ballState === 'hit') {
-        setShotStartPosition(new Vector3(...position));
+      if (ballState === 'hit' && position) {
+        // ✅ SAFETY CHECK: Ensure position is valid before creating Vector3
+        if (Array.isArray(position) && position.length >= 3) {
+          setShotStartPosition(new Vector3(...position));
+        } else if (position && typeof position === 'object' && position.x !== undefined) {
+          setShotStartPosition(new Vector3(position.x, position.y || 0, position.z || 0));
+        } else {
+          console.warn('⚠️ Invalid position for shot start position', position);
+          setShotStartPosition(new Vector3(0, 0, -9)); // Default striker position
+        }
       }
     } else if (!isMoving) {
       // Ball stopped - reset trajectory state completely
@@ -154,6 +162,20 @@ const EnhancedBall = ({
               
               // Mark trajectory as complete - no physics mode activation
               setCurrentWaypoint(prev => prev + 1); // This will stop trajectory movement
+              
+              // SAFETY: Add timeout to ensure ball doesn't stay stuck at final position
+              setTimeout(() => {
+                if (onCatch) {
+                  console.log('🔄 Safety timeout: Ball stuck at final position, forcing reset to bowler');
+                  onCatch({
+                    type: 'collect',
+                    playerId: 'bowler',
+                    position: endPoint.toArray(),
+                    reason: 'safety_timeout_reset'
+                  });
+                }
+              }, 20000); // 20 second safety timeout (longer than 15s auto-reset delay)
+              
               return; // Exit early to prevent further movement
             }
             
@@ -176,6 +198,18 @@ const EnhancedBall = ({
         
         // Check for batsman interaction in direct coordinate mode too
         const dummyVelocity = new Vector3(0, 0, 0); // Create Vector3 object instead of array
+        
+        // DEBUG: Log ball position during direct coordinate movement
+        if (ballState === 'bowling') {
+          const strikerPos = new Vector3(0, 0, -9);
+          const distanceToStriker = currentPos.distanceTo(strikerPos);
+          
+          // Only log when ball is getting close to striker to reduce console spam
+          if (distanceToStriker < 15) {
+            console.log(`🏏 Direct coord ball at [${currentPos.x.toFixed(1)}, ${currentPos.y.toFixed(1)}, ${currentPos.z.toFixed(1)}], distance to striker: ${distanceToStriker.toFixed(1)}m`);
+          }
+        }
+        
         checkTargetReached(currentPos, dummyVelocity);
         
         return; // Skip physics when in direct coordinate mode
@@ -572,15 +606,30 @@ const EnhancedBall = ({
 
   // Dedicated handler for shot movement WITHOUT physics interference
   const handleShotMovement = (ball, currentPos, currentVel, delta) => {
+    // ✅ SAFETY CHECK: Ensure shotStartPosition is not null
     if (!shotStartPosition) {
       setShotStartPosition(currentPos.clone());
+      return; // Exit early until shotStartPosition is set
+    }
+    
+    // ✅ SAFETY CHECK: Ensure currentPos is valid
+    if (!currentPos || !currentPos.isVector3) {
+      console.warn('⚠️ handleShotMovement: currentPos is invalid', currentPos);
+      return;
     }
     
     const currentDistance = currentPos.distanceTo(shotStartPosition);
     const deterministicTarget = typeof window !== 'undefined' ? window.deterministicTarget : null;
     
-    if (deterministicTarget) {
+    if (deterministicTarget && deterministicTarget.finalStopPosition) {
       const exactStopDistance = deterministicTarget.exactDistance;
+      
+      // ✅ SAFETY CHECK: Ensure finalStopPosition is valid
+      if (!Array.isArray(deterministicTarget.finalStopPosition) || deterministicTarget.finalStopPosition.length < 3) {
+        console.warn('⚠️ handleShotMovement: invalid finalStopPosition', deterministicTarget.finalStopPosition);
+        return;
+      }
+      
       const stopPosition = new Vector3(...deterministicTarget.finalStopPosition);
       const progressToTarget = currentDistance / exactStopDistance;
       const distanceToStopPosition = currentPos.distanceTo(stopPosition);
@@ -600,18 +649,27 @@ const EnhancedBall = ({
           });
         }
         
-        // Add a configurable delay before resetting to bowler
-        const resetDelay = (2.0) * 1000; // Convert to milliseconds
+        // Add a configurable delay before resetting to bowler (10 seconds)
+        const resetDelay = (10.0) * 1000; // Convert to milliseconds
+        
+        console.log(`🎯 Shot target reached! Ball at [${stopPosition.x.toFixed(1)}, ${stopPosition.y.toFixed(1)}, ${stopPosition.z.toFixed(1)}], resetting in 10s`);
         
         if (onCatch) {
-          setTimeout(() => {
-            onCatch({
-              type: 'collect',
-              playerId: 'bowler',
-              position: stopPosition.toArray(),
-              reason: 'shot_distance_reached'
-            });
-          }, resetDelay);
+                  setTimeout(() => {
+          console.log('🔄 Shot completed after 10s, resetting ball to bowler');
+          
+          // Get shot distance from deterministic target for runs calculation
+          const deterministicTarget = typeof window !== 'undefined' ? window.deterministicTarget : null;
+          const shotDistance = deterministicTarget?.exactDistance || 0;
+          
+          onCatch({
+            type: 'collect',
+            playerId: 'bowler',
+            position: stopPosition.toArray(),
+            reason: 'shot_distance_reached',
+            shotDistance: shotDistance
+          });
+        }, resetDelay);
         }
         
         // Clear deterministic target
@@ -622,7 +680,15 @@ const EnhancedBall = ({
       }
       
       // Move ball toward target WITHOUT physics
-      const moveDirection = stopPosition.clone().sub(currentPos).normalize();
+      const moveDirection = stopPosition.clone().sub(currentPos);
+      
+      // ✅ SAFETY CHECK: Ensure moveDirection is valid before normalizing
+      if (moveDirection.length() < 0.001) {
+        console.warn('⚠️ handleShotMovement: moveDirection too small, ball may be at target');
+        return;
+      }
+      
+      moveDirection.normalize();
       
       // Calculate speed based on remaining distance (smooth deceleration)
       let moveSpeed = 20; // Base speed in m/s
@@ -645,14 +711,19 @@ const EnhancedBall = ({
         }
       }
       
-      // Update ball position
-      ball.position.copy(currentPos);
-      
-      // Update trail
-      setTrail(prev => {
-        const newTrail = [...prev, currentPos.clone()];
-        return newTrail.slice(-20);
-      });
+      // ✅ SAFETY CHECK: Ensure ball and currentPos are valid before updating
+      if (ball && ball.position && currentPos && currentPos.isVector3) {
+        ball.position.copy(currentPos);
+        
+        // Update trail
+        setTrail(prev => {
+          const newTrail = [...prev, currentPos.clone()];
+          return newTrail.slice(-20);
+        });
+      } else {
+        console.warn('⚠️ handleShotMovement: invalid ball or currentPos for position update', { ball, currentPos });
+        return;
+      }
       
       // Check for boundary
       const boundaryDistance = Math.sqrt(currentPos.x ** 2 + currentPos.z ** 2);
@@ -706,12 +777,25 @@ const EnhancedBall = ({
       
       // Simple forward movement
       currentPos.add(currentVel.clone().multiplyScalar(delta));
-      ball.position.copy(currentPos);
+      
+      // ✅ SAFETY CHECK: Ensure ball is valid before updating position
+      if (ball && ball.position) {
+        ball.position.copy(currentPos);
+      } else {
+        console.warn('⚠️ handleShotMovement: invalid ball for fallback position update', ball);
+        return;
+      }
     }
   };
 
   const checkTargetReached = (ballPos, ballVel) => {
     if (!onReachTarget) return;
+
+    // ✅ SAFETY CHECK: Ensure ballPos is valid
+    if (!ballPos || !ballPos.isVector3) {
+      console.warn('⚠️ checkTargetReached: invalid ballPos', ballPos);
+      return;
+    }
 
     // Check various target conditions
     
@@ -727,8 +811,23 @@ const EnhancedBall = ({
       // Also calculate full 3D distance for reference
       const fullDistance = ballPos.distanceTo(strikerPos);
       
-      // Trigger when ball is within 2 meters on Z-axis (approaching striker)
-      if (distanceZ <= 2.0 && ballZ > strikerZ) { // Ball must be approaching from bowler's end
+      // ✅ ENHANCED: Multiple trigger conditions for maximum reliability
+      const zDistanceTrigger = distanceZ <= 3.0; // Increased from 2.0 to 3.0
+      const fullDistanceTrigger = fullDistance <= 4.0; // New 3D distance trigger
+      const directionTrigger = ballZ > strikerZ; // Ball approaching from bowler's end
+      
+      // ✅ ENHANCED: Trigger if ANY condition is met (more aggressive)
+      if ((zDistanceTrigger || fullDistanceTrigger) && directionTrigger) {
+        console.log(`🎯 ENHANCED BALL REACHED BATSMAN!`, {
+          ballZ: ballZ.toFixed(1),
+          strikerZ: strikerZ,
+          zDistance: distanceZ.toFixed(1),
+          fullDistance: fullDistance.toFixed(1),
+          zDistanceTrigger,
+          fullDistanceTrigger,
+          directionTrigger
+        });
+        
         onReachTarget({
           target: 'batsman',
           position: ballPos.toArray(),
@@ -736,6 +835,20 @@ const EnhancedBall = ({
           distance: distanceZ, // Pass Z-axis distance
           fullDistance // Pass full distance for reference
         });
+      } else if (ballState === 'bowling') {
+        // ✅ ENHANCED: More detailed debugging for non-trigger cases
+        if (distanceZ <= 6.0) { // Increased debug range
+          console.log(`🏏 Ball near batsman but not triggering:`, {
+            ballZ: ballZ.toFixed(1),
+            strikerZ: strikerZ,
+            zDistance: distanceZ.toFixed(1),
+            fullDistance: fullDistance.toFixed(1),
+            zDistanceTrigger,
+            fullDistanceTrigger,
+            directionTrigger,
+            reason: !directionTrigger ? 'Wrong direction' : 'Distance too far'
+          });
+        }
       }
     }
     

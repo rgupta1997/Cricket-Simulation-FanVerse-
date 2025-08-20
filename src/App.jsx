@@ -11,6 +11,8 @@ import Navigation from './components/Navigation';
 import PlayerPositionManager from './components/PlayerPositionManager';
 import RightDockedPanel from './components/RightDockedPanel';
 import LeftDockedPanel from './components/LeftDockedPanel';
+import BallOutcomeGraphics from './components/BallOutcomeGraphics';
+import BowlingValidationMessage from './components/BowlingValidationMessage';
 import { useCameraControls } from './hooks/useCameraControls';
 import { createInitialPositions } from './utils/functionalPositionManager';
 
@@ -258,6 +260,42 @@ const App = () => {
       {cricketUIData && (
         <LeftDockedPanel
           gameState={cricketUIData.gameState}
+        />
+      )}
+
+      {/* Ball Outcome Graphics - rendered outside Canvas */}
+      {cricketUIData ? (
+        <>
+          {console.log('🎮 App.jsx: Rendering BallOutcomeGraphics with:', {
+            showOutcomeGraphics: cricketUIData.showOutcomeGraphics,
+            currentBallOutcome: cricketUIData.currentBallOutcome
+          })}
+          <BallOutcomeGraphics
+            isVisible={cricketUIData.showOutcomeGraphics}
+            ballOutcome={cricketUIData.currentBallOutcome}
+            onComplete={cricketUIData.handleOutcomeGraphicsComplete}
+          />
+        </>
+      ) : (
+        <div style={{ 
+          position: 'fixed', 
+          top: '10px', 
+          right: '10px', 
+          background: 'yellow', 
+          color: 'black', 
+          padding: '10px', 
+          zIndex: 10000,
+          fontSize: '12px'
+        }}>
+          cricketUIData is null
+        </div>
+      )}
+
+      {/* Bowling Validation Message - rendered outside Canvas */}
+      {cricketUIData && (
+        <BowlingValidationMessage
+          isVisible={cricketUIData.showBowlingValidationMessage}
+          message={cricketUIData.bowlingValidationMessage}
         />
       )}
       

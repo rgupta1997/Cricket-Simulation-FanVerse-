@@ -189,8 +189,37 @@ const EmbeddedSimulator = ({ matchId, onExpand }) => {
             Load Demo
           </button>
         ) : (
-          <button
-            onClick={handleClearData}
+          <>
+            <button
+              onClick={() => {
+                console.log('🎮 Testing BallOutcome from dummy data...');
+                // This will trigger the graphics if BallOutcome is present
+                if (currentGameData?.gameState?.BallOutcome) {
+                  console.log('🎮 Found BallOutcome in dummy data:', currentGameData.gameState.BallOutcome);
+                } else {
+                  console.log('🎮 No BallOutcome found in dummy data');
+                }
+              }}
+              style={{
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                border: '2px solid #3b82f6',
+                color: '#3b82f6',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.3s ease',
+                backdropFilter: 'blur(4px)',
+                fontWeight: '500'
+              }}
+            >
+              🎮 Test BallOutcome
+            </button>
+            <button
+              onClick={handleClearData}
             style={{
               backgroundColor: 'rgba(239, 68, 68, 0.2)',
               border: '2px solid #ef4444',
@@ -218,6 +247,7 @@ const EmbeddedSimulator = ({ matchId, onExpand }) => {
             </svg>
             Clear Demo
           </button>
+          </>
         )}
 
         {/* Expand Button */}

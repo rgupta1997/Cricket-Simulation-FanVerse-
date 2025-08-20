@@ -24,10 +24,53 @@ import {
 } from '../constants/playerPositions';
 import ZoneMarkers from './ZoneMarkers';
 
+
 const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEditorActive = false, isEmbedded = false, matchId = null, dummyGameData = null, isDummyDataActive = false, onBallPositionUpdate }) => {
   const [gameState, setGameState] = useState(createInitialGameState());
   const [isPlaying, setIsPlaying] = useState(false);
+  
+  // Ball outcome graphics state
+  const [showOutcomeGraphics, setShowOutcomeGraphics] = useState(false);
+  const [currentBallOutcome, setCurrentBallOutcome] = useState(null);
+  
+  // Bowling validation message state
+  const [showBowlingValidationMessage, setShowBowlingValidationMessage] = useState(false);
+  const [bowlingValidationMessage, setBowlingValidationMessage] = useState('');
+  
+  // ✅ ENHANCED: Timer management for auto-shot fallbacks
+  const [activeFallbackTimers, setActiveFallbackTimers] = useState(new Set());
+  
   const [selectedShotDirection, setSelectedShotDirection] = useState('straight');
+  
+  // Handle ball outcome graphics completion
+  const handleOutcomeGraphicsComplete = useCallback(() => {
+    setShowOutcomeGraphics(false);
+    setCurrentBallOutcome(null);
+  }, []);
+  
+  // ✅ ENHANCED: Clear all active fallback timers
+  const clearAllFallbackTimers = useCallback(() => {
+    activeFallbackTimers.forEach(timerId => {
+      clearTimeout(timerId);
+    });
+    setActiveFallbackTimers(new Set());
+  }, [activeFallbackTimers]);
+
+  // ✅ ENHANCED: Add timer to active timers set
+  const addFallbackTimer = useCallback((timerId) => {
+    setActiveFallbackTimers(prev => new Set([...prev, timerId]));
+  }, []);
+
+  // Show bowling validation message
+  const showBowlingMessage = useCallback((message, duration = 2000) => {
+    setBowlingValidationMessage(message);
+    setShowBowlingValidationMessage(true);
+    
+    setTimeout(() => {
+      setShowBowlingValidationMessage(false);
+      setBowlingValidationMessage('');
+    }, duration);
+  }, []);
   const [selectedShotType, setSelectedShotType] = useState('drive'); // drive, defensive, pull, cut, loft
   const [showBatSwing, setShowBatSwing] = useState(false);
   const [shotAngle, setShotAngle] = useState(0); // Default to straight (down arrow) - 0°
@@ -76,8 +119,6 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
   // Function to apply dummy data to game state
   const applyDummyData = useCallback((dummyData) => {
     if (!dummyData) return;
-
-    console.log('Applying dummy data to cricket game:', dummyData);
     
     // Create new game state based on dummy data
     const newGameState = {
@@ -85,6 +126,7 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       gameState: dummyData.gameState.gameState,
       ballState: dummyData.gameState.ballState,
       canBat: dummyData.gameState.canBat,
+      formatId: dummyData.gameState.formatId,
       score: dummyData.gameState.score,
       currentBall: dummyData.gameState.currentBall,
       players: {
@@ -93,6 +135,7 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       },
       controls: dummyData.controls,
       lastAction: dummyData.gameState.lastAction,
+      BallOutcome: dummyData.gameState.BallOutcome, // Include BallOutcome from dummy data
       animations: dummyData.animations || { active: [], queue: [] }
     };
 
@@ -104,6 +147,14 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     }
     if (dummyData.controls?.batting?.shot) {
       setSelectedShotType(dummyData.controls.batting.shot);
+    }
+    
+    // Trigger graphics if BallOutcome is present in dummy data
+    if (dummyData.gameState.BallOutcome) {
+      console.log('🎮 Dummy data contains BallOutcome, triggering graphics:', dummyData.gameState.BallOutcome);
+      setTimeout(() => {
+        triggerOutcomeGraphics();
+      }, 1000); // 1s delay to ensure state is set
     }
   }, []);
 
@@ -125,7 +176,10 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
 
   // Reusable helper function to reset ball to bowler position
   const resetBallToBowler = useCallback((reason = 'manual_reset') => {
-    console.log(`🔄 Resetting ball to bowler: ${reason}`);
+    
+    // ✅ ENHANCED: Clear all fallback timers when ball is reset
+    clearAllFallbackTimers();
+    
     setGameState(prevState => ({
       ...prevState,
       gameState: GAME_STATES.WAITING_FOR_BALL,
@@ -160,22 +214,57 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     
     // Clear any pending ball data from global scope
     window.pendingBallData = null;
-    console.log(`✅ Ball reset complete - ready for next delivery`);
-  }, []);
+  }, [clearAllFallbackTimers]);
 
   // 🏏 REALISTIC BOWLING HANDLER with Run-up and Ball Release Coordination
   const handleBowl = useCallback(() => {
     if (gameState.gameState !== GAME_STATES.WAITING_FOR_BALL) {
+      console.log('⚠️ Cannot bowl - game not in WAITING_FOR_BALL state');
+      showBowlingMessage('🏏 Game not ready for bowling', 1500);
       return;
     }
 
     const { controls } = gameState;
-    const bowlingControls = controls.bowling;
+    const bowlingControls = controls?.bowling;
+    
+    // ✅ ENHANCED: Validate bowling controls before proceeding
+    if (!bowlingControls) {
+      console.error('❌ Cannot bowl - no bowling controls available');
+      showBowlingMessage('🏏 Bowling data not configured', 2000);
+      return;
+    }
+    
+    // ✅ ENHANCED: Validate required bowling parameters
+    const requiredParams = ['velocity', 'ball_axis_x', 'ball_axis_y', 'length_axis_x', 'length_axis_z', 'line_axis_x', 'line_axis_z'];
+    const missingParams = requiredParams.filter(param => bowlingControls[param] === undefined || bowlingControls[param] === null);
+    
+    if (missingParams.length > 0) {
+      console.error('❌ Cannot bowl - missing required parameters:', missingParams);
+      showBowlingMessage(`🏏 Missing bowling data: ${missingParams.join(', ')}`, 2500);
+      return;
+    }
+    
+    // ✅ ENHANCED: Validate bowling parameters are not zero/invalid
+    const invalidParams = requiredParams.filter(param => {
+      const value = bowlingControls[param];
+      return value === 0 || value === null || value === undefined || isNaN(value);
+    });
+    
+    if (invalidParams.length > 0) {
+      console.error('❌ Cannot bowl - invalid bowling parameters:', invalidParams);
+      showBowlingMessage(`🏏 Invalid bowling data: ${invalidParams.join(', ')}`, 2500);
+      return;
+    }
     
     // Calculate enhanced ball trajectory using pitch analysis
     const trajectory = calculateBallTrajectory(bowlingControls);
     
-    console.log(`🏏 Starting realistic bowling sequence - ${bowlingControls.type || 'fast'} bowling`);
+    // ✅ ENHANCED: Validate trajectory data
+    if (!trajectory || !trajectory.initial || !trajectory.bounce || !trajectory.target) {
+      console.error('❌ Cannot bowl - invalid trajectory calculated');
+      showBowlingMessage('🏏 Cannot calculate ball trajectory', 2000);
+      return;
+    }
     
     // 🏃‍♂️ START RUN-UP ANIMATION - Trigger realistic bowling sequence
     setGameState(prevState => updateGameState(prevState, {
@@ -184,7 +273,7 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       ballData: trajectory // Store trajectory for later use
     }));
 
-    // Store trajectory data for ball release
+    // ✅ ENHANCED: Store trajectory data for ball release with validation
     window.pendingBallData = {
       position: trajectory.initial.position,
       velocity: trajectory.initial.velocity,
@@ -203,62 +292,98 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         velocity: bowlingControls.velocity
       }
     };
+    
+    console.log('✅ Pending ball data stored successfully:', window.pendingBallData);
 
-  }, [gameState]);
+  }, [gameState, showBowlingMessage]);
 
   // 🎯 BALL RELEASE HANDLER - Called by bowler animation at the right moment
   const handleBallRelease = useCallback(() => {
     console.log('🎯🎯🎯 BALL RELEASE HANDLER CALLED! 🎯🎯🎯');
     console.log('Pending ball data:', window.pendingBallData);
     
-    if (window.pendingBallData) {
-      console.log('✅ Releasing ball with pending data');
+    // ✅ ENHANCED: Add safety checks and fallback mechanisms
+    if (!window.pendingBallData) {
+      console.error('❌ No pending ball data found! Attempting to recover...');
       
-      // 🏏 CRITICAL: Ball releases from ACTUAL release position from bowling data
-      // Use the exact release_z coordinate from the bowling configuration
-      const releaseZ = window.pendingBallData.pitchAnalysis?.line_axis?.z || 
-                       gameState.controls?.bowling?.release_z || 11.5;
-      
-      // 🏏 CRICKET BOWLING SIDES: Adjust X position based on side
-      const bowlingSide = gameState.controls?.bowling?.side || "L";
-      let bowlerX = 0; // Default center position
-      
-      if (bowlingSide === "L") {
-        bowlerX = -1.0; // Over the wicket (left side from batsman's perspective)
-        console.log('🏏 Bowling OVER THE WICKET (L) - Bowler positioned left');
-      } else if (bowlingSide === "R") {
-        bowlerX = 1.0; // Around the wicket (right side from batsman's perspective)
-        console.log('🏏 Bowling AROUND THE WICKET (R) - Bowler positioned right');
+      // Try to recover by checking if we can get data from current game state
+      const currentGameState = gameState;
+      if (currentGameState.controls?.bowling) {
+        console.log('🔄 Attempting to recreate pending ball data from current state...');
+        
+        const bowlingControls = currentGameState.controls.bowling;
+        const trajectory = calculateBallTrajectory(bowlingControls);
+        
+        window.pendingBallData = {
+          position: trajectory.initial.position,
+          velocity: trajectory.initial.velocity,
+          isMoving: true,
+          bounceHeight: bowlingControls.bounceHeight || 0.5,
+          trajectory: {
+            initial: trajectory.initial,
+            bounce: trajectory.bounce,
+            target: trajectory.target,
+            metadata: trajectory.metadata
+          },
+          pitchAnalysis: {
+            ball_axis: { x: bowlingControls.ball_axis_x, y: bowlingControls.ball_axis_y },
+            length_axis: { x: bowlingControls.length_axis_x, z: bowlingControls.length_axis_z },
+            line_axis: { x: bowlingControls.line_axis_x, z: bowlingControls.line_axis_z },
+            velocity: bowlingControls.velocity
+          }
+        };
+        
+        console.log('✅ Successfully recreated pending ball data');
+      } else {
+        console.error('❌ Cannot recover - no bowling controls available');
+        return; // Exit if we can't recover
       }
-      
-      const actualBowlerPosition = [bowlerX, 0.5, releaseZ]; // Bowler's position at release point
-      
-      const releasePosition = [
-        actualBowlerPosition[0],                      // X: Bowler's X position
-        actualBowlerPosition[1] + 1.5,                // Y: Bowler's hand height (0.5 + 1.5 = 2.0)
-        actualBowlerPosition[2]                       // Z: Bowler's actual release position
-      ];
-      
-      const updatedBallData = {
-        ...window.pendingBallData,
-        position: releasePosition
-      };
-      
-      console.log(`🏏 Ball releases from ACTUAL release position: [${releasePosition[0]}, ${releasePosition[1]}, ${releasePosition[2]}]`);
-      console.log(`🏃‍♂️ Bowler runs to release position: from [0, 0.5, 15] to [0, 0.5, ${releaseZ}]`);
-      
-      setGameState(prevState => updateGameState(prevState, {
-        type: 'BALL_BOWLED',
-        ballData: updatedBallData
-      }));
-      
-      // Clear pending data
-      window.pendingBallData = null;
-      console.log('✅ Ball successfully released from ACTUAL bowler position and pending data cleared');
-    } else {
-      console.error('❌ No pending ball data found!');
     }
-  }, []);
+    
+    console.log('✅ Releasing ball with pending data');
+    
+    // 🏏 CRITICAL: Ball releases from ACTUAL release position from bowling data
+    // Use the exact release_z coordinate from the bowling configuration
+    const releaseZ = window.pendingBallData.pitchAnalysis?.release_z || 
+                     gameState.controls?.bowling?.release_z || 11.5;
+    
+    // 🏏 CRICKET BOWLING SIDES: Adjust X position based on side
+    const bowlingSide = gameState.controls?.bowling?.side || "L";
+    let bowlerX = 0; // Default center position
+    
+    if (bowlingSide === "L") {
+      bowlerX = -1.0; // Over the wicket (left side from batsman's perspective)
+      console.log('🏏 Bowling OVER THE WICKET (L) - Bowler positioned left');
+    } else if (bowlingSide === "R") {
+      bowlerX = 1.0; // Around the wicket (right side from batsman's perspective)
+      console.log('🏏 Bowling AROUND THE WICKET (R) - Bowler positioned right');
+    }
+    
+    const actualBowlerPosition = [bowlerX, 0.5, releaseZ]; // Bowler's position at release point
+    
+    const releasePosition = [
+      actualBowlerPosition[0],                      // X: Bowler's X position
+      actualBowlerPosition[1] + 1.5,                // Y: Bowler's hand height (0.5 + 1.5 = 2.0)
+      actualBowlerPosition[2]                       // Z: Bowler's actual release position
+    ];
+    
+    const updatedBallData = {
+      ...window.pendingBallData,
+      position: releasePosition
+    };
+    
+    console.log(`🏏 Ball releases from ACTUAL release position: [${releasePosition[0]}, ${releasePosition[1]}, ${releasePosition[2]}]`);
+    console.log(`🏃‍♂️ Bowler runs to release position: from [0, 0.5, 15] to [0, 0.5, ${releaseZ}]`);
+    
+    setGameState(prevState => updateGameState(prevState, {
+      type: 'BALL_BOWLED',
+      ballData: updatedBallData
+    }));
+    
+    // Clear pending data
+    window.pendingBallData = null;
+    console.log('✅ Ball successfully released from ACTUAL bowler position and pending data cleared');
+  }, [gameState]); // ✅ FIXED: Added gameState dependency
 
   // 🚨 DEBUG: Log when handleBallRelease is created
   React.useEffect(() => {
@@ -382,7 +507,72 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     }
   }, []);
 
+    // 🎯 Helper function to trigger ball outcome graphics
+  const triggerOutcomeGraphics = useCallback(() => {
+    console.log('🎮 triggerOutcomeGraphics called');
+    
+    // Use BallOutcome data from gameState as primary source
+    const ballOutcome = gameState.BallOutcome;
+    const lastAction = gameState.lastAction;
+    const currentBall = gameState.currentBall;
+    
+    console.log('🎮 Available data:', { 
+      ballOutcome: ballOutcome ? JSON.stringify(ballOutcome) : 'null', 
+      lastAction: lastAction ? JSON.stringify(lastAction) : 'null', 
+      currentBall: currentBall ? JSON.stringify(currentBall) : 'null' 
+    });
+    
+    if (ballOutcome && ballOutcome.type) {
+      // Use BallOutcome data as primary source
+      const outcomeData = {
+        runs: ballOutcome.runs || 0,
+        isBoundary: ballOutcome.type === 'boundary' || false,
+        details: ballOutcome.description || "",
+        type: ballOutcome.type
+      };
+      
+      console.log('🎮 Triggering ball outcome graphics from BallOutcome:', outcomeData);
+      setCurrentBallOutcome(outcomeData);
+      setShowOutcomeGraphics(true);
+    } else if (lastAction) {
+      // Fallback to lastAction data
+      const outcomeData = {
+        runs: lastAction.runs || 0,
+        isBoundary: lastAction.type === 'boundary' || false,
+        details: lastAction.description || ""
+      };
+      
+      // Only trigger graphics if we have meaningful data
+      if (outcomeData.runs > 0 || outcomeData.details) {
+        console.log('🎮 Triggering ball outcome graphics from lastAction:', outcomeData);
+        setCurrentBallOutcome(outcomeData);
+        setShowOutcomeGraphics(true);
+      } else {
+        console.log('🎮 Skipping graphics - incomplete lastAction data:', outcomeData);
+      }
+    } else if (currentBall) {
+      // Fallback to currentBall data if lastAction is not available
+      const outcomeData = {
+        runs: currentBall.runs || 0,
+        isBoundary: currentBall.Isboundary || false,
+        details: currentBall.Details || ""
+      };
+      
+      // Only trigger graphics if we have meaningful data
+      if (outcomeData.runs > 0 || outcomeData.details) {
+        console.log('🎮 Triggering ball outcome graphics from currentBall:', outcomeData);
+        setCurrentBallOutcome(outcomeData);
+        setShowOutcomeGraphics(true);
+      } else {
+        console.log('🎮 Skipping graphics - incomplete currentBall data:', outcomeData);
+      }
+    } else {
+      console.log('🎮 No data available for graphics');
+    }
+  }, [gameState.BallOutcome, gameState.lastAction, gameState.currentBall]);
+
   const handleBallCatch = useCallback((catchData) => {
+    
     if (catchData.type === 'catch') {
       // Wicket taken
       setGameState(prevState => updateGameState(prevState, {
@@ -391,48 +581,221 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       }));
     } else if (catchData.type === 'collect') {
       if (catchData.playerId === 'wicket_keeper') {
-        // Ball collected by keeper - first set to keeper, then return to bowler
+        // Ball collected by keeper - reset all states and return to bowler immediately
+        triggerOutcomeGraphics();
+        
+        // ✅ ENHANCED: Clear all fallback timers when keeper collects ball
+        clearAllFallbackTimers();
+        
+        // ✅ Reset ALL active states and bring ball to bowler
         setGameState(prevState => {
-          const updatedState = updateGameState(prevState, {
-            type: 'BALL_WITH_KEEPER'
-          });
+          // Reset to initial game state with ball at bowler
+          const resetState = {
+            ...prevState,
+            gameState: GAME_STATES.WAITING_FOR_BALL,
+            ballState: BALL_STATES.WITH_BOWLER,
+            canBat: false,
+            bowlingAnimation: null,
+            bowlingSequenceActive: false,
+            pendingBallData: null,
+            currentBall: {
+              position: prevState.players.bowler.position,
+              velocity: [0, 0, 0],
+              isMoving: false,
+              trajectory: []
+            },
+            players: {
+              ...prevState.players,
+              striker: {
+                ...prevState.players.striker,
+                state: PLAYER_STATES.READY,
+                animation: null
+              },
+              nonStriker: {
+                ...prevState.players.nonStriker,
+                state: PLAYER_STATES.IDLE,
+                animation: null
+              },
+              bowler: {
+                ...prevState.players.bowler,
+                state: PLAYER_STATES.READY,
+                animation: null
+              },
+              wicketKeeper: {
+                ...prevState.players.wicketKeeper,
+                state: PLAYER_STATES.READY,
+                animation: null
+              }
+            },
+            lastAction: null,
+            animations: {
+              active: [],
+              queue: []
+            }
+          };
           
-          // ✅ Automatically return ball to bowler after keeper collection
-          const returnDelay = prevState.controls?.ballShot?.resetDelay || 2.0; // Use current state delay
+          console.log('🔄 Keeper collection: Resetting all states and bringing ball to bowler');
+          
+          // Immediately reset ball to bowler position
           setTimeout(() => {
-            resetBallToBowler('keeper_to_bowler');
-          }, returnDelay * 1000);
+            // Clear any global state
+            if (typeof window !== 'undefined') {
+              window.pendingBallData = null;
+              window.deterministicTarget = null;
+            }
+            
+            setGameState(prevState => ({
+              ...prevState,
+              ballState: BALL_STATES.WITH_BOWLER,
+              currentBall: {
+                position: prevState.players.bowler.position,
+                velocity: [0, 0, 0],
+                isMoving: false,
+                trajectory: []
+              }
+            }));
+          }, 100); // Small delay for graphics
           
-          return updatedState;
+          return resetState;
         });
         
       } else if (catchData.playerId === 'bowler' || catchData.reason === 'reset_to_bowler') {
-        // Ball reset to bowler (for boundary, max distance, etc.)
-        resetBallToBowler(catchData.reason || 'reset_to_bowler');
+        // Ball reset to bowler (for boundary, max distance, etc.) - show graphics first
+        
+        // If this is a shot completion, determine runs scored based on distance
+        if (catchData.reason === 'shot_distance_reached' && catchData.shotDistance) {
+          const shotDistance = catchData.shotDistance;
+          let runs = 0;
+          let description = '';
+          
+          // Determine runs based on shot distance
+          if (shotDistance >= 50) {
+            runs = 6;
+            description = 'Hit over the boundary for six';
+          } else if (shotDistance >= 40) {
+            runs = 4;
+            description = 'Driven through covers for four';
+          } else if (shotDistance >= 25) {
+            runs = 3;
+            description = 'Well placed for three runs';
+          } else if (shotDistance >= 15) {
+            runs = 2;
+            description = 'Good running between the wickets for two';
+          } else if (shotDistance >= 8) {
+            runs = 1;
+            description = 'Quick single taken';
+          } else {
+            runs = 0;
+            description = 'Defended back to the bowler';
+          }
+          
+          // Set BallOutcome for graphics
+          setGameState(prevState => {
+            const updatedState = updateGameState(prevState, {
+              type: 'SET_BALL_OUTCOME',
+              outcome: {
+                type: runs >= 4 ? 'boundary' : 'shot',
+                runs: runs,
+                description: description
+              }
+            });
+            
+            // Update lastAction with shot result
+            const finalState = {
+              ...updatedState,
+              lastAction: {
+                type: runs >= 4 ? 'boundary' : 'shot',
+                runs: runs,
+                description: description,
+                shotType: 'drive',
+                source: 'auto-shot'
+              }
+            };
+            
+            // Update score if runs were scored
+            if (runs > 0) {
+              return updateGameState(finalState, {
+                type: 'UPDATE_SCORE',
+                scoreUpdate: { runs: prevState.score.runs + runs }
+              });
+            }
+            
+            return finalState;
+          });
+        }
+        
+        triggerOutcomeGraphics();
+        
+        // Delay the reset to allow graphics to complete
+        setTimeout(() => {
+          resetBallToBowler(catchData.reason || 'reset_to_bowler');
+        }, 2500); // 2.5 seconds for graphics
+        
       } else {
-        // Ball fielded by other player
-        handleFielding();
+        // Ball fielded by other player - show graphics then handle fielding
+        triggerOutcomeGraphics();
+        setTimeout(() => {
+          handleFielding();
+        }, 2500);
       }
     } else {
-      // Ball fielded
-      handleFielding();
+      // Ball fielded - show graphics first
+      triggerOutcomeGraphics();
+      setTimeout(() => {
+        handleFielding();
+      }, 2500);
     }
-  }, [handleFielding, resetBallToBowler]);
+  }, [handleFielding, resetBallToBowler, gameState.currentBall]);
 
 
 
   const handleBallReachTarget = useCallback((targetData) => {
     if (targetData.target === 'batsman') {
-      // Calculate distance between ball and striker position (ignore Y axis for now)
+      // ✅ ENHANCED: Calculate distance between ball and striker position with comprehensive checks
       const ballPos = targetData.position;
       const strikerPos = [0, 0, -9]; // Striker position
+      
+      // ✅ SAFETY CHECK: Ensure ballPos is valid
+      if (!ballPos || !Array.isArray(ballPos) || ballPos.length < 3) {
+        console.warn('⚠️ handleBallReachTarget: Invalid ballPos', ballPos);
+        return;
+      }
+      
       const ballZ = ballPos[2];
       const strikerZ = strikerPos[2];
       const distanceZ = Math.abs(ballZ - strikerZ); // Distance along Z-axis only
       
-      // Check if autoPlay is enabled and ball is close enough (within 2 meters on Z-axis)
-      const ballShotConfig = gameState.controls.ballShot;
-      const shouldAutoShot = ballShotConfig.autoPlay && distanceZ <= 2.0;
+      // ✅ ENHANCED: Also calculate full 3D distance for better accuracy
+      const fullDistance = Math.sqrt(
+        Math.pow(ballPos[0] - strikerPos[0], 2) + 
+        Math.pow(ballPos[1] - strikerPos[1], 2) + 
+        Math.pow(ballPos[2] - strikerPos[2], 2)
+      );
+      
+      console.log(`🎯 BALL REACHED BATSMAN! Ball Z: ${ballZ.toFixed(1)}, Striker Z: ${strikerZ}, Z-Distance: ${distanceZ.toFixed(1)}m, Full Distance: ${fullDistance.toFixed(1)}m`);
+      
+      // ✅ ENHANCED: Check if autoPlay is enabled with multiple distance thresholds
+      const ballShotConfig = gameState.controls?.ballShot;
+      if (!ballShotConfig) {
+        console.warn('⚠️ handleBallReachTarget: ballShotConfig is missing');
+        return;
+      }
+      
+      // ✅ ENHANCED: Multiple trigger conditions for maximum reliability
+      const zDistanceTrigger = distanceZ <= 3.0;
+      const fullDistanceTrigger = fullDistance <= 4.0; // Slightly larger threshold for 3D distance
+      const autoPlayEnabled = ballShotConfig.autoPlay === true;
+      
+      const shouldAutoShot = autoPlayEnabled && (zDistanceTrigger || fullDistanceTrigger);
+      
+      console.log(`🤖 ENHANCED Auto-shot check:`, {
+        autoPlay: autoPlayEnabled,
+        zDistance: distanceZ.toFixed(1),
+        fullDistance: fullDistance.toFixed(1),
+        zDistanceTrigger: zDistanceTrigger,
+        fullDistanceTrigger: fullDistanceTrigger,
+        shouldAutoShot: shouldAutoShot
+      });
       
       setGameState(prevState => ({
         ...prevState,
@@ -441,80 +804,409 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       }));
       
       if (shouldAutoShot) {
-        // Trigger automatic shot using ball shot configuration immediately when ball is in position
-        setTimeout(() => {
-          // Ensure we have valid values from configuration
-          const ballShotConfig = gameState.controls.ballShot;
-          const targetDistance = parseFloat(ballShotConfig.distance) || 15; // Default to 15m if not specified
-          
-          // Use ball shot configuration for DETERMINISTIC shot
-          const angle = ballShotConfig.degree || 0;
-          const isLofted = ballShotConfig.lofted || false;
-          const elevation = isLofted ? 8.0 : 0.5;
-          
-          // USE THE SAME calculateShotVector FUNCTION AS MANUAL SHOTS
-          // This ensures window.deterministicTarget is properly set
-          const scaledVelocity = calculateShotVector(angle, targetDistance, elevation, '🤖 AUTO');
-          const shotDirection = scaledVelocity;
-          
-          // Execute auto shot from striker's position
-          setGameState(prevState => {
-            // Position ball at striker and apply the shot
-            const updatedState = {
-              ...prevState,
-              currentBall: {
-                ...prevState.currentBall,
-                position: [0, 0.5, -9], // Striker's position
-                velocity: [0, 0, 0] // Reset velocity before shot
-              }
-            };
+        console.log('🚀 EXECUTING AUTO-SHOT - Batsman MUST hit the ball!');
+        
+        // ✅ ENHANCED: Immediate execution with multiple fallback mechanisms
+        const executeAutoShot = () => {
+          try {
+            // ✅ SAFETY CHECK: Ensure we have valid configuration
+            const ballShotConfig = gameState.controls?.ballShot;
+            if (!ballShotConfig) {
+              console.error('❌ Auto-shot failed: ballShotConfig is missing');
+              return false;
+            }
             
-            // Apply the ball hit action with the calculated trajectory
-            return updateGameState(updatedState, {
-              type: 'BALL_HIT',
-              payload: {
-                newVelocity: scaledVelocity,
-                trajectory: shotDirection,
-                isRunnable: targetDistance > 5,
-                shotType: isLofted ? 'loft' : ballShotConfig.type || 'drive',
-                shotDirection: `${angle}°`,
-                startPosition: [0, 0.5, -9], // Ensure shot starts from striker
-                targetDistance // For verification
-              }
+            const targetDistance = parseFloat(ballShotConfig.distance) || 15; // Default to 15m if not specified
+            const angle = ballShotConfig.degree || 0;
+            const isLofted = ballShotConfig.lofted || false;
+            const elevation = isLofted ? 8.0 : 0.5;
+            
+            console.log('🎯 Auto-shot parameters:', {
+              targetDistance,
+              angle,
+              isLofted,
+              elevation
             });
-          });
-        }, 100); // Small delay to ensure state is updated
+            
+            // ✅ ENHANCED: Use calculateShotVector with error handling
+            let scaledVelocity;
+            try {
+              scaledVelocity = calculateShotVector(angle, targetDistance, elevation, '🤖 AUTO');
+              console.log('✅ Shot vector calculated successfully:', scaledVelocity);
+            } catch (error) {
+              console.error('❌ Auto-shot failed: calculateShotVector error:', error);
+              // Fallback to simple shot vector
+              scaledVelocity = [0, 5, 10]; // Simple forward shot
+            }
+            
+            // ✅ ENHANCED: Execute auto shot with comprehensive state update
+            setGameState(prevState => {
+              console.log('🔄 Updating game state for auto-shot...');
+              
+              // Position ball at striker and apply the shot
+              const updatedState = {
+                ...prevState,
+                currentBall: {
+                  ...prevState.currentBall,
+                  position: [0, 0.5, -9], // Striker's position
+                  velocity: [0, 0, 0] // Reset velocity before shot
+                },
+                canBat: false // Disable manual batting during auto-shot
+              };
+              
+                             // Apply the ball hit action with the calculated trajectory
+               const finalState = updateGameState(updatedState, {
+                 type: 'BALL_HIT',
+                 payload: {
+                   newVelocity: scaledVelocity,
+                   trajectory: scaledVelocity,
+                   isRunnable: targetDistance > 5,
+                   shotType: isLofted ? 'loft' : ballShotConfig.type || 'drive',
+                   shotDirection: `${angle}°`,
+                   startPosition: [0, 0.5, -9], // Ensure shot starts from striker
+                   targetDistance, // For verification
+                   source: 'auto-shot' // Track that this is an auto-shot
+                 }
+               });
+              
+              console.log('✅ Auto-shot state updated successfully:', finalState.ballState);
+              return finalState;
+            });
+            
+            return true; // Success
+          } catch (error) {
+            console.error('❌ Auto-shot execution failed:', error);
+            return false;
+          }
+        };
+        
+        // ✅ ENHANCED: Multiple execution attempts with different delays
+        let shotExecuted = false;
+        
+        // Attempt 1: Immediate execution
+        shotExecuted = executeAutoShot();
+        
+        // Attempt 2: After 50ms delay (if first attempt failed)
+        if (!shotExecuted) {
+          setTimeout(() => {
+            console.log('🔄 Auto-shot retry attempt 1...');
+            shotExecuted = executeAutoShot();
+          }, 50);
+        }
+        
+        // Attempt 3: After 100ms delay (final attempt)
+        setTimeout(() => {
+          if (!shotExecuted) {
+            console.log('🔄 Auto-shot retry attempt 2 (final)...');
+            executeAutoShot();
+          }
+        }, 100);
+        
+        // ✅ ENHANCED: Multiple aggressive fallback mechanisms with timer management
+        const fallbackTimeouts = [2000, 5000, 8000, 15000]; // Increased final timeout to 15s
+        
+        fallbackTimeouts.forEach((timeout, index) => {
+          const timerId = setTimeout(() => {
+            const currentBallState = gameState.ballState;
+            console.log(`🔄 Auto-shot fallback check ${index + 1} (${timeout}ms): ballState = ${currentBallState}`);
+            
+            // ✅ ENHANCED: Check if ball is still bowling before taking action
+            if (currentBallState === BALL_STATES.BOWLING) {
+              console.log(`⚠️ Auto-shot fallback ${index + 1}: Ball still bowling, forcing shot execution`);
+              
+              // Force auto-shot execution as last resort
+              const ballShotConfig = gameState.controls?.ballShot;
+              if (ballShotConfig?.autoPlay) {
+                console.log('🚀 FORCING AUTO-SHOT EXECUTION as fallback!');
+                executeAutoShot();
+              } else {
+                console.log('🔄 Resetting ball to bowler due to fallback');
+                setGameState(prevState => updateGameState(prevState, {
+                  type: 'BALL_WITH_BOWLER'
+                }));
+              }
+            } else {
+              console.log(`✅ Ball state changed to ${currentBallState}, skipping fallback ${index + 1}`);
+            }
+          }, timeout);
+          
+          // Add timer to active timers set for cleanup
+          addFallbackTimer(timerId);
+        });
+      } else {
+        console.log('⚠️ Auto-shot not triggered - ball too far or autoPlay disabled');
+        
+        // ✅ ENHANCED: Check if autoPlay is actually enabled but distance check failed
+        const ballShotConfig = gameState.controls?.ballShot;
+        if (ballShotConfig?.autoPlay === true) {
+          console.log('🚨 CRITICAL: AutoPlay is TRUE but shot not triggered - forcing execution!');
+          
+          // Force auto-shot even if distance check failed
+          setTimeout(() => {
+            console.log('🚀 FORCING AUTO-SHOT despite distance check failure!');
+            executeAutoShot();
+          }, 500);
+        }
+        
+        // ✅ ENHANCED: Multiple fallback timeouts for non-auto-shot cases with timer management
+        const fallbackTimeouts = [3000, 6000, 9000, 15000]; // Increased final timeout to 15s
+        
+        fallbackTimeouts.forEach((timeout, index) => {
+          const timerId = setTimeout(() => {
+            const currentBallState = gameState.ballState;
+            console.log(`🔄 Non-auto-shot fallback ${index + 1} (${timeout}ms): ballState = ${currentBallState}`);
+            
+            // ✅ ENHANCED: Check if ball is still bowling before taking action
+            if (currentBallState === BALL_STATES.BOWLING) {
+              console.log(`🔄 Fallback reset ${index + 1}: Ball not hit, resetting to bowler`);
+              setGameState(prevState => updateGameState(prevState, {
+                type: 'BALL_WITH_BOWLER'
+              }));
+            } else {
+              console.log(`✅ Ball state changed to ${currentBallState}, skipping non-auto-shot fallback ${index + 1}`);
+            }
+          }, timeout);
+          
+          // Add timer to active timers set for cleanup
+          addFallbackTimer(timerId);
+        });
       }
     } else if (targetData.target === 'final_coordinate') {
       // Ball reached final coordinate in direct coordinate mode
-      // ✅ Check if auto-reset is enabled (default: false to let ball stay at target)
-      const ballShotConfig = gameState.controls?.ballShot;
-      const autoResetAfterTarget = ballShotConfig?.autoResetAfterTarget ?? false;
+      console.log('🎯 Ball reached final coordinate - checking for auto-reset');
       
-      if (autoResetAfterTarget) {
-        // Only reset if explicitly enabled
-        setTimeout(() => {
-          setGameState(prevState => updateGameState(prevState, {
-            type: 'BALL_WITH_KEEPER'
-          }));
-        }, ballShotConfig?.resetDelay || 5000); // Use user-defined delay (default 5s)
+      // Get shot distance from deterministic target for runs calculation
+      const deterministicTarget = typeof window !== 'undefined' ? window.deterministicTarget : null;
+      const shotDistance = deterministicTarget?.exactDistance || 0;
+      
+      if (shotDistance > 0) {
+        // Determine runs based on shot distance
+        let runs = 0;
+        let description = '';
+        let outcomeType = 'shot';
+        
+        if (shotDistance >= 50) {
+          runs = 6;
+          description = 'Hit over the boundary for six';
+          outcomeType = 'boundary';
+        } else if (shotDistance >= 40) {
+          runs = 4;
+          description = 'Driven through covers for four';
+          outcomeType = 'boundary';
+        } else if (shotDistance >= 25) {
+          runs = 3;
+          description = 'Well placed for three runs';
+        } else if (shotDistance >= 15) {
+          runs = 2;
+          description = 'Good running between the wickets for two';
+        } else if (shotDistance >= 8) {
+          runs = 1;
+          description = 'Quick single taken';
+        } else {
+          runs = 0;
+          description = 'Defended back to the bowler';
+        }
+        
+        // Set BallOutcome for graphics
+        setGameState(prevState => {
+          const updatedState = updateGameState(prevState, {
+            type: 'SET_BALL_OUTCOME',
+            outcome: {
+              type: outcomeType,
+              runs: runs,
+              description: description
+            }
+          });
+          
+          // Update score if runs were scored
+          if (runs > 0) {
+            return updateGameState(updatedState, {
+              type: 'UPDATE_SCORE',
+              scoreUpdate: { runs: prevState.score.runs + runs }
+            });
+          }
+          
+          return updatedState;
+        });
       }
-      // ✅ If auto-reset is disabled, ball stays at final coordinate
+      
+      // 🎮 TRIGGER BALL OUTCOME GRAPHICS when ball reaches destination (with delay to ensure state update)
+      setTimeout(() => {
+        console.log('🎮 About to trigger graphics after ball reached destination');
+        triggerOutcomeGraphics();
+      }, 1500); // 1.5s delay to ensure state update completes
+      
+      // ✅ ALWAYS reset after final coordinate to prevent stuck state
+      const ballShotConfig = gameState.controls?.ballShot;
+      const resetDelay = ballShotConfig?.resetDelay || 15000; // Default 15s delay (increased from 10s)
+      
+              console.log(`🔄 Auto-resetting ball to bowler after ${resetDelay/1000}s`);
+      
+      setTimeout(() => {
+        console.log('🔄 Executing auto-reset to bowler');
+        setGameState(prevState => updateGameState(prevState, {
+          type: 'BALL_WITH_BOWLER'
+        }));
+      }, resetDelay);
     } else if (targetData.target === 'boundary') {
       // Boundary scored
-      setGameState(prevState => updateGameState(prevState, {
-        type: 'UPDATE_SCORE',
-        scoreUpdate: { runs: prevState.score.runs + targetData.runs }
-      }));
+      const boundaryDescription = targetData.runs === 6 ? 
+        'Hit over the boundary for six' : 
+        'Driven through covers for four';
       
-      // Return ball to keeper after boundary
+      setGameState(prevState => {
+        const updatedState = updateGameState(prevState, {
+          type: 'UPDATE_SCORE',
+          scoreUpdate: { runs: prevState.score.runs + targetData.runs }
+        });
+        
+        // Set BallOutcome for graphics
+        const finalState = updateGameState(updatedState, {
+          type: 'SET_BALL_OUTCOME',
+          outcome: {
+            type: 'boundary',
+            runs: targetData.runs,
+            description: boundaryDescription
+          }
+        });
+        
+        // Update lastAction to reflect boundary result
+        return {
+          ...finalState,
+          lastAction: {
+            type: 'boundary',
+            runs: targetData.runs,
+            description: boundaryDescription
+          }
+        };
+      });
+      
+      // 🎮 TRIGGER BALL OUTCOME GRAPHICS for boundary (with small delay)
+      setTimeout(() => {
+        triggerOutcomeGraphics();
+      }, 500); // 0.5s delay to ensure ball has settled
+      
+      // Return ball to bowler after boundary
       setTimeout(() => {
         setGameState(prevState => updateGameState(prevState, {
-          type: 'BALL_WITH_KEEPER'
+          type: 'BALL_WITH_BOWLER'
         }));
-      }, 3000);
+      }, 15000); // Increased from 10s to 15s for consistency
     }
   }, [gameState.controls.ballShot]); // Add ballShot config to dependencies
+
+  // ✅ ENHANCED: Monitor ball state changes and clear fallback timers when ball is reset
+  useEffect(() => {
+    const currentBallState = gameState.ballState;
+    
+    // Clear all fallback timers when ball is no longer bowling
+    if (currentBallState !== BALL_STATES.BOWLING) {
+      clearAllFallbackTimers();
+    }
+  }, [gameState.ballState, clearAllFallbackTimers]);
+
+  // ✅ ENHANCED: Global auto-shot monitoring system
+  useEffect(() => {
+    const ballShotConfig = gameState.controls?.ballShot;
+    const isAutoPlayEnabled = ballShotConfig?.autoPlay === true;
+    const isBallBowling = gameState.ballState === BALL_STATES.BOWLING;
+    const isBallMoving = gameState.currentBall?.isMoving;
+    
+    // Monitor for stuck bowling state with autoPlay enabled
+    if (isAutoPlayEnabled && isBallBowling && isBallMoving) {
+      const monitorTimeout = setTimeout(() => {
+        console.log('🚨 AUTO-SHOT MONITOR: Ball stuck in bowling state with autoPlay enabled!');
+        console.log('🚨 Current state:', {
+          ballState: gameState.ballState,
+          isMoving: gameState.currentBall?.isMoving,
+          autoPlay: ballShotConfig?.autoPlay,
+          ballPosition: gameState.currentBall?.position
+        });
+        
+        // ✅ ENHANCED: Check if ball is still bowling before forcing auto-shot
+        if (gameState.ballState !== BALL_STATES.BOWLING) {
+          console.log('✅ Ball state changed, skipping forced auto-shot');
+          return;
+        }
+        
+        // Force auto-shot execution if ball is stuck
+        const executeAutoShot = () => {
+          try {
+            const targetDistance = parseFloat(ballShotConfig.distance) || 15;
+            const angle = ballShotConfig.degree || 0;
+            const isLofted = ballShotConfig.lofted || false;
+            const elevation = isLofted ? 8.0 : 0.5;
+            
+            const scaledVelocity = calculateShotVector(angle, targetDistance, elevation, '🚨 MONITOR FORCE');
+            
+            setGameState(prevState => {
+              const updatedState = {
+                ...prevState,
+                currentBall: {
+                  ...prevState.currentBall,
+                  position: [0, 0.5, -9],
+                  velocity: [0, 0, 0]
+                }
+              };
+              
+              return updateGameState(updatedState, {
+                type: 'BALL_HIT',
+                payload: {
+                  newVelocity: scaledVelocity,
+                  trajectory: scaledVelocity,
+                  isRunnable: targetDistance > 5,
+                  shotType: isLofted ? 'loft' : 'drive',
+                  shotDirection: `${angle}°`,
+                  startPosition: [0, 0.5, -9],
+                  targetDistance,
+                  source: 'monitor-force' // Track that this is a monitor-forced shot
+                }
+              });
+            });
+            
+            console.log('✅ MONITOR: Forced auto-shot execution successful');
+          } catch (error) {
+            console.error('❌ MONITOR: Forced auto-shot failed:', error);
+          }
+        };
+        
+        executeAutoShot();
+      }, 5000); // Monitor after 5 seconds
+      
+      return () => clearTimeout(monitorTimeout);
+    }
+  }, [gameState.ballState, gameState.currentBall?.isMoving, gameState.controls?.ballShot?.autoPlay]);
+
+  // ✅ ENHANCED: Bowling sequence monitoring system
+  useEffect(() => {
+    const isBowlingSequenceActive = gameState.bowlingSequenceActive;
+    const isBallBowling = gameState.ballState === BALL_STATES.BOWLING;
+    
+    // Monitor for stuck bowling sequence (bowler animation running but no ball release)
+    if (isBowlingSequenceActive && isBallBowling) {
+      const bowlingMonitorTimeout = setTimeout(() => {
+        console.log('🚨 BOWLING MONITOR: Bowling sequence stuck - no ball release detected!');
+        console.log('🚨 Current state:', {
+          bowlingSequenceActive: gameState.bowlingSequenceActive,
+          ballState: gameState.ballState,
+          pendingBallData: window.pendingBallData ? 'exists' : 'missing'
+        });
+        
+        // Force ball release if bowling sequence is stuck
+        if (window.pendingBallData) {
+          console.log('🔄 BOWLING MONITOR: Forcing ball release...');
+          handleBallRelease();
+        } else {
+          console.log('🔄 BOWLING MONITOR: No pending ball data - resetting bowling sequence');
+          setGameState(prevState => updateGameState(prevState, {
+            type: 'BALL_WITH_BOWLER'
+          }));
+        }
+      }, 8000); // Monitor after 8 seconds
+      
+      return () => clearTimeout(bowlingMonitorTimeout);
+    }
+  }, [gameState.bowlingSequenceActive, gameState.ballState]);
 
   // Direct compass shot selection - NO intermediate logic
   useEffect(() => {
@@ -750,19 +1442,32 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     point: positions.umpire_square_leg?.position || UMPIRE_POSITIONS.SQUARE_LEG_UMPIRE.position
   };
 
-  // Create fielder positions from dynamic positions
-  const fielderPositions = [
-    { position: positions.mid_off?.position || FIELDER_POSITIONS.MID_OFF.position, role: 'mid-off' },
-    { position: positions.mid_on?.position || FIELDER_POSITIONS.MID_ON.position, role: 'mid-on' },
-    { position: positions.cover?.position || FIELDER_POSITIONS.COVER.position, role: 'cover' },
-    { position: positions.mid_wicket?.position || FIELDER_POSITIONS.MID_WICKET.position, role: 'mid-wicket' },
-    { position: positions.third_man?.position || FIELDER_POSITIONS.THIRD_MAN.position, role: 'third-man' },
-    { position: positions.fine_leg?.position || FIELDER_POSITIONS.FINE_LEG.position, role: 'fine-leg' },
-    { position: positions.point?.position || FIELDER_POSITIONS.POINT.position, role: 'point' },
-    { position: positions.square_leg?.position || FIELDER_POSITIONS.SQUARE_LEG.position, role: 'square-leg' },
-    { position: positions.long_off?.position || FIELDER_POSITIONS.LONG_OFF.position, role: 'long-off' },
-    { position: positions.long_on?.position || FIELDER_POSITIONS.LONG_ON.position, role: 'long-on' }
-  ];
+  // Create fielder positions - Use game state fielders if available, otherwise use dynamic positions
+  const fielderPositions = React.useMemo(() => {
+    // If we have fielders in game state (from dummy data or dynamic generation), use those
+    if (gameState.players?.fielders && gameState.players.fielders.length > 0) {
+      return gameState.players.fielders.map(fielder => ({
+        position: fielder.position,
+        role: fielder.role || 'fielding',
+        id: fielder.id,
+        name: fielder.name
+      }));
+    }
+    
+    // Fallback to static/dynamic positions if no fielders in game state
+    return [
+      { position: positions.mid_off?.position || FIELDER_POSITIONS.MID_OFF.position, role: 'mid-off' },
+      { position: positions.mid_on?.position || FIELDER_POSITIONS.MID_ON.position, role: 'mid-on' },
+      { position: positions.cover?.position || FIELDER_POSITIONS.COVER.position, role: 'cover' },
+      { position: positions.mid_wicket?.position || FIELDER_POSITIONS.MID_WICKET.position, role: 'mid-wicket' },
+      { position: positions.third_man?.position || FIELDER_POSITIONS.THIRD_MAN.position, role: 'third-man' },
+      { position: positions.fine_leg?.position || FIELDER_POSITIONS.FINE_LEG.position, role: 'fine-leg' },
+      { position: positions.point?.position || FIELDER_POSITIONS.POINT.position, role: 'point' },
+      { position: positions.square_leg?.position || FIELDER_POSITIONS.SQUARE_LEG.position, role: 'square-leg' },
+      { position: positions.long_off?.position || FIELDER_POSITIONS.LONG_OFF.position, role: 'long-off' },
+      { position: positions.long_on?.position || FIELDER_POSITIONS.LONG_ON.position, role: 'long-on' }
+    ];
+  }, [gameState.players?.fielders, positions]);
 
   // Pass UI state to parent for external rendering
   React.useEffect(() => {
@@ -792,14 +1497,22 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         currentView,
         switchToView,
         // Add playShot function to gameState for UI access
-        playShot
+        playShot,
+        // Ball outcome graphics state
+        showOutcomeGraphics,
+        currentBallOutcome,
+        handleOutcomeGraphicsComplete,
+        // Bowling validation message state
+        showBowlingValidationMessage,
+        bowlingValidationMessage
       });
     }
   }, [
     gameState, isPlaying, selectedShotDirection, selectedShotType, shotAngle,
     useCompactUI, showPitchMarkers, showCoordinateDisplay, showPitchGrid, showZoneMarkers, currentView,
     onGameStateChange, updateBowlingControls, handleBowlingConfigUpdate, handleBallShotConfigUpdate,
-    resetBallToBowler, switchToView, playShot
+    resetBallToBowler, switchToView, playShot, showOutcomeGraphics, currentBallOutcome, handleOutcomeGraphicsComplete,
+    showBowlingValidationMessage, bowlingValidationMessage, clearAllFallbackTimers, addFallbackTimer
   ]);
 
   return (
@@ -917,6 +1630,8 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
           currentAngle={gameState.controls.ballShot.degree}
         />
       )}
+
+      {/* Ball Outcome Graphics - Rendered outside canvas in App.jsx */}
 
     </group>
   );
