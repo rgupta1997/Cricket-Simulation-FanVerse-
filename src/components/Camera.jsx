@@ -251,7 +251,7 @@ const useBallFollowing = (
 // Custom camera component with smooth transitions and ball following
 const CricketCamera = ({ 
   view, 
-  transitionSpeed = 0.05, 
+  transitionSpeed = 0.10, 
   ballPosition = null,
   ballFollowConfig = {},
   isFollowingBall = false,

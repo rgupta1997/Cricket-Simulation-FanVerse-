@@ -1,0 +1,304 @@
+{
+  "stadiumSimulation": {
+    "metadata": {
+      "description": "Dummy cricket stadium simulation data - No ball with free hit",
+      "version": "1.0",
+      "created": "2024-01-01",
+      "scenario": "Sample T20 Match - Over 5"
+    },
+    "gameState": {
+      "gameState": "waiting_for_ball",
+      "ballState": "with_bowler",
+      "canBat": false,
+      "formatId": 78,
+      "score": {
+        "runs": 44,
+        "wickets": 0,
+        "overs": 4,
+        "balls": 1,
+        "target": 185,
+        "runRate": 10.5,
+        "requiredRunRate": 9.1
+      },
+      "fieldPositioningMetadata": {
+        "formatType": "T20",
+        "isRestrictedPeriod": true,
+        "currentOvers": 4,
+        "restrictionLimit": 6,
+        "fieldersInside30m": 5,
+        "fieldersOutside30m": 6,
+        "minFieldersInside30m": 5,
+        "boundaryRadius": 50,
+        "positioningMethod": "dynamic_random_boundary_compliant",
+        "minDistanceBetweenFielders": "20m",
+        "allFieldersWithinBoundary": true,
+        "lastUpdated": "2024-01-01T12:00:00Z"
+      },
+      "currentBall": {
+        "Isboundary": false,
+        "runs": 1,
+        "Details": "NO BALL! Overstepped at the crease, free hit next ball",
+        "position": [0, 0.5, 15],
+        "velocity": [0, 0, 0],
+        "isMoving": false,
+        "trajectory": []
+      },
+      "lastAction": {
+        "type": "no_ball",
+        "runs": 1,
+        "description": "NO BALL! Bowler has overstepped! Free hit coming up!"
+      },
+      "BallOutcome": {
+        "type": "no_ball",
+        "runs": 1,
+        "description": "NO BALL! Bowler has overstepped! Free hit coming up!"
+      }
+    },
+    "players": {
+      "striker": {
+        "id": "striker",
+        "name": "Babar Azam",
+        "position": [0, 0, -9],
+        "state": "ready",
+        "isOnStrike": true,
+        "animation": null,
+        "stats": {
+          "runs": 22,
+          "balls": 16,
+          "fours": 3,
+          "sixes": 0
+        }
+      },
+      "nonStriker": {
+        "id": "non_striker",
+        "name": "Mohammad Rizwan",
+        "position": [1.5, 0, 9],
+        "state": "idle",
+        "isOnStrike": false,
+        "animation": null,
+        "stats": {
+          "runs": 18,
+          "balls": 12,
+          "fours": 2,
+          "sixes": 0
+        }
+      },
+      "bowler": {
+        "id": "bowler",
+        "name": "Arshdeep Singh",
+        "position": [0, 0, 15],
+        "state": "frustrated",
+        "animation": null,
+        "runUpDistance": 0,
+        "stats": {
+          "overs": 1.1,
+          "runs": 14,
+          "wickets": 0,
+          "economy": 12.6
+        }
+      },
+      "wicketKeeper": {
+        "id": "wicket_keeper",
+        "name": "Dinesh Karthik",
+        "position": [0, 0, -11],
+        "state": "ready",
+        "animation": null
+      },
+      "umpires": {
+        "bowlersEnd": {
+          "id": "bowlers_end_umpire",
+          "name": "Joel Wilson",
+          "position": [0, 0, 11],
+          "state": "signaling_no_ball"
+        },
+        "point": {
+          "id": "point_umpire",
+          "name": "Chris Gaffaney",
+          "position": [12, 0, -8],
+          "state": "idle"
+        }
+      },
+      "fielders": [
+        {
+          "id": "fielder_1",
+          "name": "Rohit Sharma",
+          "position": [22, 0, 12],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "fielder_2", 
+          "name": "Virat Kohli",
+          "position": [-15, 0, 25],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "fielder_3",
+          "name": "Suryakumar Yadav",
+          "position": [30, 0, -20],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "fielder_4",
+          "name": "Hardik Pandya",
+          "position": [-22, 0, 18],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "fielder_5",
+          "name": "Ravindra Jadeja",
+          "position": [12, 0, 48],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "fielder_6",
+          "name": "Axar Patel",
+          "position": [-40, 0, -15],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "fielder_7",
+          "name": "Jasprit Bumrah",
+          "position": [35, 0, 38],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "fielder_8",
+          "name": "Bhuvneshwar Kumar",
+          "position": [-32, 0, 40],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "fielder_9",
+          "name": "Yuzvendra Chahal",
+          "position": [42, 0, -28],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "fielder_10",
+          "name": "Mohammed Shami",
+          "position": [-25, 0, -38],
+          "role": "fielding",
+          "state": "ready"
+        },
+        {
+          "id": "fielder_11",
+          "name": "Deepak Hooda",
+          "position": [18, 0, -12],
+          "role": "fielding",
+          "state": "ready"
+        }
+      ]
+    },
+    "controls": {
+      "bowling": {
+        "velocity": 140.2,
+        "ball_axis_x": 30.4,
+        "ball_axis_y": 22.8,
+        "length_axis_x": 54.7,
+        "length_axis_z": 7.8,
+        "line_axis_x": 36.2,
+        "line_axis_z": 28.1,
+        "bounceHeight": 0.8,
+        "useDirectCoordinates": true,
+        "side": "L",
+        "release_x": -0.3,
+        "release_y": 2.1,
+        "release_z": 12.2,
+        "bounce_x": -0.1,
+        "bounce_y": 0.4,
+        "bounce_z": 4.5,
+        "final_x": 0.0,
+        "final_y": 0.6,
+        "final_z": -9.0,
+        "speed": 140.2,
+        "line": 0.0,
+        "length": 6.5,
+        "pitch": 0.8
+      },
+      "ballShot": {
+        "lofted": false,
+        "degree": 0,
+        "distance": 0,
+        "autoPlay": false,
+        "power": 0.0,
+        "timing": 0.0,
+        "keeperAutoCollect": true,
+        "keeperCollectionRadius": 2.0,
+        "keeperSpeedThreshold": 4.0,
+        "usePhysicsMode": true,
+        "resetDelay": 2000
+      },
+      "batting": {
+        "footwork": "none",
+        "shot": "leave",
+        "timing": 0.0
+      },
+      "fielding": {
+        "selectedFielder": null,
+        "throwTarget": "bowler"
+      }
+    },
+    "animations": {
+      "active": [],
+      "queue": [
+        {
+          "type": "no_ball_delivery",
+          "player": "bowler",
+          "duration": 2200
+        },
+        {
+          "type": "leave_ball",
+          "player": "striker",
+          "duration": 200
+        }
+      ]
+    },
+    "stadium": {
+      "weather": "Perfect Day",
+      "temperature": "28°C", 
+      "humidity": "55%",
+      "windSpeed": "8 km/h",
+      "windDirection": "North-West",
+      "pitchCondition": "Excellent for batting",
+      "dew": false,
+      "crowd": {
+        "attendance": "75,000",
+        "capacity": "75,000", 
+        "atmosphere": "Buzzing with excitement",
+        "noise_level": "Loud cheers",
+        "support": "Home team advantage"
+      },
+      "infrastructure": {
+        "floodlights": "Off - Daylight",
+        "roof": "Open",
+        "flags": "Bright team colors"
+      }
+    },
+    "commentary": [
+      {
+        "ball": "4.2",
+        "text": "Arshdeep to Babar, NO BALL! Oversteps! Free hit next!",
+        "type": "no_ball"
+      },
+      {
+        "ball": "4.1",
+        "text": "Arshdeep to Babar, FOUR! Brilliant cover drive!",
+        "type": "boundary"
+      },
+      {
+        "ball": "3.6",
+        "text": "Bumrah to Rizwan, 2 runs, worked into the gap",
+        "type": "runs"
+      }
+    ]
+  }
+}

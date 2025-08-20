@@ -174,7 +174,7 @@ const EnhancedBall = ({
                     reason: 'safety_timeout_reset'
                   });
                 }
-              }, 20000); // 20 second safety timeout (longer than 15s auto-reset delay)
+              }, 5000); // 20 second safety timeout (longer than 15s auto-reset delay)
               
               return; // Exit early to prevent further movement
             }

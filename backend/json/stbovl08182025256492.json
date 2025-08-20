@@ -1,9 +1,9 @@
 {
   "matchId": "stbovl08182025256492",
-  "lastUpdated": "2025-08-20T11:03:59.506Z",
+  "lastUpdated": "2025-08-20T19:59:49.235Z",
   "apiUrl": "https://demo.sportz.io/sifeeds/repo/cricket/live/json/stbovl08182025256492.json",
   "data": {
-    "Timestamp": "08/19/2025T02:02:51.886+05:30",
+    "Timestamp": "08/20/2025T21:55:25.628+05:30",
     "Matchdetail": {
       "Awards": [
         {
@@ -147,11 +147,7 @@
       "Required_Runrate": "",
       "Required_Rpb": "",
       "Verification_Completed": true,
-      "Lineup_status": 2,
-      "Verification_Completed_Until": {
-        "Inning_no": "2",
-        "Overs": "18"
-      }
+      "Lineup_status": 2
     },
     "Nuggets": [],
     "Innings": [
@@ -400,9 +396,7 @@
               "Balls": "0"
             }
           ],
-          "ForWicket": 10,
-          "Runrate": "10",
-          "Runsperball": "2"
+          "ForWicket": 10
         },
         "Bowlers": [
           {
@@ -581,7 +575,7 @@
             "Score": "44",
             "Overs": "8",
             "Wicket_No": 6,
-            "Review_status_id": 3,
+            "Review_status_id": 0,
             "Ball_number": "40"
           },
           {
@@ -796,9 +790,7 @@
                 "Balls": "0"
               }
             ],
-            "ForWicket": 10,
-            "Runrate": "10",
-            "Runsperball": "2"
+            "ForWicket": 10
           }
         ],
         "PowerPlay": {
@@ -1130,9 +1122,7 @@
               "Balls": "1"
             }
           ],
-          "ForWicket": 4,
-          "Runrate": "9.37",
-          "Runsperball": "1.87"
+          "ForWicket": 4
         },
         "Bowlers": [
           {
@@ -1359,9 +1349,7 @@
                 "Balls": "1"
               }
             ],
-            "ForWicket": 4,
-            "Runrate": "9.37",
-            "Runsperball": "1.87"
+            "ForWicket": 4
           }
         ],
         "PowerPlay": {
@@ -1494,7 +1482,7 @@
             "Bowling": {
               "Style": "LFM",
               "Average": "10.87",
-              "Economyrate": "5.11",
+              "Economyrate": "6.14",
               "Wickets": "8"
             },
             "status_id": 12,
@@ -1548,7 +1536,7 @@
             "Bowling": {
               "Style": "RMF",
               "Average": "28.40",
-              "Economyrate": "8.35",
+              "Economyrate": "10.02",
               "Wickets": "5"
             },
             "status_id": 12,
@@ -1574,7 +1562,7 @@
             "Bowling": {
               "Style": "RFM",
               "Average": "23.58",
-              "Economyrate": "7.39",
+              "Economyrate": "8.87",
               "Wickets": "34"
             },
             "status_id": 12,
@@ -1600,7 +1588,7 @@
             "Bowling": {
               "Style": "LB",
               "Average": "25.18",
-              "Economyrate": "6.99",
+              "Economyrate": "8.39",
               "Wickets": "22"
             },
             "status_id": 12,
@@ -1626,7 +1614,7 @@
             "Bowling": {
               "Style": "LMF",
               "Average": "18.65",
-              "Economyrate": "6.94",
+              "Economyrate": "8.33",
               "Wickets": "43"
             },
             "status_id": 12,
@@ -1652,7 +1640,7 @@
             "Bowling": {
               "Style": "LBG",
               "Average": "17.17",
-              "Economyrate": "7.05",
+              "Economyrate": "8.46",
               "Wickets": "34"
             },
             "status_id": 12,
@@ -1678,7 +1666,7 @@
             "Bowling": {
               "Style": "OB",
               "Average": "14.14",
-              "Economyrate": "5.50",
+              "Economyrate": "6.60",
               "Wickets": "14"
             },
             "status_id": 12,
@@ -1842,7 +1830,7 @@
             "Bowling": {
               "Style": "RMF",
               "Average": "20.19",
-              "Economyrate": "6.06",
+              "Economyrate": "7.27",
               "Wickets": "26"
             },
             "status_id": 12,
@@ -1868,7 +1856,7 @@
             "Bowling": {
               "Style": "LF",
               "Average": "17.13",
-              "Economyrate": "6.77",
+              "Economyrate": "8.13",
               "Wickets": "51"
             },
             "status_id": 12,
@@ -1894,7 +1882,7 @@
             "Bowling": {
               "Style": "OB",
               "Average": "21.75",
-              "Economyrate": "6.69",
+              "Economyrate": "8.03",
               "Wickets": "4"
             },
             "status_id": 12,
@@ -1914,7 +1902,7 @@
             "Batting": {
               "Style": "RHB",
               "Average": "19",
-              "Strikerate": "128.08",
+              "Strikerate": "128.09",
               "Runs": "114"
             },
             "Bowling": {
@@ -1946,7 +1934,7 @@
             "Bowling": {
               "Style": "RF",
               "Average": "22.92",
-              "Economyrate": "6.20",
+              "Economyrate": "7.45",
               "Wickets": "13"
             },
             "status_id": 12,
@@ -1972,7 +1960,7 @@
             "Bowling": {
               "Style": "SLO",
               "Average": "0",
-              "Economyrate": "16",
+              "Economyrate": "19.20",
               "Wickets": "0"
             },
             "status_id": 12,
@@ -1998,7 +1986,7 @@
             "Bowling": {
               "Style": "RMF",
               "Average": "24.60",
-              "Economyrate": "7.73",
+              "Economyrate": "9.28",
               "Wickets": "20"
             },
             "status_id": 12,
@@ -2024,7 +2012,7 @@
             "Bowling": {
               "Style": "SLO",
               "Average": "54",
-              "Economyrate": "6",
+              "Economyrate": "7.20",
               "Wickets": "2"
             },
             "status_id": 12,
@@ -2062,6 +2050,6 @@
       "Equation": "Oval Invincibles beat Southern Brave by 7 wickets",
       "Eq_type": "match_ended"
     },
-    "SerialNumber": 366
+    "SerialNumber": 1
   }
 }

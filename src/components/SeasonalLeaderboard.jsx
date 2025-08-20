@@ -125,7 +125,7 @@ const SeasonalLeaderboard = ({ currentUser, onLoginClick }) => {
       <div className="top-leaderboard-section">
         <h2>Top 10 Players</h2>
         <div className="leaderboard-table">
-          <div className="table-header">
+          <div className="table-header-leaderboard">
             <div className="rank-col">Rank</div>
             <div className="name-col">Player Name</div>
             <div className="score-col">Score</div>
@@ -135,7 +135,7 @@ const SeasonalLeaderboard = ({ currentUser, onLoginClick }) => {
             {leaderboardData?.top_10?.map((player, index) => (
               <div 
                 key={player.user_id} 
-                className={`table-row ${index < 3 ? 'top-three' : ''} ${currentUser?.userId === player.user_id ? 'current-user' : ''}`}
+                className={`table-row-leaderboard ${index < 3 ? 'top-three' : ''} ${currentUser?.userId === player.user_id ? 'current-user' : ''}`}
               >
                 <div className="rank-col">
                   {index < 3 ? (

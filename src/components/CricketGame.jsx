@@ -1091,7 +1091,7 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         setGameState(prevState => updateGameState(prevState, {
           type: 'BALL_WITH_BOWLER'
         }));
-      }, 15000); // Increased from 10s to 15s for consistency
+      }, 7000); // Increased from 10s to 15s for consistency
     }
   }, [gameState.controls.ballShot]); // Add ballShot config to dependencies
 

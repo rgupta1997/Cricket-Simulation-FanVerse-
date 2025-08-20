@@ -684,10 +684,10 @@ export const AnimatedBowler = ({
         </group>
         
         {/* Ball in hand - follows bowler during run-up */}
-        <mesh ref={ballRef} position={[0.35, 1.5, 0]}>
+        {/* <mesh ref={ballRef} position={[0.35, 1.5, 0]}>
           <sphereGeometry args={[0.04, 12, 12]} />
           <meshLambertMaterial color="#CC0000" />
-        </mesh>
+        </mesh> */}
         
         {/* Shoes */}
         <mesh position={[-0.1, 0.02, 0]}>

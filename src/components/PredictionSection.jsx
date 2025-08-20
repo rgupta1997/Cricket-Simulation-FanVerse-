@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './PredictionSection.css';
 import { savePrediction, getPredictions, clearPredictions, updateLeaderboard } from '../services/predictionService';
 
-const PredictionSection = ({ currentUser, onLoginClick, latestBallEvent, isOpen, onToggle, matchId }) => {
+const PredictionSection = ({ currentUser, onLoginClick, latestBallEvent, isOpen, onToggle, matchId, showCloseButton = true }) => {
   const [prediction, setPrediction] = useState('');
   const [predictions, setPredictions] = useState([]);
   const [lastBallNumber, setLastBallNumber] = useState(null);
@@ -69,9 +69,6 @@ const PredictionSection = ({ currentUser, onLoginClick, latestBallEvent, isOpen,
       const response = await updateLeaderboard(matchId, leaderboardData);
       
       if (response.success) {
-        console.log('✅ Leaderboard updated successfully:', response.message);
-        console.log('🏆 Correct predictions found:', response.correctPredictions);
-        console.log('🏆 Points awarded:', response.pointsAwarded);
         
         // Reload predictions to show updated results
         await loadPredictions();
@@ -264,25 +261,11 @@ const PredictionSection = ({ currentUser, onLoginClick, latestBallEvent, isOpen,
     <div className="prediction-section">
       <div className="prediction-header">
         <h3>🎯 Ball Prediction</h3>
-        <button onClick={onToggle} className="close-prediction-btn">✕</button>
+        {showCloseButton && <button onClick={onToggle} className="close-prediction-btn">✕</button>}
       </div>
 
       {/* Debug Info */}
-      {process.env.NODE_ENV === 'development' && (
-        <div style={{ 
-          padding: '8px', 
-          marginBottom: '10px', 
-          backgroundColor: 'rgba(255,255,255,0.1)', 
-          borderRadius: '4px',
-          fontSize: '11px',
-          color: 'white',
-          fontFamily: 'monospace'
-        }}>
-          <strong>Debug:</strong> matchId={matchId || 'undefined'} | 
-          currentUser={currentUser ? 'logged in' : 'not logged in'} |
-          lastBallNumber={lastBallNumber || 'null'}
-        </div>
-      )}
+      
 
       {!currentUser ? (
         <div className="login-required">
@@ -298,172 +281,148 @@ const PredictionSection = ({ currentUser, onLoginClick, latestBallEvent, isOpen,
         </div>
       ) : (
         <>
-          {error && (
+          {/* {error && (
             <div className="error-message">
               <span className="error-icon">⚠️</span>
               {error}
             </div>
-          )}
+          )} */}
           
-                     <div className="prediction-form">
-             <h4>Predict Ball {getNextBallNumber()}:</h4>
-             <p style={{ fontSize: '12px', color: '#999', marginBottom: '12px', fontStyle: 'italic' }}>
-               Next ball is calculated as: Last completed ball + 1
-             </p>
-             
-             {/* Debug info for ball number logic */}
-             {process.env.NODE_ENV === 'development' && (
-               <div style={{ 
-                 padding: '6px', 
-                 marginBottom: '8px', 
-                 backgroundColor: 'rgba(255,255,255,0.1)', 
-                 borderRadius: '4px',
-                 fontSize: '10px',
-                 color: '#ccc',
-                 fontFamily: 'monospace'
-               }}>
-                 <strong>Ball Logic:</strong> Last ball: {lastBallNumber || 'null'} | 
-                 Next ball: {getNextBallNumber()} | 
-                 Latest event: {latestBallEvent?.Ball_Number || 'none'}
-               </div>
-             )}
-             
-             {hasPredictedNextBall() ? (
-               <div className="already-predicted">
-                 <p>✅ You have predicted ball {getNextBallNumber()}</p>
-                 <p style={{ fontSize: '14px', color: '#ccc' }}>
-                   Wait for the next ball to make another prediction
-                 </p>
-                 <p style={{ fontSize: '12px', color: '#999', fontStyle: 'italic' }}>
-                   Next ball will be available when ball {latestBallEvent?.Ball_Number || '?'} is completed
-                 </p>
-               </div>
-             ) : (
-               <form onSubmit={handlePredictionSubmit}>
-                 <div className="prediction-options">
-                   <div className="runs-predictions">
-                     <label>Runs:</label>
-                     <div className="runs-buttons">
-                       {[0, 1, 2, 3, 4, 5, 6].map(run => (
-                         <label key={run} className="radio-option">
-                           <input
-                             type="radio"
-                             name="prediction"
-                             value={run.toString()}
-                             checked={prediction === run.toString()}
-                             onChange={(e) => setPrediction(e.target.value)}
-                           />
-                           <span className="radio-custom">{run}</span>
-                         </label>
-                       ))}
-                     </div>
-                   </div>
-                   
-                   <div className="wicket-prediction">
-                     <label className="radio-option">
-                       <input
-                         type="radio"
-                         name="prediction"
-                         value="W"
-                         checked={prediction === 'W'}
-                         onChange={(e) => setPrediction(e.target.value)}
-                       />
-                       <span className="radio-custom wicket">W</span>
-                     </label>
-                   </div>
-                 </div>
-                 
-                 <button 
-                   type="submit" 
-                   className="submit-prediction-btn"
-                   disabled={!prediction || isLoading}
-                 >
-                   {isLoading ? 'Saving...' : 'Submit Prediction'}
-                 </button>
-               </form>
-             )}
-           </div>
+          <div className="prediction-form">
+            <div className="form-header">
+              <h4>🎯 Predict Ball {getNextBallNumber()}</h4>
+              <span className="next-ball-info">Next: Last completed + 1</span>
+            </div>
+            
+            {hasPredictedNextBall() ? (
+              <div className="already-predicted">
+                <span className="prediction-status-icon">✅</span>
+                <span className="prediction-status-text">Predicted ball {getNextBallNumber()}</span>
+                <span className="waiting-info">Wait for ball {latestBallEvent?.Ball_Number || '?'} to complete</span>
+              </div>
+            ) : (
+              <form onSubmit={handlePredictionSubmit}>
+                <div className="prediction-options">
+                  <div className="runs-section">
+                    <span className="option-label">Runs:</span>
+                    <div className="runs-buttons">
+                      {[0, 1, 2, 3, 4, 5, 6].map(run => (
+                        <label key={run} className="radio-option">
+                          <input
+                            type="radio"
+                            name="prediction"
+                            value={run.toString()}
+                            checked={prediction === run.toString()}
+                            onChange={(e) => setPrediction(e.target.value)}
+                          />
+                          <span className="radio-custom">{run}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="wicket-section">
+                    <span className="option-label">Wicket:</span>
+                    <label className="radio-option">
+                      <input
+                        type="radio"
+                        name="prediction"
+                        value="W"
+                        checked={prediction === 'W'}
+                        onChange={(e) => setPrediction(e.target.value)}
+                      />
+                      <span className="radio-custom wicket">W</span>
+                    </label>
+                  </div>
+                </div>
+                
+                <button 
+                  type="submit" 
+                  className="submit-prediction-btn"
+                  disabled={!prediction || isLoading}
+                >
+                  {isLoading ? 'Saving...' : 'Submit Prediction'}
+                </button>
+              </form>
+            )}
+          </div>
 
 
 
           <div className="prediction-history">
             <div className="history-header">
-              <h4>Recent Predictions</h4>
-                        <button 
-                          onClick={handleClearPredictions} 
-                          className="clear-btn"
-                          disabled={isLoading}
-                        >
-                          {isLoading ? 'Clearing...' : 'Clear All'}
-                        </button>
+              <h4>📋 Recent Predictions</h4>
+              <button 
+                onClick={handleClearPredictions} 
+                className="clear-btn"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Clearing...' : 'Clear All'}
+              </button>
             </div>
             
-                         <div className="predictions-list">
-               {predictions.slice(0, 10).map(pred => (
-                 <div key={pred.id} className={`prediction-item ${pred.resultChecked ? 'checked' : 'pending'}`}>
-                   <div className="prediction-info">
-                     <span className="user-name">{pred.firstName} {pred.lastName}</span>
-                     <span className="prediction-value">
-                       Predicted: {pred.prediction === 'W' ? 'Wicket' : `${pred.prediction} runs`}
-                     </span>
-                     <span className="ball-number">Ball: {pred.ballNumber}</span>
-                   </div>
-                   
-                   {pred.resultChecked && (
-                     <div className={`prediction-result ${pred.isCorrect ? 'correct' : 'incorrect'}`}>
-                       <span className="result-icon">
-                         {pred.isCorrect ? '✅' : '❌'}
-                       </span>
-                       <span className="actual-result">
-                         Actual: {pred.actualResult}
-                       </span>
-                     </div>
-                   )}
-                   
-                   {!pred.resultChecked && (
-                     <div className="prediction-status">
-                       <span className="status-pending">⏳ Waiting for result...</span>
-                     </div>
-                   )}
-                 </div>
-               ))}
-               
-               {predictions.length === 0 && (
-                 <div className="no-predictions">
-                   <p>No predictions yet. Make your first prediction above!</p>
-                 </div>
-               )}
-             </div>
-           </div>
+            <div className="predictions-list">
+              {predictions.slice(0, 8).map(pred => (
+                <div key={pred.id} className={`prediction-item ${pred.resultChecked ? 'checked' : 'pending'}`}>
+                  <div className="prediction-row">
+                    <div className="prediction-details">
+                      <span className="user-name">{pred.firstName} {pred.lastName}</span>
+                      <span className="prediction-info">
+                        Ball {pred.ballNumber}: {pred.prediction === 'W' ? 'Wicket' : `${pred.prediction} runs`}
+                      </span>
+                    </div>
+                    
+                    <div className="prediction-outcome">
+                      {pred.resultChecked ? (
+                        <div className={`result ${pred.isCorrect ? 'correct' : 'incorrect'}`}>
+                          <span className="result-icon">{pred.isCorrect ? '✅' : '❌'}</span>
+                          <span className="result-text">{pred.actualResult}</span>
+                        </div>
+                      ) : (
+                        <div className="pending-status">
+                          <span className="pending-icon">⏳</span>
+                          <span className="pending-text">Waiting...</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {predictions.length === 0 && (
+                <div className="no-predictions">
+                  <span className="no-predictions-icon">📊</span>
+                  <span className="no-predictions-text">No predictions yet. Make your first prediction above!</span>
+                </div>
+              )}
+            </div>
+          </div>
 
            {/* Leaderboard Section */}
            <div className="leaderboard-section">
-             <h4>🏆 Leaderboard</h4>
-             <div className="leaderboard-content">
-               <p className="leaderboard-info">
-                 Points are awarded for correct predictions. Each correct prediction earns <strong>1 point</strong>.
-               </p>
-                               {matchId ? (
-                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                    <button 
-                      onClick={() => window.open(`http://localhost:3001/api/match/${matchId}/leaderboard`, '_blank')}
-                      className="view-leaderboard-btn"
-                    >
-                      Match Leaderboard
-                    </button>
-                    <button 
-                      onClick={() => window.open(`http://localhost:3001/api/leaderboard`, '_blank')}
-                      className="view-leaderboard-btn"
-                      style={{ backgroundColor: '#059669' }}
-                    >
-                      Global Leaderboard
-                    </button>
-                  </div>
-                ) : (
-                  <p className="error-message" style={{color: 'orange'}}>
-                    ⚠️ Match ID not available for leaderboard
-                  </p>
-                )}
+             <div className="leaderboard-header">
+               <h4>🏆 Leaderboard</h4>
+               <span className="points-info">1 point per correct prediction</span>
+             </div>
+             <div className="leaderboard-actions">
+               {matchId ? (
+                 <>
+                   <button 
+                     onClick={() => window.open(`http://localhost:3001/api/match/${matchId}/leaderboard`, '_blank')}
+                     className="view-leaderboard-btn match-board"
+                   >
+                     Match Board
+                   </button>
+                   <button 
+                     onClick={() => window.open(`http://localhost:3001/api/leaderboard`, '_blank')}
+                     className="view-leaderboard-btn global-board"
+                   >
+                     Global Board
+                   </button>
+                 </>
+               ) : (
+                 <span className="error-text">⚠️ Match ID not available</span>
+               )}
              </div>
            </div>
          </>

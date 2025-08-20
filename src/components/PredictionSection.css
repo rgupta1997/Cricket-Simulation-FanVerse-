@@ -1,11 +1,11 @@
-/* Prediction Section Styles */
+/* Prediction Section Styles - Optimized */
 
 .prediction-section {
   background: white;
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border: 1px solid #e5e7eb;
 }
 
@@ -13,15 +13,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid #f3f4f6;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f3f4f6;
 }
 
 .prediction-header h3 {
   margin: 0;
   color: #1f2937;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
 }
 
@@ -29,13 +29,13 @@
   background: #f3f4f6;
   border: none;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 14px;
   color: #6b7280;
   transition: all 0.2s ease;
 }
@@ -106,42 +106,59 @@
   box-shadow: none !important;
 }
 
-/* Prediction Form */
+/* Prediction Form - Compact */
 .prediction-form {
-  margin-bottom: 32px;
-  padding: 24px;
+  margin-bottom: 20px;
+  padding: 16px;
   background: #f8fafc;
-  border-radius: 12px;
+  border-radius: 8px;
   border: 1px solid #e2e8f0;
 }
 
-.prediction-form h4 {
-  margin: 0 0 20px 0;
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.form-header h4 {
+  margin: 0;
   color: #1f2937;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
+}
+
+.next-ball-info {
+  font-size: 11px;
+  color: #6b7280;
+  font-style: italic;
 }
 
 .prediction-options {
-  margin-bottom: 24px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
-.runs-predictions {
-  margin-bottom: 20px;
+.runs-section, .wicket-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.runs-predictions label {
-  display: block;
-  margin-bottom: 12px;
-  color: #374151;
-  font-weight: 600;
+.option-label {
   font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  min-width: 40px;
 }
 
 .runs-buttons {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .radio-option {
@@ -158,10 +175,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border: 2px solid #d1d5db;
-  border-radius: 8px;
+  border-radius: 6px;
   background: white;
   color: #374151;
   font-weight: 600;
@@ -189,16 +206,12 @@
   transform: scale(1.05);
 }
 
-.wicket-prediction {
-  margin-top: 16px;
-}
-
 .submit-prediction-btn {
   background: #10b981;
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
+  border-radius: 6px;
+  padding: 10px 20px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -219,23 +232,23 @@
 
 
 
-/* Prediction History */
+/* Prediction History - Compact */
 .prediction-history {
   border-top: 1px solid #e5e7eb;
-  padding-top: 24px;
+  padding-top: 16px;
 }
 
 .history-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .history-header h4 {
   margin: 0;
   color: #1f2937;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -243,9 +256,9 @@
   background: #f3f4f6;
   color: #6b7280;
   border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
-  font-size: 12px;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 11px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -256,204 +269,272 @@
 }
 
 .predictions-list {
-  max-height: 300px;
+  max-height: 200px;
   overflow-y: auto;
 }
 
 .prediction-item {
-  padding: 16px;
-  margin-bottom: 12px;
-  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  border-radius: 6px;
   border: 1px solid #e5e7eb;
   background: white;
   transition: all 0.2s ease;
 }
 
 .prediction-item.checked {
-  border-left: 4px solid #10b981;
+  border-left: 3px solid #10b981;
 }
 
 .prediction-item.pending {
-  border-left: 4px solid #f59e0b;
+  border-left: 3px solid #f59e0b;
 }
 
-.prediction-info {
+.prediction-row {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 8px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.prediction-details {
+  flex: 1;
+  min-width: 0;
 }
 
 .user-name {
   font-weight: 600;
   color: #374151;
-  font-size: 14px;
+  font-size: 13px;
+  display: block;
 }
 
-.prediction-value {
-  color: #1f2937;
-  font-size: 14px;
-}
-
-.ball-number {
+.prediction-info {
   color: #6b7280;
+  font-size: 12px;
+  display: block;
+  margin-top: 2px;
+}
+
+.prediction-outcome {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.result, .pending-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
   font-size: 12px;
 }
 
-.prediction-result {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-.prediction-result.correct {
+.result.correct {
   background: #f0fdf4;
   color: #059669;
 }
 
-.prediction-result.incorrect {
+.result.incorrect {
   background: #fef2f2;
   color: #dc2626;
 }
 
-.result-icon {
-  font-size: 16px;
-}
-
-.prediction-status {
-  padding: 8px 12px;
+.pending-status {
   background: #fef3c7;
   color: #d97706;
-  border-radius: 6px;
+}
+
+.result-icon, .pending-icon {
   font-size: 14px;
 }
 
-.status-pending {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.result-text, .pending-text {
+  font-size: 11px;
+  font-weight: 500;
 }
 
 .no-predictions {
   text-align: center;
-  padding: 40px 20px;
+  padding: 20px;
   color: #6b7280;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
-.no-predictions p {
+.no-predictions-icon {
+  font-size: 24px;
+}
+
+.no-predictions-text {
+  font-size: 13px;
   margin: 0;
-  font-size: 14px;
 }
 
-/* Responsive Design */
+/* Responsive Design - Optimized */
 @media (max-width: 768px) {
   .prediction-section {
-    padding: 16px;
-    margin-bottom: 16px;
+    padding: 12px;
+    margin-bottom: 12px;
   }
   
-  .stats-grid {
-    grid-template-columns: 1fr;
+  .prediction-options {
+    flex-direction: column;
     gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .runs-section, .wicket-section {
+    width: 100%;
+    justify-content: space-between;
   }
   
   .runs-buttons {
-    gap: 6px;
+    gap: 4px;
   }
   
   .radio-custom {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     font-size: 12px;
+  }
+  
+  .prediction-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .prediction-outcome {
+    align-self: flex-end;
+  }
+  
+  .leaderboard-actions {
+    flex-direction: column;
+  }
+  
+  .view-leaderboard-btn {
+    width: 100%;
   }
 }
 
 @media (max-width: 480px) {
   .prediction-header h3 {
-    font-size: 18px;
+    font-size: 16px;
   }
   
   .prediction-form {
-    padding: 16px;
+    padding: 12px;
+  }
+  
+  .form-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
   }
   
   .runs-buttons {
-    justify-content: center;
+    justify-content: space-between;
+    width: 100%;
   }
 }
 
-/* Leaderboard Section */
+/* Leaderboard Section - Compact */
 .leaderboard-section {
   border-top: 1px solid #e5e7eb;
-  padding-top: 24px;
-  margin-top: 24px;
+  padding-top: 16px;
+  margin-top: 16px;
 }
 
-.leaderboard-section h4 {
-  margin: 0 0 16px 0;
-  color: #1f2937;
-  font-size: 16px;
-  font-weight: 600;
+.leaderboard-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  margin-bottom: 12px;
 }
 
-.leaderboard-content {
-  text-align: center;
-}
-
-.leaderboard-info {
-  color: #6b7280;
+.leaderboard-header h4 {
+  margin: 0;
+  color: #1f2937;
   font-size: 14px;
-  margin-bottom: 16px;
-  line-height: 1.5;
+  font-weight: 600;
+}
+
+.points-info {
+  font-size: 11px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.leaderboard-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .view-leaderboard-btn {
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 14px;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 1px 3px rgba(245, 158, 11, 0.3);
 }
 
 .view-leaderboard-btn:hover {
   background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
 }
 
-/* Already Predicted State */
+.view-leaderboard-btn.global-board {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 1px 3px rgba(5, 150, 105, 0.3);
+}
+
+.view-leaderboard-btn.global-board:hover {
+  background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.4);
+}
+
+.error-text {
+  color: #dc2626;
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* Already Predicted State - Compact */
 .already-predicted {
   background: rgba(34, 197, 94, 0.1);
   border: 1px solid rgba(34, 197, 94, 0.3);
-  border-radius: 8px;
-  padding: 20px;
-  text-align: center;
-  margin: 20px 0;
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
 }
 
-.already-predicted p {
-  margin: 5px 0;
+.prediction-status-icon {
+  font-size: 16px;
+}
+
+.prediction-status-text {
   color: #22c55e;
-}
-
-.already-predicted p:first-child {
-  font-size: 18px;
   font-weight: 600;
+  font-size: 14px;
+  flex: 1;
 }
 
-.prediction-form h4 {
-  color: #fbbf24;
-  margin-bottom: 15px;
-  text-align: center;
+.waiting-info {
+  color: #6b7280;
+  font-size: 12px;
 }

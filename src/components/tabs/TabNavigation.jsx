@@ -1,9 +1,9 @@
-import React from 'react';
 import '../../styles/responsive.css';
 
 const TabNavigation = ({ activeTab, onTabChange, tabs }) => {
   const defaultTabs = [
     { id: 'commentary', label: 'Commentary' },
+    { id: 'prediction', label: 'Predictions' },
     { id: 'scorecard', label: 'Scorecard' },
     { id: 'matchInfo', label: 'Match Info' },
     { id: 'wagonWheel', label: 'Wagon Wheel' },

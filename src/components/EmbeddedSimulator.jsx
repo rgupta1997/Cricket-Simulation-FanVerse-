@@ -5,11 +5,53 @@ import CricketCamera from './Camera';
 import Lighting from './Lighting';
 import Stadium from './Stadium';
 import dummyStadiumData from '../data/dummyStadiumData.json';
+import dummyStadiumData_1 from '../data/dummyStadiumData_1.json';
+import dummyStadiumData_2 from '../data/dummyStadiumData_2.json';
+import dummyStadiumData_3 from '../data/dummyStadiumData_3.json';
+import dummyStadiumData_4 from '../data/dummyStadiumData_4.json';
+import dummyStadiumData_5 from '../data/dummyStadiumData_5.json';
+import dummyStadiumData_6 from '../data/dummyStadiumData_6.json';
+import dummyStadiumData_7 from '../data/dummyStadiumData_7.json';
+import dummyStadiumData_8 from '../data/dummyStadiumData_8.json';
+import dummyStadiumData_9 from '../data/dummyStadiumData_9.json';
+import dummyStadiumData_10 from '../data/dummyStadiumData_10.json';
+import dummyStadiumData_11 from '../data/dummyStadiumData_11.json';
+import dummyStadiumData_12 from '../data/dummyStadiumData_12.json';
+import dummyStadiumData_13 from '../data/dummyStadiumData_13.json';
+import dummyStadiumData_14 from '../data/dummyStadiumData_14.json';
+import dummyStadiumData_15 from '../data/dummyStadiumData_15.json';
+import dummyStadiumData_16 from '../data/dummyStadiumData_16.json';
+import dummyStadiumData_17 from '../data/dummyStadiumData_17.json';
+import dummyStadiumData_18 from '../data/dummyStadiumData_18.json';
+import dummyStadiumData_19 from '../data/dummyStadiumData_19.json';
 
 const EmbeddedSimulator = ({ matchId, onExpand }) => {
   const [isDummyDataLoaded, setIsDummyDataLoaded] = useState(false);
   const [currentGameData, setCurrentGameData] = useState(null);
-  
+  const [currentDummyDataIndex, setCurrentDummyDataIndex] = useState(0);
+  const gameDataArray = [
+    dummyStadiumData.stadiumSimulation,
+    dummyStadiumData_1.stadiumSimulation,
+    dummyStadiumData_2.stadiumSimulation,
+    dummyStadiumData_3.stadiumSimulation,
+    dummyStadiumData_4.stadiumSimulation,
+    dummyStadiumData_5.stadiumSimulation,
+    dummyStadiumData_6.stadiumSimulation,
+    dummyStadiumData_7.stadiumSimulation,
+    dummyStadiumData_8.stadiumSimulation,
+    dummyStadiumData_9.stadiumSimulation,
+    dummyStadiumData_10.stadiumSimulation,
+    dummyStadiumData_11.stadiumSimulation,
+    dummyStadiumData_12.stadiumSimulation,
+    dummyStadiumData_13.stadiumSimulation,
+    dummyStadiumData_14.stadiumSimulation,
+    dummyStadiumData_15.stadiumSimulation,
+    dummyStadiumData_16.stadiumSimulation,
+    dummyStadiumData_17.stadiumSimulation,
+    dummyStadiumData_18.stadiumSimulation,
+    dummyStadiumData_19.stadiumSimulation
+  ];
+
   // Ball Following Camera State for embedded simulator
   const [ballPosition, setBallPosition] = useState(null);
   const [isFollowingBall, setIsFollowingBall] = useState(false);
@@ -25,7 +67,7 @@ const EmbeddedSimulator = ({ matchId, onExpand }) => {
 
   // Default camera view for embedded simulator
   const defaultCameraView = {
-    position: [45, 35, 45],
+    position: [0, 6, 20],
     target: [0, 0, 0],
     fov: 75
   };
@@ -36,11 +78,14 @@ const EmbeddedSimulator = ({ matchId, onExpand }) => {
     }
   };
 
-  const handleLoadDummyData = () => {
+  const handleLoadDummyData = (e) => {
     try {
-      setCurrentGameData(dummyStadiumData.stadiumSimulation);
+      const currentDummyData = gameDataArray[currentDummyDataIndex];
+      setCurrentGameData(currentDummyData);
+      setCurrentDummyDataIndex((prevIndex) => prevIndex == 19 ? 0: (prevIndex + 1)); // Cycle through dummy data
       setIsDummyDataLoaded(true);
-      console.log('Dummy stadium data loaded:', dummyStadiumData.stadiumSimulation);
+      console.log('Dummy stadium data loaded:', currentDummyData);
+      e.preventDefault();
     } catch (error) {
       console.error('Error loading dummy data:', error);
     }
@@ -283,7 +328,9 @@ const EmbeddedSimulator = ({ matchId, onExpand }) => {
 
              {/* Demo Data Indicator */}
        {isDummyDataLoaded && (
-         <div style={{
+         <div 
+         onClick={handleLoadDummyData}
+         style={{
            position: 'absolute',
            top: '70px',
            right: '20px',

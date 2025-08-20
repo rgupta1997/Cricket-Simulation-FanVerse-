@@ -8,6 +8,7 @@ import authService from '../services/authService.js';
 import TabNavigation from './tabs/TabNavigation.jsx';
 import CommentaryTab from './tabs/CommentaryTab.jsx';
 import ScorecardTab from './tabs/ScorecardTab.jsx';
+import PredictionTab from './tabs/PredictionTab.jsx';
 import MatchInfoTab from './tabs/MatchInfoTab.jsx';
 import WagonWheelTab from './tabs/WagonWheelTab.jsx';
 import PointsTableTab from './tabs/PointsTableTab.jsx';
@@ -17,7 +18,6 @@ import EmbeddedSimulator from './EmbeddedSimulator';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import Stadium from './Stadium';
-import PredictionSection from './PredictionSection.jsx';
 import SeasonalLeaderboard from './SeasonalLeaderboard.jsx';
 
 // Import responsive styles
@@ -161,7 +161,7 @@ const ModernMatchCard = ({ match, onClick }) => {
         transition: 'all 0.3s ease',
         position: 'relative',
         overflow: 'hidden',
-        width: '420px',
+        width: '100%',
         height: '180px',
         float: 'left',
         display: 'inline-block'
@@ -809,7 +809,6 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetai
   const [error, setError] = useState(null);
   const [commentary, setCommentary] = useState(null);
   const [isLoadingData, setIsLoadingData] = useState(false);
-  const [isPredictionOpen, setIsPredictionOpen] = useState(false);
 
   
   const extractTeamDataFromMatchFile = useCallback((matchFileData) => {
@@ -944,19 +943,6 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetai
       fetchMatchData();
     }
   }, [matchId, selectedMatchDetails, fetchMatchData]);
-
-
-  const fetchLiveData = async () => {
-    if (!match?.matchFile) return;
-    
-    try {
-      const data = await webappApiService.getLiveInningsData(match.matchFile);
-      setLiveData(data);
-    } catch (err) {
-      console.warn('Could not fetch live data:', err);
-    }
-  };
-
 
 
   // Show loading state while fetching data
@@ -1198,47 +1184,13 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetai
         />
       </div>
 
-      {/* Prediction Section Toggle */}
-      <div style={{ padding: '0 20px', marginBottom: '20px' }}>
-        <button
-          onClick={() => setIsPredictionOpen(!isPredictionOpen)}
-          style={{
-            backgroundColor: '#3b82f6',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '10px 20px',
-            fontSize: '14px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}
-        >
-          <span>🎯</span>
-          {isPredictionOpen ? 'Hide Predictions' : 'Show Predictions'}
-        </button>
-      </div>
-
-      {/* Prediction Section */}
-      <div style={{ padding: '0 20px' }}>
-        <PredictionSection
-          currentUser={currentUser}
-          onLoginClick={onLoginClick}
-          latestBallEvent={latestBallEvent}
-          isOpen={isPredictionOpen}
-          onToggle={() => setIsPredictionOpen(!isPredictionOpen)}
-          matchId={matchId}
-        />
-      </div>
-
       {/* Tab Navigation */}
       <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
              {/* Tab Content - Scrollable */}
        <div className="tab-content">
          {activeTab === 'commentary' && <CommentaryTab matchDetail={matchDetail} matchId={matchId} commentary={commentary} />}
+         {activeTab === 'prediction' && <PredictionTab matchId={matchId} currentUser={currentUser} onLoginClick={onLoginClick} latestBallEvent={latestBallEvent} />}
          {activeTab === 'scorecard' && <ScorecardTab matchDetail={matchDetail} matchId={matchId} />}
          {activeTab === 'matchInfo' && <MatchInfoTab matchDetail={matchDetail} match={match} matchName={match?.matchName } />}
          {activeTab === 'wagonWheel' && <WagonWheelTab matchDetail={matchDetail} match={match} />}

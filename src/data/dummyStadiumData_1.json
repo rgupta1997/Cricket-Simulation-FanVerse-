@@ -1,10 +1,10 @@
 {
   "stadiumSimulation": {
     "metadata": {
-      "description": "Dummy cricket stadium simulation data",
+      "description": "Dummy cricket stadium simulation data - Six over long-on",
       "version": "1.0",
       "created": "2024-01-01",
-      "scenario": "Sample T20 Match - Over 15"
+      "scenario": "Sample T20 Match - Over 10"
     },
     "gameState": {
       "gameState": "waiting_for_ball",
@@ -12,18 +12,18 @@
       "canBat": false,
       "formatId": 78,
       "score": {
-        "runs": 127,
-        "wickets": 3,
-        "overs": 14,
-        "balls": 5,
+        "runs": 89,
+        "wickets": 2,
+        "overs": 9,
+        "balls": 3,
         "target": 185,
-        "runRate": 8.6,
-        "requiredRunRate": 11.2
+        "runRate": 9.3,
+        "requiredRunRate": 9.6
       },
       "fieldPositioningMetadata": {
         "formatType": "T20",
         "isRestrictedPeriod": false,
-        "currentOvers": 14,
+        "currentOvers": 9,
         "restrictionLimit": 6,
         "fieldersInside30m": 4,
         "fieldersOutside30m": 7,
@@ -36,70 +36,70 @@
       },
       "currentBall": {
         "Isboundary": true,
-        "runs": 4,
-        "Details":"",
+        "runs": 6,
+        "Details": "Maximum! Lofted over long-on",
         "position": [0, 0.5, 15],
         "velocity": [0, 0, 0],
         "isMoving": false,
         "trajectory": []
       },
       "lastAction": {
-        "type": "boundary",
-        "runs": 4,
-        "description": "Driven through covers for four"
+        "type": "six",
+        "runs": 6,
+        "description": "Massive six over long-on! What a strike!"
       },
       "BallOutcome": {
-        "type": "boundary",
-        "runs": 4,
-        "description": "Driven through covers for four"
+        "type": "six",
+        "runs": 6,
+        "description": "Massive six over long-on! What a strike!"
       }
     },
     "players": {
       "striker": {
         "id": "striker",
-        "name": "Virat Kohli",
+        "name": "Rohit Sharma",
         "position": [0, 0, -9],
         "state": "ready",
         "isOnStrike": true,
         "animation": null,
         "stats": {
-          "runs": 45,
-          "balls": 32,
-          "fours": 5,
-          "sixes": 1
+          "runs": 52,
+          "balls": 38,
+          "fours": 4,
+          "sixes": 3
         }
       },
       "nonStriker": {
         "id": "non_striker",
-        "name": "KL Rahul",
+        "name": "Shubman Gill",
         "position": [1.5, 0, 9],
         "state": "idle",
         "isOnStrike": false,
         "animation": null,
         "stats": {
-          "runs": 28,
-          "balls": 24,
-          "fours": 3,
-          "sixes": 0
+          "runs": 21,
+          "balls": 18,
+          "fours": 2,
+          "sixes": 1
         }
       },
       "bowler": {
         "id": "bowler",
-        "name": "Jasprit Bumrah",
+        "name": "Mitchell Starc",
         "position": [0, 0, 15],
         "state": "ready",
         "animation": null,
         "runUpDistance": 0,
         "stats": {
-          "overs": 2.5,
-          "runs": 18,
-          "wickets": 1,
-          "economy": 7.2
+          "overs": 1.3,
+          "runs": 15,
+          "wickets": 0,
+          "economy": 11.5
         }
       },
       "wicketKeeper": {
         "id": "wicket_keeper",
-        "name": "MS Dhoni",
+        "name": "Alex Carey",
         "position": [0, 0, -11],
         "state": "ready",
         "animation": null
@@ -107,13 +107,13 @@
       "umpires": {
         "bowlersEnd": {
           "id": "bowlers_end_umpire",
-          "name": "Nitin Menon",
+          "name": "Kumar Dharmasena",
           "position": [0, 0, 11],
           "state": "idle"
         },
         "point": {
           "id": "point_umpire",
-          "name": "Anil Chaudhary",
+          "name": "Paul Reiffel",
           "position": [12, 0, -8],
           "state": "idle"
         }
@@ -121,78 +121,78 @@
       "fielders": [
         {
           "id": "fielder_1",
-          "name": "Rohit Sharma",
-          "position": [25, 0, 15],
+          "name": "Steve Smith",
+          "position": [20, 0, 12],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_2", 
-          "name": "Hardik Pandya",
-          "position": [-18, 0, 22],
+          "name": "Marcus Stoinis",
+          "position": [-15, 0, 25],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_3",
-          "name": "Shubman Gill",
-          "position": [28, 0, -25],
+          "name": "Glenn Maxwell",
+          "position": [30, 0, -20],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_4",
-          "name": "Ravindra Jadeja",
-          "position": [-22, 0, 16],
+          "name": "Adam Zampa",
+          "position": [-25, 0, 18],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_5",
-          "name": "Mohammed Shami",
-          "position": [15, 0, 45],
+          "name": "Josh Hazlewood",
+          "position": [8, 0, 50],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_6",
-          "name": "Yuzvendra Chahal",
-          "position": [-42, 0, -15],
+          "name": "Pat Cummins",
+          "position": [-40, 0, -12],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_7",
-          "name": "Suryakumar Yadav",
-          "position": [35, 0, 35],
+          "name": "David Warner",
+          "position": [32, 0, 40],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_8",
-          "name": "Rishabh Pant",
-          "position": [-35, 0, 35],
+          "name": "Tim David",
+          "position": [-30, 0, 40],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_9",
-          "name": "Washington Sundar",
-          "position": [40, 0, -25],
+          "name": "Cameron Green",
+          "position": [45, 0, -20],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_10",
-          "name": "Ishan Kishan",
-          "position": [-20, 0, -40],
+          "name": "Matthew Wade",
+          "position": [-18, 0, -35],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_11",
-          "name": "Axar Patel",
-          "position": [20, 0, -15],
+          "name": "Ashton Agar",
+          "position": [15, 0, -12],
           "role": "fielding",
           "state": "ready"
         }
@@ -200,47 +200,38 @@
     },
     "controls": {
       "bowling": {
-        "velocity": 145.2,
-        "ball_axis_x": 30.15,
-        "ball_axis_y": 22.40,
-        "length_axis_x": 58.89,
-        "length_axis_z": 6.07,
-        "line_axis_x": 35.04,
-        "line_axis_z": 25.93,
-        "bounceHeight": 0.7,
+        "velocity": 148.5,
+        "ball_axis_x": 25.8,
+        "ball_axis_y": 18.2,
+        "length_axis_x": 52.4,
+        "length_axis_z": 8.1,
+        "line_axis_x": 32.7,
+        "line_axis_z": 22.5,
+        "bounceHeight": 0.8,
         "useDirectCoordinates": true,
-        "side": "R",
-        "release_x": 0.2,
-        "release_y": 2.1,
+        "side": "L",
+        "release_x": -0.3,
+        "release_y": 2.2,
         "release_z": 11.5,
-        "bounce_x": 0.1,
-        "bounce_y": 0.3,
-        "bounce_z": 4.2,
-        "final_x": 0.0,
-        "final_y": 0.5,
+        "bounce_x": -0.1,
+        "bounce_y": 0.4,
+        "bounce_z": 3.8,
+        "final_x": 0.1,
+        "final_y": 0.6,
         "final_z": -9.0,
-        "speed": 145.2,
-        "line": 0.2,
-        "length": 6.2,
-        "pitch": 0.7,
-        "alternativeExample": {
-          "note": "Example for Around the Wicket bowling",
-          "side": "R",
-          "release_x": -0.5,
-          "release_y": 2.1,
-          "release_z": 11.5,
-          "bounce_x": -0.2,
-          "final_x": 0.3
-        }
+        "speed": 148.5,
+        "line": -0.1,
+        "length": 5.8,
+        "pitch": 0.8
       },
       "ballShot": {
-        "lofted": false,
-        "degree": 270,
-        "distance": 50,
+        "lofted": true,
+        "degree": 0,
+        "distance": 75,
         "autoPlay": true,
-        "power": 0.8,
-        "timing": 0.95,
-        "keeperAutoCollect": true,
+        "power": 0.95,
+        "timing": 0.92,
+        "keeperAutoCollect": false,
         "keeperCollectionRadius": 0.0,
         "keeperSpeedThreshold": 4.0,
         "usePhysicsMode": true,
@@ -248,8 +239,8 @@
       },
       "batting": {
         "footwork": "front",
-        "shot": "drive",
-        "timing": 0.95
+        "shot": "lofted_drive",
+        "timing": 0.92
       },
       "fielding": {
         "selectedFielder": null,
@@ -265,47 +256,47 @@
           "duration": 2000
         },
         {
-          "type": "bat_swing",
+          "type": "lofted_shot",
           "player": "striker",
-          "duration": 500
+          "duration": 800
         }
       ]
     },
     "stadium": {
-      "weather": "Clear",
-      "temperature": "28°C", 
-      "humidity": "65%",
-      "windSpeed": "12 km/h",
-      "windDirection": "North-East",
-      "pitchCondition": "Good for batting",
+      "weather": "Partly Cloudy",
+      "temperature": "26°C", 
+      "humidity": "58%",
+      "windSpeed": "8 km/h",
+      "windDirection": "South-West",
+      "pitchCondition": "Excellent for batting",
       "dew": false,
       "crowd": {
-        "attendance": "15,250",
-        "capacity": "16,000", 
-        "atmosphere": "Electric",
-        "noise_level": "Loud",
+        "attendance": "18,500",
+        "capacity": "20,000", 
+        "atmosphere": "Explosive",
+        "noise_level": "Deafening",
         "support": "Home team favored"
       },
       "infrastructure": {
         "floodlights": "On",
-        "roof": "Covered seating",
+        "roof": "Retractable closed",
         "flags": "Team colors displayed"
       }
     },
     "commentary": [
       {
-        "ball": "14.6",
-        "text": "Bumrah to Kohli, FOUR! What a shot! Driven beautifully through covers",
-        "type": "boundary"
+        "ball": "9.4",
+        "text": "Starc to Rohit, SIX! Out of the park! Incredible shot over long-on!",
+        "type": "six"
       },
       {
-        "ball": "14.5",
-        "text": "Bumrah to Kohli, 1 run, worked away to mid-wicket",
-        "type": "single"
+        "ball": "9.3",
+        "text": "Starc to Rohit, 2 runs, worked into the gap at midwicket",
+        "type": "runs"
       },
       {
-        "ball": "14.4",
-        "text": "Bumrah to Rahul, 1 run, tucked off the pads to fine leg",
+        "ball": "9.2",
+        "text": "Starc to Gill, 1 run, pushed to cover for a quick single",
         "type": "single"
       }
     ]

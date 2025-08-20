@@ -1,10 +1,10 @@
 {
   "stadiumSimulation": {
     "metadata": {
-      "description": "Dummy cricket stadium simulation data",
+      "description": "Dummy cricket stadium simulation data - Single to deep fine leg",
       "version": "1.0",
       "created": "2024-01-01",
-      "scenario": "Sample T20 Match - Over 15"
+      "scenario": "Sample T20 Match - Over 4"
     },
     "gameState": {
       "gameState": "waiting_for_ball",
@@ -12,22 +12,22 @@
       "canBat": false,
       "formatId": 78,
       "score": {
-        "runs": 127,
-        "wickets": 3,
-        "overs": 14,
-        "balls": 5,
+        "runs": 34,
+        "wickets": 0,
+        "overs": 3,
+        "balls": 3,
         "target": 185,
-        "runRate": 8.6,
-        "requiredRunRate": 11.2
+        "runRate": 10.2,
+        "requiredRunRate": 9.4
       },
       "fieldPositioningMetadata": {
         "formatType": "T20",
-        "isRestrictedPeriod": false,
-        "currentOvers": 14,
+        "isRestrictedPeriod": true,
+        "currentOvers": 3,
         "restrictionLimit": 6,
-        "fieldersInside30m": 4,
-        "fieldersOutside30m": 7,
-        "minFieldersInside30m": 4,
+        "fieldersInside30m": 5,
+        "fieldersOutside30m": 6,
+        "minFieldersInside30m": 5,
         "boundaryRadius": 50,
         "positioningMethod": "dynamic_random_boundary_compliant",
         "minDistanceBetweenFielders": "20m",
@@ -35,71 +35,71 @@
         "lastUpdated": "2024-01-01T12:00:00Z"
       },
       "currentBall": {
-        "Isboundary": true,
-        "runs": 4,
-        "Details":"",
+        "Isboundary": false,
+        "runs": 1,
+        "Details": "Neatly glanced down to deep fine leg for one",
         "position": [0, 0.5, 15],
         "velocity": [0, 0, 0],
         "isMoving": false,
         "trajectory": []
       },
       "lastAction": {
-        "type": "boundary",
-        "runs": 4,
-        "description": "Driven through covers for four"
+        "type": "single",
+        "runs": 1,
+        "description": "Well placed glance to deep fine leg for a single"
       },
       "BallOutcome": {
-        "type": "boundary",
-        "runs": 4,
-        "description": "Driven through covers for four"
+        "type": "single",
+        "runs": 1,
+        "description": "Well placed glance to deep fine leg for a single"
       }
     },
     "players": {
       "striker": {
         "id": "striker",
-        "name": "Virat Kohli",
+        "name": "Aaron Finch",
         "position": [0, 0, -9],
         "state": "ready",
         "isOnStrike": true,
         "animation": null,
         "stats": {
-          "runs": 45,
-          "balls": 32,
-          "fours": 5,
+          "runs": 18,
+          "balls": 14,
+          "fours": 2,
           "sixes": 1
         }
       },
       "nonStriker": {
         "id": "non_striker",
-        "name": "KL Rahul",
+        "name": "David Warner",
         "position": [1.5, 0, 9],
         "state": "idle",
         "isOnStrike": false,
         "animation": null,
         "stats": {
-          "runs": 28,
-          "balls": 24,
-          "fours": 3,
+          "runs": 12,
+          "balls": 8,
+          "fours": 1,
           "sixes": 0
         }
       },
       "bowler": {
         "id": "bowler",
-        "name": "Jasprit Bumrah",
+        "name": "Bhuvneshwar Kumar",
         "position": [0, 0, 15],
         "state": "ready",
         "animation": null,
         "runUpDistance": 0,
         "stats": {
-          "overs": 2.5,
-          "runs": 18,
-          "wickets": 1,
-          "economy": 7.2
+          "overs": 1.3,
+          "runs": 12,
+          "wickets": 0,
+          "economy": 9.0
         }
       },
       "wicketKeeper": {
         "id": "wicket_keeper",
-        "name": "MS Dhoni",
+        "name": "Rishabh Pant",
         "position": [0, 0, -11],
         "state": "ready",
         "animation": null
@@ -107,13 +107,13 @@
       "umpires": {
         "bowlersEnd": {
           "id": "bowlers_end_umpire",
-          "name": "Nitin Menon",
+          "name": "Sundaram Ravi",
           "position": [0, 0, 11],
           "state": "idle"
         },
         "point": {
           "id": "point_umpire",
-          "name": "Anil Chaudhary",
+          "name": "Chettithody Shamshuddin",
           "position": [12, 0, -8],
           "state": "idle"
         }
@@ -121,78 +121,78 @@
       "fielders": [
         {
           "id": "fielder_1",
-          "name": "Rohit Sharma",
-          "position": [25, 0, 15],
+          "name": "Virat Kohli",
+          "position": [20, 0, 15],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_2", 
-          "name": "Hardik Pandya",
+          "name": "Rohit Sharma",
           "position": [-18, 0, 22],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_3",
-          "name": "Shubman Gill",
-          "position": [28, 0, -25],
+          "name": "KL Rahul",
+          "position": [28, 0, -15],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_4",
-          "name": "Ravindra Jadeja",
-          "position": [-22, 0, 16],
+          "name": "Suryakumar Yadav",
+          "position": [-22, 0, 15],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_5",
-          "name": "Mohammed Shami",
-          "position": [15, 0, 45],
+          "name": "Hardik Pandya",
+          "position": [10, 0, 42],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_6",
-          "name": "Yuzvendra Chahal",
-          "position": [-42, 0, -15],
+          "name": "Ravindra Jadeja",
+          "position": [-35, 0, -18],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_7",
-          "name": "Suryakumar Yadav",
-          "position": [35, 0, 35],
+          "name": "Jasprit Bumrah",
+          "position": [32, 0, 35],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_8",
-          "name": "Rishabh Pant",
-          "position": [-35, 0, 35],
+          "name": "Mohammed Shami",
+          "position": [-30, 0, 38],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_9",
-          "name": "Washington Sundar",
-          "position": [40, 0, -25],
+          "name": "Yuzvendra Chahal",
+          "position": [40, 0, -22],
           "role": "fielding",
           "state": "ready"
         },
         {
           "id": "fielder_10",
-          "name": "Ishan Kishan",
-          "position": [-20, 0, -40],
+          "name": "Washington Sundar",
+          "position": [-38, 0, -28],
           "role": "fielding",
-          "state": "ready"
+          "state": "collecting"
         },
         {
           "id": "fielder_11",
-          "name": "Axar Patel",
-          "position": [20, 0, -15],
+          "name": "Deepak Chahar",
+          "position": [15, 0, -10],
           "role": "fielding",
           "state": "ready"
         }
@@ -200,60 +200,51 @@
     },
     "controls": {
       "bowling": {
-        "velocity": 145.2,
-        "ball_axis_x": 30.15,
-        "ball_axis_y": 22.40,
-        "length_axis_x": 58.89,
-        "length_axis_z": 6.07,
-        "line_axis_x": 35.04,
-        "line_axis_z": 25.93,
+        "velocity": 132.4,
+        "ball_axis_x": 28.9,
+        "ball_axis_y": 21.5,
+        "length_axis_x": 52.1,
+        "length_axis_z": 8.4,
+        "line_axis_x": 35.7,
+        "line_axis_z": 26.8,
         "bounceHeight": 0.7,
         "useDirectCoordinates": true,
         "side": "R",
         "release_x": 0.2,
-        "release_y": 2.1,
+        "release_y": 2.0,
         "release_z": 11.5,
-        "bounce_x": 0.1,
-        "bounce_y": 0.3,
-        "bounce_z": 4.2,
-        "final_x": 0.0,
+        "bounce_x": 0.0,
+        "bounce_y": 0.35,
+        "bounce_z": 4.1,
+        "final_x": -0.3,
         "final_y": 0.5,
         "final_z": -9.0,
-        "speed": 145.2,
-        "line": 0.2,
-        "length": 6.2,
-        "pitch": 0.7,
-        "alternativeExample": {
-          "note": "Example for Around the Wicket bowling",
-          "side": "R",
-          "release_x": -0.5,
-          "release_y": 2.1,
-          "release_z": 11.5,
-          "bounce_x": -0.2,
-          "final_x": 0.3
-        }
+        "speed": 132.4,
+        "line": -0.3,
+        "length": 6.1,
+        "pitch": 0.7
       },
       "ballShot": {
         "lofted": false,
-        "degree": 270,
-        "distance": 50,
+        "degree": 210,
+        "distance": 42,
         "autoPlay": true,
-        "power": 0.8,
-        "timing": 0.95,
-        "keeperAutoCollect": true,
+        "power": 0.5,
+        "timing": 0.87,
+        "keeperAutoCollect": false,
         "keeperCollectionRadius": 0.0,
         "keeperSpeedThreshold": 4.0,
         "usePhysicsMode": true,
         "resetDelay": 3000
       },
       "batting": {
-        "footwork": "front",
-        "shot": "drive",
-        "timing": 0.95
+        "footwork": "back",
+        "shot": "glance",
+        "timing": 0.87
       },
       "fielding": {
-        "selectedFielder": null,
-        "throwTarget": "keeper"
+        "selectedFielder": "fielder_10",
+        "throwTarget": "striker_end"
       }
     },
     "animations": {
@@ -265,47 +256,47 @@
           "duration": 2000
         },
         {
-          "type": "bat_swing",
+          "type": "leg_glance",
           "player": "striker",
-          "duration": 500
+          "duration": 400
         }
       ]
     },
     "stadium": {
-      "weather": "Clear",
-      "temperature": "28°C", 
-      "humidity": "65%",
-      "windSpeed": "12 km/h",
-      "windDirection": "North-East",
-      "pitchCondition": "Good for batting",
+      "weather": "Bright Sunshine",
+      "temperature": "32°C", 
+      "humidity": "48%",
+      "windSpeed": "6 km/h",
+      "windDirection": "South",
+      "pitchCondition": "Flat batting track",
       "dew": false,
       "crowd": {
-        "attendance": "15,250",
-        "capacity": "16,000", 
-        "atmosphere": "Electric",
-        "noise_level": "Loud",
-        "support": "Home team favored"
+        "attendance": "68,000",
+        "capacity": "70,000", 
+        "atmosphere": "Electric start",
+        "noise_level": "Very Loud",
+        "support": "Mixed but passionate"
       },
       "infrastructure": {
-        "floodlights": "On",
-        "roof": "Covered seating",
-        "flags": "Team colors displayed"
+        "floodlights": "Off - Daylight",
+        "roof": "Open",
+        "flags": "Colorful display"
       }
     },
     "commentary": [
       {
-        "ball": "14.6",
-        "text": "Bumrah to Kohli, FOUR! What a shot! Driven beautifully through covers",
-        "type": "boundary"
-      },
-      {
-        "ball": "14.5",
-        "text": "Bumrah to Kohli, 1 run, worked away to mid-wicket",
+        "ball": "3.4",
+        "text": "Bhuvneshwar to Finch, 1 run, neatly glanced to deep fine leg",
         "type": "single"
       },
       {
-        "ball": "14.4",
-        "text": "Bumrah to Rahul, 1 run, tucked off the pads to fine leg",
+        "ball": "3.3",
+        "text": "Bhuvneshwar to Finch, no run, well bowled, defended back",
+        "type": "dot"
+      },
+      {
+        "ball": "3.2",
+        "text": "Bhuvneshwar to Warner, 1 run, worked away to mid-on",
         "type": "single"
       }
     ]

@@ -209,7 +209,7 @@ const StadiumSeating = () => {
   const seats = [];
   const crowd = [];
   const baseRadius = 53; // ✅ CORRECTED: Start outside 50m playing boundary
-  const sections = 16; // Reduced sections for better performance
+  const sections = 10; // Reduced sections for better performance
   const rowCount = 12; // Reduced rows for better performance  
   const rowHeight = 0.5; // Tighter row spacing
   const rowDepth = 0.8; // Smaller depth to fit more rows
