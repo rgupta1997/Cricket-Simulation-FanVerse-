@@ -24,7 +24,7 @@ import {
 } from '../constants/playerPositions';
 import ZoneMarkers from './ZoneMarkers';
 
-const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEditorActive = false, isEmbedded = false, matchId = null, dummyGameData = null, isDummyDataActive = false }) => {
+const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEditorActive = false, isEmbedded = false, matchId = null, dummyGameData = null, isDummyDataActive = false, onBallPositionUpdate }) => {
   const [gameState, setGameState] = useState(createInitialGameState());
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedShotDirection, setSelectedShotDirection] = useState('straight');
@@ -125,11 +125,15 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
 
   // Reusable helper function to reset ball to bowler position
   const resetBallToBowler = useCallback((reason = 'manual_reset') => {
+    console.log(`🔄 Resetting ball to bowler: ${reason}`);
     setGameState(prevState => ({
       ...prevState,
       gameState: GAME_STATES.WAITING_FOR_BALL,
       ballState: BALL_STATES.WITH_BOWLER,
       canBat: false,
+      bowlingSequenceActive: false, // 🚨 CRITICAL: Reset bowling sequence
+      bowlingAnimation: null, // Clear bowling animation
+      pendingBallData: null, // Clear any pending data
       currentBall: {
         position: [0, 0.5, 15], // Bowler position
         velocity: [0, 0, 0],
@@ -148,13 +152,18 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         },
         bowler: {
           ...prevState.players.bowler,
-          state: PLAYER_STATES.READY
+          state: PLAYER_STATES.READY,
+          animation: null // Reset bowler animation
         }
       }
     }));
+    
+    // Clear any pending ball data from global scope
+    window.pendingBallData = null;
+    console.log(`✅ Ball reset complete - ready for next delivery`);
   }, []);
 
-  // Game action handlers
+  // 🏏 REALISTIC BOWLING HANDLER with Run-up and Ball Release Coordination
   const handleBowl = useCallback(() => {
     if (gameState.gameState !== GAME_STATES.WAITING_FOR_BALL) {
       return;
@@ -166,41 +175,95 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
     // Calculate enhanced ball trajectory using pitch analysis
     const trajectory = calculateBallTrajectory(bowlingControls);
     
-    // Start bowling animation
+    console.log(`🏏 Starting realistic bowling sequence - ${bowlingControls.type || 'fast'} bowling`);
+    
+    // 🏃‍♂️ START RUN-UP ANIMATION - Trigger realistic bowling sequence
     setGameState(prevState => updateGameState(prevState, {
-      type: 'START_BOWLING'
+      type: 'START_BOWLING',
+      bowlingAnimation: 'runUp', // Start with run-up animation
+      ballData: trajectory // Store trajectory for later use
     }));
 
-    // Delay ball release for animation
-    setTimeout(() => {
-      // Create ball data using enhanced trajectory calculation
-      const ballData = {
-        position: trajectory.initial.position, // Release position from pitch analysis
-        velocity: trajectory.initial.velocity, // Initial velocity components
-        isMoving: true,
-        bounceHeight: bowlingControls.bounceHeight || 0.5,
-        trajectory: {
-          initial: trajectory.initial,
-          bounce: trajectory.bounce,
-          target: trajectory.target,
-          metadata: trajectory.metadata
-        },
-        // Store pitch analysis data for reference
-        pitchAnalysis: {
-          ball_axis: { x: bowlingControls.ball_axis_x, y: bowlingControls.ball_axis_y },
-          length_axis: { x: bowlingControls.length_axis_x, z: bowlingControls.length_axis_z },
-          line_axis: { x: bowlingControls.line_axis_x, z: bowlingControls.line_axis_z },
-          velocity: bowlingControls.velocity
-        }
+    // Store trajectory data for ball release
+    window.pendingBallData = {
+      position: trajectory.initial.position,
+      velocity: trajectory.initial.velocity,
+      isMoving: true,
+      bounceHeight: bowlingControls.bounceHeight || 0.5,
+      trajectory: {
+        initial: trajectory.initial,
+        bounce: trajectory.bounce,
+        target: trajectory.target,
+        metadata: trajectory.metadata
+      },
+      pitchAnalysis: {
+        ball_axis: { x: bowlingControls.ball_axis_x, y: bowlingControls.ball_axis_y },
+        length_axis: { x: bowlingControls.length_axis_x, z: bowlingControls.length_axis_z },
+        line_axis: { x: bowlingControls.line_axis_x, z: bowlingControls.line_axis_z },
+        velocity: bowlingControls.velocity
+      }
+    };
+
+  }, [gameState]);
+
+  // 🎯 BALL RELEASE HANDLER - Called by bowler animation at the right moment
+  const handleBallRelease = useCallback(() => {
+    console.log('🎯🎯🎯 BALL RELEASE HANDLER CALLED! 🎯🎯🎯');
+    console.log('Pending ball data:', window.pendingBallData);
+    
+    if (window.pendingBallData) {
+      console.log('✅ Releasing ball with pending data');
+      
+      // 🏏 CRITICAL: Ball releases from ACTUAL release position from bowling data
+      // Use the exact release_z coordinate from the bowling configuration
+      const releaseZ = window.pendingBallData.pitchAnalysis?.line_axis?.z || 
+                       gameState.controls?.bowling?.release_z || 11.5;
+      
+      // 🏏 CRICKET BOWLING SIDES: Adjust X position based on side
+      const bowlingSide = gameState.controls?.bowling?.side || "L";
+      let bowlerX = 0; // Default center position
+      
+      if (bowlingSide === "L") {
+        bowlerX = -1.0; // Over the wicket (left side from batsman's perspective)
+        console.log('🏏 Bowling OVER THE WICKET (L) - Bowler positioned left');
+      } else if (bowlingSide === "R") {
+        bowlerX = 1.0; // Around the wicket (right side from batsman's perspective)
+        console.log('🏏 Bowling AROUND THE WICKET (R) - Bowler positioned right');
+      }
+      
+      const actualBowlerPosition = [bowlerX, 0.5, releaseZ]; // Bowler's position at release point
+      
+      const releasePosition = [
+        actualBowlerPosition[0],                      // X: Bowler's X position
+        actualBowlerPosition[1] + 1.5,                // Y: Bowler's hand height (0.5 + 1.5 = 2.0)
+        actualBowlerPosition[2]                       // Z: Bowler's actual release position
+      ];
+      
+      const updatedBallData = {
+        ...window.pendingBallData,
+        position: releasePosition
       };
+      
+      console.log(`🏏 Ball releases from ACTUAL release position: [${releasePosition[0]}, ${releasePosition[1]}, ${releasePosition[2]}]`);
+      console.log(`🏃‍♂️ Bowler runs to release position: from [0, 0.5, 15] to [0, 0.5, ${releaseZ}]`);
       
       setGameState(prevState => updateGameState(prevState, {
         type: 'BALL_BOWLED',
-        ballData: ballData
+        ballData: updatedBallData
       }));
-    }, 500); // Reduced delay for faster action
+      
+      // Clear pending data
+      window.pendingBallData = null;
+      console.log('✅ Ball successfully released from ACTUAL bowler position and pending data cleared');
+    } else {
+      console.error('❌ No pending ball data found!');
+    }
+  }, []);
 
-  }, [gameState]);
+  // 🚨 DEBUG: Log when handleBallRelease is created
+  React.useEffect(() => {
+    console.log('🎯 handleBallRelease callback created/updated');
+  }, [handleBallRelease]);
 
   const handleBat = useCallback(() => {
     // Check if game is in correct state
@@ -328,10 +391,21 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
       }));
     } else if (catchData.type === 'collect') {
       if (catchData.playerId === 'wicket_keeper') {
-      // Ball returned to keeper
-      setGameState(prevState => updateGameState(prevState, {
-        type: 'BALL_WITH_KEEPER'
-      }));
+        // Ball collected by keeper - first set to keeper, then return to bowler
+        setGameState(prevState => {
+          const updatedState = updateGameState(prevState, {
+            type: 'BALL_WITH_KEEPER'
+          });
+          
+          // ✅ Automatically return ball to bowler after keeper collection
+          const returnDelay = prevState.controls?.ballShot?.resetDelay || 2.0; // Use current state delay
+          setTimeout(() => {
+            resetBallToBowler('keeper_to_bowler');
+          }, returnDelay * 1000);
+          
+          return updatedState;
+        });
+        
       } else if (catchData.playerId === 'bowler' || catchData.reason === 'reset_to_bowler') {
         // Ball reset to bowler (for boundary, max distance, etc.)
         resetBallToBowler(catchData.reason || 'reset_to_bowler');
@@ -412,12 +486,20 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         }, 100); // Small delay to ensure state is updated
       }
     } else if (targetData.target === 'final_coordinate') {
-      // Ball reached final coordinate in direct coordinate mode - reset for next ball
-      setTimeout(() => {
-        setGameState(prevState => updateGameState(prevState, {
-          type: 'BALL_WITH_KEEPER'
-        }));
-      }, 1000); // Brief pause before reset
+      // Ball reached final coordinate in direct coordinate mode
+      // ✅ Check if auto-reset is enabled (default: false to let ball stay at target)
+      const ballShotConfig = gameState.controls?.ballShot;
+      const autoResetAfterTarget = ballShotConfig?.autoResetAfterTarget ?? false;
+      
+      if (autoResetAfterTarget) {
+        // Only reset if explicitly enabled
+        setTimeout(() => {
+          setGameState(prevState => updateGameState(prevState, {
+            type: 'BALL_WITH_KEEPER'
+          }));
+        }, ballShotConfig?.resetDelay || 5000); // Use user-defined delay (default 5s)
+      }
+      // ✅ If auto-reset is disabled, ball stays at final coordinate
     } else if (targetData.target === 'boundary') {
       // Boundary scored
       setGameState(prevState => updateGameState(prevState, {
@@ -635,32 +717,8 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
           type: 'START_BOWLING'
         });
 
-        // Schedule ball release with the calculated trajectory
-        setTimeout(() => {
-          const ballData = {
-            position: trajectory.initial.position,
-            velocity: trajectory.initial.velocity,
-            isMoving: true,
-            bounceHeight: bowlingControls.bounceHeight || 0.5,
-            trajectory: {
-              initial: trajectory.initial,
-              bounce: trajectory.bounce,
-              target: trajectory.target,
-              metadata: trajectory.metadata
-            },
-            pitchAnalysis: {
-              ball_axis: { x: bowlingControls.final_x, y: bowlingControls.final_y },
-              length_axis: { x: bowlingControls.bounce_x, z: bowlingControls.bounce_z },
-              line_axis: { x: bowlingControls.release_x, z: bowlingControls.release_z },
-              velocity: bowlingControls.velocity
-            }
-          };
-
-          setGameState(prevState => updateGameState(prevState, {
-            type: 'BALL_BOWLED',
-            ballData: ballData
-          }));
-        }, 500);
+        // 🚨 REMOVED DELAYED RELEASE - Ball now releases through animation system
+        // Ball will be released immediately when bowler reaches release point via handleBallRelease callback
 
         return bowlingState;
       });
@@ -746,18 +804,7 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
 
   return (
     <group>
-      {/* Dummy Data Visual Indicator */}
-      {isDummyDataActive && dummyGameData && (
-        <group position={[0, 8, 0]}>
-          <mesh>
-            <planeGeometry args={[12, 2]} />
-            <meshBasicMaterial color="#22c55e" transparent opacity={0.8} />
-          </mesh>
-          <mesh position={[0, 0, 0.1]}>
-            <meshBasicMaterial color="#ffffff" />
-          </mesh>
-        </group>
-      )}
+      {/* Dummy Data Visual Indicator - Removed for clean scene */}
 
       {/* Players */}
       
@@ -780,13 +827,29 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         gameState={gameState}
       />
       
-      {/* Bowler */}
+      {/* Bowler with Realistic Animations */}
       <AnimatedBowler
-        position={positions.bowler?.position || gameState.players.bowler.position}
-        animation={gameState.players.bowler.animation}
+        position={(() => {
+          // 🏏 CRICKET BOWLING SIDES: Adjust bowler position based on side
+          const baseBowlerPosition = positions.bowler?.position || gameState.players.bowler.position;
+          const bowlingSide = gameState.controls?.bowling?.side || "L";
+          
+          let adjustedPosition = [...baseBowlerPosition];
+          if (bowlingSide === "L") {
+            adjustedPosition[0] = -1.0; // Over the wicket (left side)
+          } else if (bowlingSide === "R") {
+            adjustedPosition[0] = 1.0; // Around the wicket (right side)
+          }
+          
+          return adjustedPosition;
+        })()}
+        animation={gameState.bowlingSequenceActive ? 'runUp' : 'idle'}
         bowlingType={gameState.controls.bowling.type || 'fast'}
         gameState={gameState}
+        onBallRelease={handleBallRelease}
       />
+      
+      {/* Debug Info - Removed for clean visual */}
       
       {/* Wicket Keeper */}
       <AnimatedWicketKeeper
@@ -824,11 +887,12 @@ const CricketGame = ({ onGameStateChange, currentPlayerPositions, isPositionEdit
         onBounce={handleBallBounce}
         onCatch={handleBallCatch}
         onReachTarget={handleBallReachTarget}
-        showTrajectory={true}
+        showTrajectory={false}
+        onBallPositionUpdate={onBallPositionUpdate}
       />
       
-             {/* Field Boundary Regions */}
-       <FieldRegions selectedDirection={selectedShotDirection} selectedShotType={selectedShotType} shotAngle={shotAngle} />
+             {/* Field Boundary Regions - Hidden for clean view */}
+       {/* <FieldRegions selectedDirection={selectedShotDirection} selectedShotType={selectedShotType} shotAngle={shotAngle} /> */}
       
       {/* Wickets */}
       {/* <Wickets /> */}

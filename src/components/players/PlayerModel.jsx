@@ -47,26 +47,10 @@ const PlayerModel = ({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1 }) 
     }
   }, [gltf]);
 
-  // Always show the debug markers
+  // Debug markers - Hidden in production
   const DebugMarkers = () => (
     <>
-      {/* Origin marker */}
-      <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[0.2, 0.2, 0.2]} />
-        <meshBasicMaterial color="red" />
-      </mesh>
-      
-      {/* Height marker */}
-      <mesh position={[0, 1, 0]}>
-        <sphereGeometry args={[0.1]} />
-        <meshBasicMaterial color="blue" />
-      </mesh>
-      
-      {/* Forward direction marker */}
-      <mesh position={[0, 0.5, 0.5]}>
-        <coneGeometry args={[0.1, 0.2]} />
-        <meshBasicMaterial color="green" />
-      </mesh>
+      {/* Debug markers removed for clean visual */}
     </>
   );
 
@@ -74,10 +58,10 @@ const PlayerModel = ({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1 }) 
     console.error("Failed to load player model:", error);
     return (
       <group position={position}>
-        <DebugMarkers />
+        {/* Clean fallback - no debug markers */}
         <mesh position={[0, 1, 0]}>
           <boxGeometry args={[1, 2, 1]} />
-          <meshStandardMaterial color="red" wireframe />
+          <meshStandardMaterial color="#8B4513" wireframe />
         </mesh>
       </group>
     );
@@ -85,7 +69,7 @@ const PlayerModel = ({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1 }) 
 
   return (
     <group position={position}>
-      <DebugMarkers />
+      {/* Clean player model - no debug markers */}
       
       {modelLoaded && gltf && (
         <primitive 
@@ -99,7 +83,7 @@ const PlayerModel = ({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1 }) 
       {!modelLoaded && (
         <mesh position={[0, 1, 0]}>
           <sphereGeometry args={[0.5]} />
-          <meshStandardMaterial color="yellow" wireframe />
+          <meshStandardMaterial color="#8B4513" wireframe />
         </mesh>
       )}
     </group>

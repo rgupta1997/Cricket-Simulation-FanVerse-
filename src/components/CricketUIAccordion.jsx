@@ -4,6 +4,7 @@ import CoordinateDisplay from './CoordinateDisplay';
 import DeliveryInfo from './DeliveryInfo';
 import CameraControlsDisabled from './CameraControlsDisabled';
 import { calculateBallTrajectory } from './CricketGameState';
+import dummyStadiumData from '../data/dummyStadiumData.json';
 
 const AccordionSection = ({ title, children, isOpen, onToggle, icon, color = '#FFD700' }) => {
   return (
@@ -68,13 +69,22 @@ const CricketUIAccordion = ({
   setShowPitchGrid,
   currentCameraView,
   onCameraViewChange,
-  playShot // Add playShot function prop
+  playShot, // Add playShot function prop
+  isFollowingBall = false,
+  ballFollowConfig = {},
+  onBallFollowToggle = () => {},
+  onBallFollowConfigUpdate = () => {},
+  isDummyDataActive = false,
+  onLoadDummyData = () => {},
+  onClearDummyData = () => {}
 }) => {
   const [openSections, setOpenSections] = useState({
     playBall: true,  // New section, open by default
     analysis: false,
     coordinates: false,
     camera: false,
+    ballFollow: false,
+    demo: false,
     guides: false,
     ballTrajectory: false,
     ballShot: false
@@ -441,6 +451,339 @@ const CricketUIAccordion = ({
               currentView={currentCameraView}
               onViewChange={onCameraViewChange}
             />
+          </AccordionSection>
+
+          {/* Ball Following Section */}
+          <AccordionSection
+            title="Ball Following Camera"
+            icon="🎬"
+            color="#E91E63"
+            isOpen={openSections.ballFollow}
+            onToggle={() => toggleSection('ballFollow')}
+          >
+            <div style={{ display: 'grid', gap: '15px' }}>
+              {/* Ball Following Toggle */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '12px',
+                background: isFollowingBall ? 'rgba(0, 255, 0, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '6px',
+                border: `2px solid ${isFollowingBall ? '#00AA00' : 'rgba(255, 255, 255, 0.1)'}`
+              }}>
+                <span style={{ color: '#FFD700', fontSize: '14px', fontWeight: 'bold' }}>
+                  🎬 Follow Ball Camera
+                </span>
+                <button
+                  onClick={onBallFollowToggle}
+                  style={{
+                    background: isFollowingBall ? '#00AA00' : '#AA0000',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '5px',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    transition: 'all 0.3s ease',
+                    boxShadow: isFollowingBall ? '0 0 10px rgba(0, 170, 0, 0.5)' : 'none'
+                  }}
+                >
+                  {isFollowingBall ? '✅ FOLLOWING' : '❌ STOPPED'}
+                </button>
+              </div>
+
+              {/* Distance Control */}
+              <div>
+                <label style={{ 
+                  color: '#FFD700', 
+                  fontSize: '13px', 
+                  fontWeight: 'bold',
+                  display: 'block',
+                  marginBottom: '8px'
+                }}>
+                  📏 Camera Distance: {(ballFollowConfig.distance || 8.0).toFixed(1)}m
+                </label>
+                <input
+                  type="range"
+                  min="3"
+                  max="20"
+                  step="0.5"
+                  value={ballFollowConfig.distance || 8}
+                  onChange={(e) => onBallFollowConfigUpdate({ distance: parseFloat(e.target.value) })}
+                  style={{
+                    width: '100%',
+                    height: '6px',
+                    background: '#333',
+                    borderRadius: '3px',
+                    outline: 'none',
+                    WebkitAppearance: 'none'
+                  }}
+                />
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  fontSize: '10px', 
+                  color: '#999',
+                  marginTop: '4px'
+                }}>
+                  <span>3m (Close)</span>
+                  <span>20m (Wide)</span>
+                </div>
+              </div>
+
+              {/* Height Control */}
+              <div>
+                <label style={{ 
+                  color: '#FFD700', 
+                  fontSize: '13px', 
+                  fontWeight: 'bold',
+                  display: 'block',
+                  marginBottom: '8px'
+                }}>
+                  📐 Camera Height: {(ballFollowConfig.height || 4.0).toFixed(1)}m
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  step="0.2"
+                  value={ballFollowConfig.height || 4}
+                  onChange={(e) => onBallFollowConfigUpdate({ height: parseFloat(e.target.value) })}
+                  style={{
+                    width: '100%',
+                    height: '6px',
+                    background: '#333',
+                    borderRadius: '3px',
+                    outline: 'none',
+                    WebkitAppearance: 'none'
+                  }}
+                />
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  fontSize: '10px', 
+                  color: '#999',
+                  marginTop: '4px'
+                }}>
+                  <span>1m (Low)</span>
+                  <span>10m (High)</span>
+                </div>
+              </div>
+
+              {/* Smoothness Control */}
+              <div>
+                <label style={{ 
+                  color: '#FFD700', 
+                  fontSize: '13px', 
+                  fontWeight: 'bold',
+                  display: 'block',
+                  marginBottom: '8px'
+                }}>
+                  🌊 Camera Smoothness: {((ballFollowConfig.smoothness || 0.05) * 100).toFixed(0)}%
+                </label>
+                <input
+                  type="range"
+                  min="0.01"
+                  max="0.2"
+                  step="0.01"
+                  value={ballFollowConfig.smoothness || 0.05}
+                  onChange={(e) => onBallFollowConfigUpdate({ smoothness: parseFloat(e.target.value) })}
+                  style={{
+                    width: '100%',
+                    height: '6px',
+                    background: '#333',
+                    borderRadius: '3px',
+                    outline: 'none',
+                    WebkitAppearance: 'none'
+                  }}
+                />
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  fontSize: '10px', 
+                  color: '#999',
+                  marginTop: '4px'
+                }}>
+                  <span>1% (Instant)</span>
+                  <span>20% (Very Smooth)</span>
+                </div>
+              </div>
+
+              {/* Auto Follow Toggle */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '10px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '6px',
+                border: '1px solid rgba(255, 255, 255, 0.1)'
+              }}>
+                <div>
+                  <span style={{ color: '#FFD700', fontSize: '13px', fontWeight: 'bold', display: 'block' }}>
+                    🚀 Auto Follow Ball
+                  </span>
+                  <span style={{ color: '#999', fontSize: '11px' }}>
+                    Automatically follow when ball moves
+                  </span>
+                </div>
+                <button
+                  onClick={() => onBallFollowConfigUpdate({ autoFollow: !(ballFollowConfig.autoFollow ?? false) })}
+                  style={{
+                    background: (ballFollowConfig.autoFollow ?? false) ? '#00AA00' : '#666',
+                    color: 'white',
+                    border: 'none',
+                    padding: '6px 12px',
+                    borderRadius: '4px',
+                    fontSize: '11px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  {(ballFollowConfig.autoFollow ?? false) ? 'ON' : 'OFF'}
+                </button>
+              </div>
+
+              {/* Cricket Broadcast Camera Info */}
+              <div style={{ 
+                padding: '12px',
+                background: 'rgba(34, 197, 94, 0.1)',
+                borderRadius: '6px',
+                border: '1px solid rgba(34, 197, 94, 0.3)',
+                textAlign: 'center'
+              }}>
+                <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#22c55e', marginBottom: '8px' }}>
+                  📺 Cricket Broadcast Style Camera
+                </div>
+                
+                <div style={{ display: 'grid', gap: '8px' }}>
+                  <div style={{ color: '#999', fontSize: '11px', lineHeight: '1.4' }}>
+                    🏏 <strong>Smart Side-On View</strong> - 90° for normal shots, like real cricket TV
+                  </div>
+                  <div style={{ color: '#999', fontSize: '11px', lineHeight: '1.4' }}>
+                    🎯 <strong>Leg-Side Specialist</strong> - 270° facing bowler for shots 225°-330°
+                  </div>
+                  <div style={{ color: '#999', fontSize: '11px', lineHeight: '1.4' }}>
+                    🔄 <strong>Fast Intelligent Switching</strong> - Quick aesthetic camera positioning
+                  </div>
+                  <div style={{ color: '#999', fontSize: '11px', lineHeight: '1.4' }}>
+                    🎥 <strong>Responsive Ball Following</strong> - Fast, professional broadcast transitions
+                  </div>
+                  <div style={{ color: '#999', fontSize: '11px', lineHeight: '1.4' }}>
+                    📡 <strong>Elevated Position</strong> - Perfect trajectory visibility
+                  </div>
+                  
+                  <div style={{
+                    padding: '6px 8px',
+                    background: 'rgba(34, 197, 94, 0.2)',
+                    borderRadius: '4px',
+                    fontSize: '10px',
+                    color: '#22c55e',
+                    fontWeight: 'bold',
+                    marginTop: '4px'
+                  }}>
+                    ✨ Professional cricket broadcast with leg-side specialist camera switching
+                  </div>
+                </div>
+              </div>
+            </div>
+          </AccordionSection>
+
+          {/* Demo Data Section */}
+          <AccordionSection
+            title="Demo Data Controls"
+            icon="🎮"
+            color="#22c55e"
+            isOpen={openSections.demo}
+            onToggle={() => toggleSection('demo')}
+          >
+            <div style={{ display: 'grid', gap: '15px' }}>
+              <div style={{ 
+                padding: '12px',
+                background: 'rgba(34, 197, 94, 0.1)',
+                borderRadius: '6px',
+                border: '1px solid rgba(34, 197, 94, 0.3)'
+              }}>
+                <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#22c55e', marginBottom: '8px' }}>
+                  🎮 Load Realistic Match Data
+                </div>
+                <div style={{ fontSize: '11px', color: '#aaa', marginBottom: '12px' }}>
+                  Load pre-configured match scenario with realistic player positions, scores, and game state for testing and demonstration purposes.
+                </div>
+                
+                {!isDummyDataActive ? (
+                  <button
+                    onClick={() => onLoadDummyData(dummyStadiumData.stadiumSimulation)}
+                    style={{
+                      width: '100%',
+                      backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                      border: '2px solid #22c55e',
+                      color: '#22c55e',
+                      padding: '10px 16px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    <span>+</span>
+                    Load Demo Data
+                  </button>
+                ) : (
+                  <div style={{ display: 'grid', gap: '8px' }}>
+                    <div style={{
+                      fontSize: '11px',
+                      color: '#22c55e',
+                      fontWeight: 'bold',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '6px 8px',
+                      background: 'rgba(34, 197, 94, 0.1)',
+                      borderRadius: '4px'
+                    }}>
+                      <div style={{
+                        width: '8px',
+                        height: '8px',
+                        backgroundColor: '#22c55e',
+                        borderRadius: '50%'
+                      }}></div>
+                      Demo Mode Active
+                    </div>
+                    <button
+                      onClick={onClearDummyData}
+                      style={{
+                        width: '100%',
+                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                        border: '2px solid #ef4444',
+                        color: '#ef4444',
+                        padding: '10px 16px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      <span>×</span>
+                      Clear Demo Data
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </AccordionSection>
 
           {/* Coordinate Display Section */}

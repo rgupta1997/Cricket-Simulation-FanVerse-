@@ -9,7 +9,8 @@ const EnhancedBall = ({
   onBounce, 
   onCatch, 
   onReachTarget,
-  showTrajectory = false 
+  showTrajectory = false,
+  onBallPositionUpdate 
 }) => {
   const ballRef = useRef();
   const [trail, setTrail] = useState([]);
@@ -71,12 +72,28 @@ const EnhancedBall = ({
     }
   }, [isMoving, trajectoryStartTime, ballState, position]);
 
+  // Update camera with ball position when it changes
+  useEffect(() => {
+    if (onBallPositionUpdate && position) {
+      const ballPos = Array.isArray(position) 
+        ? position 
+        : [position?.x || 0, position?.y || 0, position?.z || 0];
+      onBallPositionUpdate(ballPos);
+    }
+  }, [position, onBallPositionUpdate]);
+
   useFrame((state, delta) => {
     if (!ballRef.current || !isMoving) return;
     
     const ball = ballRef.current;
     const trajectory = currentBall.trajectory;
     const useDirectCoordinates = trajectory?.metadata?.useDirectCoordinates;
+    
+    // ✅ COMPREHENSIVE NULL SAFETY - Prevent "can't access property 'x', v is null" errors
+    if (!currentBall || currentBall.position === null || currentBall.velocity === null) {
+      console.warn('⚠️ Ball animation: currentBall data is null, skipping frame');
+      return;
+    }
     
     // Check if we should use direct coordinate movement or physics
     if (useDirectCoordinates && !physicsMode) {
@@ -168,8 +185,24 @@ const EnhancedBall = ({
     // PHYSICS MODE or NON-DIRECT COORDINATE MODE
     if (!position || !velocity) return;
 
-    const currentPos = new Vector3(...(Array.isArray(position) ? position : [position.x || 0, position.y || 0.5, position.z || 0]));
-    const currentVel = new Vector3(...(Array.isArray(velocity) ? velocity : [velocity.x || 0, velocity.y || 0, velocity.z || 0]));
+    // ✅ SAFE VECTOR CREATION - Handle all possible null/undefined cases
+    const currentPos = new Vector3(
+      ...(Array.isArray(position) 
+        ? position 
+        : (position && typeof position === 'object') 
+          ? [position.x || 0, position.y || 0.5, position.z || 0]
+          : [0, 0.5, 0] // Fallback if position is not an object
+      )
+    );
+    
+    const currentVel = new Vector3(
+      ...(Array.isArray(velocity) 
+        ? velocity 
+        : (velocity && typeof velocity === 'object') 
+          ? [velocity.x || 0, velocity.y || 0, velocity.z || 0]
+          : [0, 0, 0] // Fallback if velocity is not an object
+      )
+    );
     
     // Apply physics only in physics mode or for non-direct coordinates (but NOT for shots)
     if ((physicsMode || !useDirectCoordinates) && ballState !== 'hit') {
@@ -454,29 +487,36 @@ const EnhancedBall = ({
         });
       }
 
-      // Check if ball has stopped moving (auto-reset appropriate player)
+      // Check if ball has stopped moving - only auto-collect if explicitly enabled
       if (currentVel.length() < 0.1 && currentPos.y <= GROUND_LEVEL + 0.1) {
-          // Determine who should collect based on ball's final position
-          const ballZ = currentPos.z;
-          let collector = 'wicket_keeper';
+          // Check if auto-collection is enabled for stopped balls
+          const ballShotConfig = gameState.controls?.ballShot;
+          const autoCollectStoppedBall = ballShotConfig?.autoCollectStoppedBall ?? false; // ✅ DEFAULT FALSE
           
-          if (ballZ > -5) {
-            // Ball stopped in front area - bowler collects
-            collector = 'bowler';
-          } else if (ballZ < -15) {
-            // Ball stopped far behind wicket - nearest fielder should collect, but for now use bowler
-            collector = 'bowler';
+          if (autoCollectStoppedBall) {
+            // Determine who should collect based on ball's final position
+            const ballZ = currentPos.z;
+            let collector = 'wicket_keeper';
+            
+            if (ballZ > -5) {
+              // Ball stopped in front area - bowler collects
+              collector = 'bowler';
+            } else if (ballZ < -15) {
+              // Ball stopped far behind wicket - nearest fielder should collect, but for now use bowler
+              collector = 'bowler';
+            }
+            
+            if (onCatch) {
+              onCatch({
+                type: 'collect',
+                playerId: collector,
+                position: currentPos.toArray(),
+                reason: 'ball_stopped'
+              });
+            }
+            return; // Stop further processing
           }
-          
-          if (onCatch) {
-            onCatch({
-              type: 'collect',
-              playerId: collector,
-              position: currentPos.toArray(),
-              reason: 'ball_stopped'
-            });
-          }
-          return; // Stop further processing
+          // ✅ If auto-collection is disabled, ball stays at stopped position
         }
 
       // Check for catch or pickup
@@ -495,17 +535,19 @@ const EnhancedBall = ({
     // Calculate ball speed safely
     const ballSpeed = ballVel && ballVel.length ? ballVel.length() : Math.sqrt(ballVel.x**2 + ballVel.y**2 + ballVel.z**2);
     
-    // Check wicket keeper
-    if (ballState === 'returning') {
+    // Check wicket keeper - now works for all ball states (not just 'returning')
+    if (ballState === 'returning' || ballState === 'hit') {
       const keeperPos = new Vector3(...keeper.position);
       const distance = ballPos.distanceTo(keeperPos);
       
-      if (distance < 1.0 && ballSpeed < 5) {
+      // Allow manual collection when ball is close and moving slowly
+      if (distance < 2.0 && ballSpeed < 5) {
         if (onCatch) {
           onCatch({
             playerId: 'wicket_keeper',
             position: ballPos.toArray(),
-            type: 'collect'
+            type: 'collect',
+            reason: 'keeper_manual_collect'
           });
         }
       }
@@ -559,7 +601,7 @@ const EnhancedBall = ({
         }
         
         // Add a configurable delay before resetting to bowler
-        const resetDelay = (gameState.controls?.ballShot?.resetDelay || 3.0) * 1000; // Convert to milliseconds
+        const resetDelay = (2.0) * 1000; // Convert to milliseconds
         
         if (onCatch) {
           setTimeout(() => {
@@ -614,7 +656,7 @@ const EnhancedBall = ({
       
       // Check for boundary
       const boundaryDistance = Math.sqrt(currentPos.x ** 2 + currentPos.z ** 2);
-      if (boundaryDistance > 25.5) {
+      if (boundaryDistance > 50.0) {  // ✅ CORRECTED: Back to 50m boundary limit
         if (onReachTarget) {
           onReachTarget({
             target: 'boundary',
@@ -699,7 +741,7 @@ const EnhancedBall = ({
     
     // Ball reaching boundary
     const boundaryDistance = Math.sqrt(ballPos.x ** 2 + ballPos.z ** 2);
-    if (boundaryDistance > 25.5) { // Actual playable boundary (inner advertising boundary)
+    if (boundaryDistance > 50.0) { // ✅ CORRECTED: Actual playable boundary back to 50m
       onReachTarget({
         target: 'boundary',
         position: ballPos.toArray(),
@@ -729,7 +771,7 @@ const EnhancedBall = ({
       
       // Get user-defined keeper collection settings
       const ballShotConfig = gameState.controls?.ballShot;
-      const keeperAutoCollect = ballShotConfig?.keeperAutoCollect ?? true;
+      const keeperAutoCollect = ballShotConfig?.keeperAutoCollect ?? true; // ✅ DEFAULT TRUE - Normal cricket workflow
       const keeperCollectionRadius = ballShotConfig?.keeperCollectionRadius ?? 2.0;
       const keeperSpeedThreshold = ballShotConfig?.keeperSpeedThreshold ?? 3.0;
       
@@ -740,18 +782,9 @@ const EnhancedBall = ({
             type: 'collect',
             playerId: 'wicket_keeper',
             position: ballPos.toArray(),
-            reason: 'keeper_collected'
+            reason: 'keeper_auto_collect'
           });
-          
-          // Then reset to bowler
-          setTimeout(() => {
-            onCatch({
-              type: 'collect',
-              playerId: 'bowler',
-              position: [0, 0.5, 15], // Bowler position
-              reason: 'reset_to_bowler'
-            });
-          }, 1000);
+          // ✅ CricketGame.jsx now handles the return to bowler automatically
         }
         return;
       }
@@ -819,98 +852,35 @@ const EnhancedBall = ({
 
   return (
     <group>
-      {/* Always visible ball - simple version */}
-      <mesh 
-        position={Array.isArray(position) ? position : [position?.x || 0, position?.y || 0.5, position?.z || 0]} 
-        castShadow 
-        receiveShadow
-      >
-        <sphereGeometry args={[0.1, 8, 8]} />
-        <meshBasicMaterial color={isMoving ? "#8B4513" : "#654321"} />
-      </mesh>
+      {/* Clean cricket ball - single version */}
       
-      {/* Main ball */}
+      {/* Clean cricket ball - enlarged for better visibility */}
       <mesh 
         ref={ballRef} 
         position={Array.isArray(position) ? position : [position?.x || 0, position?.y || 0, position?.z || 0]} 
         castShadow 
         receiveShadow
       >
-        <sphereGeometry args={[0.15, 16, 16]} />
-        <meshBasicMaterial 
-          color={isMoving ? "#8B2500" : "#654321"} 
-          transparent={false}
+        <sphereGeometry args={[0.08, 16, 16]} />
+        <meshStandardMaterial 
+          color="#CC0000" 
+          metalness={0.1}
+          roughness={0.8}
         />
         
-        {/* Ball seam - larger and more visible */}
+        {/* Ball seam - proportionally larger */}
         <mesh>
-          <torusGeometry args={[0.15, 0.01, 4, 24]} />
-          <meshBasicMaterial color="#F5F5DC" />
+          <torusGeometry args={[0.08, 0.004, 4, 24]} />
+          <meshBasicMaterial color="#FFFFFF" />
         </mesh>
-        
-        {/* Shine effect for moving ball */}
-        {isMoving && (
-          <mesh>
-            <sphereGeometry args={[0.055, 16, 16]} />
-            <meshBasicMaterial 
-              color="#AA6644" 
-              transparent 
-              opacity={0.3}
-            />
-          </mesh>
-        )}
       </mesh>
 
-      {/* Ball Position Marker - Shows current XYZ coordinates */}
-      <BallPositionMarker 
-        position={Array.isArray(position) ? position : [position?.x || 0, position?.y || 0.5, position?.z || 0]}
-        velocity={Array.isArray(velocity) ? velocity : [velocity?.x || 0, velocity?.y || 0, velocity?.z || 0]}
-        isMoving={isMoving}
-        showCoordinates={true}
-      />
+      {/* Position marker removed for clean visual */}
 
-      {/* Ball trajectory trail */}
-      {renderTrajectory()}
+      {/* Ball trajectory trail - only when explicitly shown */}
+      {showTrajectory && renderTrajectory()}
       
-      {/* Impact particles effect */}
-      {bounceCount > 0 && position && (
-        <group position={Array.isArray(position) ? position : [position?.x || 0, position?.y || 0, position?.z || 0]}>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <mesh key={i} position={[
-              (Math.random() - 0.5) * 0.5,
-              Math.random() * 0.2,
-              (Math.random() - 0.5) * 0.5
-            ]}>
-              <sphereGeometry args={[0.01, 4, 4]} />
-              <meshBasicMaterial 
-                color="#8B4513" 
-                transparent 
-                opacity={0.6 - (bounceCount * 0.1)}
-              />
-            </mesh>
-          ))}
-        </group>
-      )}
-      
-      {/* Speed indicator */}
-      {isMoving && velocity && position && (
-        <mesh position={[
-          Array.isArray(position) ? position[0] : (position.x || 0), 
-          (Array.isArray(position) ? position[1] : (position.y || 0)) + 0.2, 
-          Array.isArray(position) ? position[2] : (position.z || 0)
-        ]}>
-          <boxGeometry args={[0.1, 0.02, 0.02]} />
-          <meshBasicMaterial 
-            color={`hsl(${Math.max(0, 120 - Math.sqrt(
-              (Array.isArray(velocity) ? velocity[0] : (velocity.x || 0))**2 + 
-              (Array.isArray(velocity) ? velocity[1] : (velocity.y || 0))**2 + 
-              (Array.isArray(velocity) ? velocity[2] : (velocity.z || 0))**2
-            ) * 10)}, 100%, 50%)`}
-            transparent
-            opacity={0.8}
-          />
-        </mesh>
-      )}
+      {/* Visual effects removed for clean scene */}
     </group>
   );
 };

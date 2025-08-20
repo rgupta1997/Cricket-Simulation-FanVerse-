@@ -6,6 +6,11 @@ const DirectCoordinateControls = ({ bowlingControls, onUpdate }) => {
     onUpdate(newConfig);
   };
 
+  const handleSideChange = (side) => {
+    const newConfig = { ...bowlingControls, side: side };
+    onUpdate(newConfig);
+  };
+
   const toggleCoordinateMode = () => {
     const newConfig = { 
       ...bowlingControls, 
@@ -43,6 +48,65 @@ const DirectCoordinateControls = ({ bowlingControls, onUpdate }) => {
           {bowlingControls.useDirectCoordinates 
             ? '✅ Using direct 3D world coordinates' 
             : '📊 Using pitch analysis conversion'}
+        </div>
+      </div>
+
+      {/* Cricket Bowling Side Selector */}
+      <div style={{ 
+        padding: '8px', 
+        background: 'rgba(0, 123, 255, 0.1)', 
+        borderRadius: '4px',
+        border: '1px solid #007BFF'
+      }}>
+        <div style={{ 
+          fontWeight: 'bold',
+          color: '#007BFF',
+          marginBottom: '8px',
+          fontSize: '11px'
+        }}>
+          🏏 Bowling Side
+        </div>
+        
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => handleSideChange('L')}
+            style={{
+              flex: 1,
+              padding: '6px 8px',
+              borderRadius: '4px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '10px',
+              fontWeight: 'bold',
+              background: bowlingControls.side === 'L' ? '#22c55e' : 'rgba(255,255,255,0.1)',
+              color: bowlingControls.side === 'L' ? 'white' : '#ccc'
+            }}
+          >
+            L - Over Wicket
+          </button>
+          
+          <button
+            onClick={() => handleSideChange('R')}
+            style={{
+              flex: 1,
+              padding: '6px 8px',
+              borderRadius: '4px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '10px',
+              fontWeight: 'bold',
+              background: bowlingControls.side === 'R' ? '#22c55e' : 'rgba(255,255,255,0.1)',
+              color: bowlingControls.side === 'R' ? 'white' : '#ccc'
+            }}
+          >
+            R - Around Wicket
+          </button>
+        </div>
+        
+        <div style={{ fontSize: '9px', color: '#ccc', marginTop: '4px' }}>
+          {bowlingControls.side === 'L' 
+            ? '🎯 Over the wicket (left side from batsman view)' 
+            : '🎯 Around the wicket (right side from batsman view)'}
         </div>
       </div>
 

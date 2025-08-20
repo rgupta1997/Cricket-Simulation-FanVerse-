@@ -11,7 +11,7 @@ Successfully extended the cricket stadium boundaries beyond the 30m green field 
 | **Component** | **Before** | **After** | **Purpose** |
 |---------------|------------|-----------|-------------|
 | **Green Field** | 30m radius | **50m radius** | 🟢 **Extended** - Full playing surface is green |
-| **Boundary Rope** | 25.5m (30m × 0.85) | **50m radius** | 🏏 **Perfect alignment** - At green field edge |
+| **Boundary Rope** | 50m radius | **50m radius** | 🏏 **Perfect alignment** - At green field edge |
 | **Stadium Wall** | 30m radius | **60m radius** | 🏟️ **Compact stadium** - Intimate venue |
 | **Playing Boundary** | 30m | **50m radius** | ⚾ **Active play area** - For simulation |
 
@@ -27,14 +27,14 @@ Successfully extended the cricket stadium boundaries beyond the 30m green field 
 
 ### **Realistic Cricket Dimensions:**
 - **Playing Surface**: 50m radius green field ✅ **FULL COVERAGE**
-- **Boundary Rope**: 55m from center (realistic cricket boundary)
-- **Stadium Wall**: 65m from center (proper stadium size)
+- **Boundary Rope**: 50m from center (realistic cricket boundary)
+- **Stadium Wall**: 60m from center (proper stadium size)
 - **Active Playing Area**: 50m radius - ENTIRELY GREEN GRASS
 
 ### **Comparison to Real Cricket:**
 - **International Cricket**: 65-80m boundaries
-- **Our Simulation**: 55m boundaries ✅ **Realistic**
-- **Stadium Size**: 65m total ✅ **Professional scale**
+- **Our Simulation**: 50m boundaries ✅ **Realistic**
+- **Stadium Size**: 60m total ✅ **Professional scale**
 
 ## 🔧 **Files Modified**
 
@@ -224,7 +224,7 @@ export const FIELD_CONSTRAINTS = {
 
 **✅ GREEN FIELD: EXTENDED to 50m radius (FULL PLAYING AREA COVERAGE)**  
 **✅ BOUNDARIES: PERFECT ALIGNMENT at 50m (exactly at green field edge)**  
-**✅ STADIUM: 60m total diameter (compact, intimate venue)**  
+**✅ STADIUM: 60m total diameter (compact, realistic venue)**  
 **✅ PLAYING AREA: 50m active simulation zone - ENTIRELY GREEN**  
 **✅ FIELDERS: 12 boundary positions available**  
 **✅ CAMERAS: Optimized for compact stadium viewing**  

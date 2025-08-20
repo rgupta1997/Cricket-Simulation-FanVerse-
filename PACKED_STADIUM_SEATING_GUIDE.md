@@ -31,15 +31,15 @@ Added realistic cricket stadium seating with **jam-packed crowds** to create an 
 🏟️ Stadium Wall (60m)
   🏠 Roof Structure (58m)
     🎪 Upper Seating (56m)
-      👥 Packed Crowd (52-56m)
-        🪑 Stadium Seats (52m-56m)
+      👥 Packed Crowd (53-56m)
+        🪑 Stadium Seats (53m-56m)
           🏏 Boundary Rope (50m)
             🟢 Green Field (50m)
 ```
 
 ### **Seating Specifications:**
-- **Base Radius**: 52m (starts just outside green field)
-- **Seating Zone**: 52m-58m (6m depth for tiered seating)
+- **Base Radius**: 53m (starts just outside 50m playing boundary)
+- **Seating Zone**: 53m-58m (5m depth for tiered seating)
 - **Row Count**: 15 rows (compact but comfortable)
 - **Row Height**: 0.5m (tighter spacing)
 - **Row Depth**: 0.8m (smaller to fit more rows)
