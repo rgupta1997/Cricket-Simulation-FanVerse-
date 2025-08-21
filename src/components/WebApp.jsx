@@ -16,6 +16,7 @@ import PointsTableTab from './tabs/PointsTableTab.jsx';
 import MatchChat from './MatchChat.jsx';
 import LoginModal from './LoginModal.jsx';
 import EmbeddedSimulator from './EmbeddedSimulator';
+import OnThisDay from './OnThisDay.jsx';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import Stadium from './Stadium';
@@ -1668,6 +1669,13 @@ const WebApp = () => {
       setIsChatOpen(false);
       setChatMatchId(null);
       setChatMatchName('');
+    } else if (navItem === 'onthisday') {
+      setCurrentView('onthisday');
+      setSelectedMatchId(null);
+      setError(null);
+      setIsChatOpen(false);
+      setChatMatchId(null);
+      setChatMatchName('');
     }
   };
 
@@ -1985,6 +1993,35 @@ const WebApp = () => {
                 Fixtures
               </button>
               <button
+                onClick={() => handleNavClick('onthisday')}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: activeNav === 'onthisday' 
+                    ? 'rgba(255, 255, 255, 0.9)' 
+                    : 'transparent',
+                  color: activeNav === 'onthisday' ? '#a181e7' : 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  transition: 'background-color 0.2s ease, color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (activeNav !== 'onthisday') {
+                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (activeNav !== 'onthisday') {
+                    e.target.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                <span style={{ marginRight: '8px' }}>🏏</span>
+                Memory Lane
+              </button>
+              <button
                 onClick={() => handleNavClick('leaderboard')}
                 style={{
                   padding: '10px 20px',
@@ -2037,6 +2074,9 @@ const WebApp = () => {
         <FixturesPage 
           onMatchClick={handleMatchClick}
         />
+      )}
+      {currentView === 'onthisday' && (
+        <OnThisDay />
       )}
       {currentView === 'leaderboard' && (
         <SeasonalLeaderboard 

@@ -1,0 +1,136 @@
+{
+  "content": [
+    {
+      "id": 1,
+      "type": "video",
+      "team": "KKR",
+      "title": "KKR's Historic IPL 2024 Championship Win",
+      "description": "Relive the magical moments from Kolkata Knight Riders' incredible journey to their third IPL title in 2024.",
+      "videoUrl": "/KKR_w.mp4",
+      "thumbnail": "/images/kkr-thumb.jpg",
+      "date": "2024-05-26",
+      "views": "2.1M",
+      "duration": "3:45"
+    },
+    {
+      "id": 2,
+      "type": "video",
+      "team": "MI",
+      "title": "Mumbai Indians' Record-Breaking Season Highlights",
+      "description": "The best moments from MI's dominant performance this season with incredible batting displays.",
+      "videoUrl": "/MI_w.mp4",
+      "thumbnail": "/images/mi-thumb.jpg",
+      "date": "2024-04-15",
+      "views": "1.8M",
+      "duration": "4:12"
+    },
+    {
+      "id": 3,
+      "type": "video",
+      "team": "RCB",
+      "title": "Royal Challengers Bangalore's Phenomenal Comeback",
+      "description": "Watch how RCB turned their season around with spectacular performances and team spirit.",
+      "videoUrl": "/RCB_w.mp4",
+      "thumbnail": "/images/rcb-thumb.jpg",
+      "date": "2024-05-10",
+      "views": "3.2M",
+      "duration": "5:30"
+    },
+    {
+      "id": 4,
+      "type": "video",
+      "team": "CSK",
+      "title": "Chennai Super Kings' Legacy Continues",
+      "description": "MS Dhoni leads CSK to another remarkable season with his legendary captaincy and strategic brilliance.",
+      "videoUrl": "/CSK_w.mp4",
+      "thumbnail": "/images/csk-thumb.jpg",
+      "date": "2024-03-28",
+      "views": "4.1M",
+      "duration": "6:15"
+    },
+    {
+      "id": 5,
+      "type": "video",
+      "team": "RR",
+      "title": "Rajasthan Royals' Spectacular Season Moments",
+      "description": "Experience the thrilling highlights from Rajasthan Royals' amazing season with outstanding performances and memorable victories.",
+      "videoUrl": "/RR_w.mp4",
+      "thumbnail": "/images/rr-thumb.jpg",
+      "date": "2024-04-22",
+      "views": "1.5M",
+      "duration": "4:45"
+    },
+    {
+      "id": 6,
+      "type": "text",
+      "team": "DC",
+      "title": "Delhi Capitals Sign International Star for Next Season",
+      "description": "Delhi Capitals have announced the signing of world-class all-rounder Marcus Stoinis for the upcoming IPL season. The Australian brings vast experience and explosive batting skills to strengthen DC's middle order. This strategic move aims to boost their championship aspirations.",
+      "date": "2024-08-20",
+      "readTime": "2 min read"
+    },
+    {
+      "id": 6,
+      "type": "text",
+      "team": "PBKS",
+      "title": "Punjab Kings Unveil New Training Facility",
+      "description": "Punjab Kings have inaugurated their state-of-the-art training facility in Mohali, featuring cutting-edge technology and world-class amenities. The facility includes advanced analytics systems, recovery centers, and specialized coaching areas designed to enhance player performance and development.",
+      "date": "2024-08-19",
+      "readTime": "3 min read"
+    },
+    {
+      "id": 7,
+      "type": "text",
+      "team": "RR",
+      "title": "Rajasthan Royals Launch Youth Development Program",
+      "description": "The Rajasthan Royals have launched an ambitious youth development program across Rajasthan to identify and nurture young cricket talent. The program will conduct trials in 15 cities and provide professional coaching, equipment, and mentorship to promising players aged 14-19.",
+      "date": "2024-08-18",
+      "readTime": "4 min read"
+    },
+    {
+      "id": 8,
+      "type": "text",
+      "team": "SRH",
+      "title": "Sunrisers Hyderabad Partners with Leading Sports Science Institute",
+      "description": "SRH has announced a strategic partnership with the National Sports Science Institute to enhance player fitness and injury prevention. This collaboration will bring advanced biomechanical analysis and personalized training programs to help players achieve peak performance.",
+      "date": "2024-08-17",
+      "readTime": "3 min read"
+    },
+    {
+      "id": 9,
+      "type": "text",
+      "team": "GT",
+      "title": "Gujarat Titans Announce New Coaching Staff for 2025",
+      "description": "Gujarat Titans have revamped their coaching setup with the appointment of former international players as specialized coaches. The new team includes batting, bowling, and fielding experts who will work closely with players to enhance their skills and game understanding.",
+      "date": "2024-08-16",
+      "readTime": "3 min read"
+    },
+    {
+      "id": 10,
+      "type": "text",
+      "team": "LSG",
+      "title": "Lucknow Super Giants Invest in Grassroots Cricket Development",
+      "description": "LSG has launched a comprehensive grassroots program in Uttar Pradesh to identify and develop young cricket talent. The initiative includes setting up cricket academies, providing equipment, and organizing tournaments at the district level to nurture future cricket stars.",
+      "date": "2024-08-15",
+      "readTime": "4 min read"
+    },
+    {
+      "id": 11,
+      "type": "text",
+      "team": "KKR",
+      "title": "KKR Foundation Launches Cricket Education Program",
+      "description": "The KKR Foundation has initiated a unique program that combines cricket training with academic education for underprivileged children in West Bengal. The program aims to provide holistic development opportunities while nurturing cricket talent at the grassroots level.",
+      "date": "2024-08-14",
+      "readTime": "5 min read"
+    },
+    {
+      "id": 12,
+      "type": "text",
+      "team": "MI",
+      "title": "Mumbai Indians' New Analytics Center Goes Live",
+      "description": "MI has unveiled their cutting-edge analytics center that uses artificial intelligence and machine learning to analyze player performance, opposition strategies, and match situations. This technology-driven approach aims to give the team a competitive edge in future tournaments.",
+      "date": "2024-08-13",
+      "readTime": "3 min read"
+    }
+  ]
+}
