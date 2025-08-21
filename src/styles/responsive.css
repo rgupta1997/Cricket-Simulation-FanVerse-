@@ -1,16 +1,35 @@
-/* Responsive Cricket App Styles */
+/* Modern Responsive Cricket App Styles */
+
+/* CSS Custom Properties for consistent theming */
+:root {
+  --tropical-indigo: #a181e7;
+  --tropical-indigo-light: #b59cec;
+  --tropical-indigo-dark: #7546dc;
+  --wisteria: #baa2e6;
+  --wisteria-light: #c8b5eb;
+  --xanthous: #ecaf1a;
+  --xanthous-light: #f0c046;
+  --desert-sand: #e0bda9;
+  --desert-sand-light: #e6caba;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --bg-primary: linear-gradient(135deg, #f1ecfa 0%, #ede6fa 50%, #dacdf6 100%);
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --shadow-modern: 0 8px 32px rgba(161, 129, 231, 0.15);
+}
 
 /* Base Mobile-First Responsive Design */
 .cricket-app {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  background: #f9fafb;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-primary);
   min-height: 100vh;
   scroll-behavior: smooth;
   color-scheme: light !important;
-  color: #000000 !important;
+  color: var(--text-primary) !important;
   width: 100%;
   overflow-x: hidden;
   box-sizing: border-box;
+  transition: all 0.3s ease;
 }
 
 /* Prevent horizontal overflow on all elements */
@@ -19,16 +38,19 @@
   max-width: 100%;
 }
 
-/* Header Styles */
+/* Modern Header Styles */
 .app-header {
-  background-color: #dc2626;
-  color: #000000;
-  padding: 15px 20px;
+  background: linear-gradient(135deg, var(--tropical-indigo) 0%, var(--wisteria) 50%, var(--desert-sand) 100%);
+  color: white;
+  padding: 20px 24px;
   display: flex;
   align-items: center;
   position: sticky;
   top: 0;
   z-index: 100;
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-modern);
+  border-bottom: 1px solid rgba(161, 129, 231, 0.2);
 }
 
 .header-content {
@@ -48,27 +70,22 @@
   font-weight: bold;
 }
 
-/* Tab Navigation Styles */
+/* Modern Tab Navigation Styles */
 .tab-navigation {
   display: flex;
-  background-color: white;
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
   scrollbar-width: none;
   -ms-overflow-style: none;
   position: relative;
   z-index: 100;
-  border-top: 1px solid #e5e7eb;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(161, 129, 231, 0.2);
+  box-shadow: var(--shadow-modern);
   margin: 0;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  padding: 0 clamp(4px, 1vw, 8px);
-  background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  padding: 6px;
   width: 100%;
   box-sizing: border-box;
-  border-left: 1px solid #e5e7eb;
-  border-right: 1px solid #e5e7eb;
 }
 
 .tab-navigation::-webkit-scrollbar {
@@ -83,47 +100,61 @@
   white-space: nowrap;
   min-width: fit-content;
   font-size: clamp(13px, 2vw, 15px);
-  font-weight: 500;
-  transition: all 0.3s ease;
-  border-bottom: 3px solid transparent;
-  position: relative;
-  z-index: 101;
-  border-radius: 8px 8px 0 0;
-  margin: 0 clamp(1px, 0.5vw, 2px);
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  margin: 0 clamp(2px, 0.5vw, 4px);
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
 }
 
 .tab-button.active {
-  color: #dc2626;
-  border-bottom: 3px solid #dc2626;
-  font-weight: 700;
-  background-color: #fef2f2;
+  color: white;
+  background: linear-gradient(135deg, var(--tropical-indigo) 0%, var(--wisteria) 100%);
+  box-shadow: 0 4px 16px rgba(161, 129, 231, 0.3);
+  transform: translateY(-1px);
 }
 
 .tab-button:not(.active) {
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .tab-button:not(.active):hover {
-  color: #374151;
-  background-color: #f9fafb;
+  color: var(--tropical-indigo);
+  background: rgba(161, 129, 231, 0.1);
+  transform: translateY(-1px);
 }
 
-/* Match Card Styles */
+/* Modern Match Card Styles */
 .match-card {
-  background-color: white;
-  border-radius: 12px;
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
   padding: 20px;
-  margin: 10px 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin: 16px 20px;
+  box-shadow: var(--shadow-modern);
+  border: 1px solid rgba(161, 129, 231, 0.2);
   cursor: pointer;
   position: relative;
-  transition: transform 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.match-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--tropical-indigo) 0%, var(--wisteria) 50%, var(--xanthous) 100%);
 }
 
 .match-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(161, 129, 231, 0.2);
+  border-color: var(--tropical-indigo);
 }
 
 .match-badge {
@@ -213,21 +244,19 @@
   font-weight: 500;
 }
 
-/* Tab Content Styles */
+/* Modern Tab Content Styles */
 .tab-content {
-  background-color: white;
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
   margin: 0;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
   z-index: 50;
-  border-left: 1px solid #e5e7eb;
-  border-right: 1px solid #e5e7eb;
-  border-bottom: 1px solid #e5e7eb;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(161, 129, 231, 0.2);
+  border-radius: 16px;
+  box-shadow: var(--shadow-modern);
   width: 100%;
   box-sizing: border-box;
 }

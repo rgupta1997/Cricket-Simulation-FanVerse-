@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './SeasonalLeaderboard.css';
 
 const SeasonalLeaderboard = ({ currentUser, onLoginClick }) => {
   const [leaderboardData, setLeaderboardData] = useState(null);
@@ -92,10 +91,38 @@ const SeasonalLeaderboard = ({ currentUser, onLoginClick }) => {
 
   if (loading) {
     return (
-      <div className="seasonal-leaderboard">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Loading leaderboard...</p>
+      <div style={{
+        background: 'linear-gradient(135deg, #f1ecfa 0%, #ede6fa 50%, #dacdf6 100%)',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          background: 'rgba(255, 255, 255, 0.95)',
+          padding: '40px',
+          borderRadius: '20px',
+          boxShadow: '0 8px 32px rgba(161, 129, 231, 0.15)',
+          border: '1px solid rgba(161, 129, 231, 0.2)'
+        }}>
+          <div style={{
+            width: '60px',
+            height: '60px',
+            border: '4px solid rgba(161, 129, 231, 0.2)',
+            borderTop: '4px solid #a181e7',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 20px auto'
+          }}></div>
+          <div style={{
+            color: '#a181e7',
+            fontSize: '18px',
+            fontWeight: '600'
+          }}>
+            Loading leaderboard...
+          </div>
         </div>
       </div>
     );
@@ -103,16 +130,65 @@ const SeasonalLeaderboard = ({ currentUser, onLoginClick }) => {
 
   if (error) {
     return (
-      <div className="seasonal-leaderboard">
-        <div className="error-container">
-          <div className="error-icon">⚠️</div>
-          <h3>Error Loading Leaderboard</h3>
-          <p>{error}</p>
-          <button 
+      <div style={{
+        background: 'linear-gradient(135deg, #f1ecfa 0%, #ede6fa 50%, #dacdf6 100%)',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          background: 'rgba(255, 255, 255, 0.95)',
+          padding: '40px',
+          borderRadius: '20px',
+          boxShadow: '0 8px 32px rgba(161, 129, 231, 0.15)',
+          border: '1px solid rgba(161, 129, 231, 0.2)',
+          maxWidth: '400px'
+        }}>
+          <div style={{
+            fontSize: '48px',
+            marginBottom: '20px',
+            color: '#e0bda9'
+          }}>⚠️</div>
+          <h3 style={{
+            color: '#a181e7',
+            marginBottom: '16px',
+            fontSize: '20px',
+            fontWeight: '600'
+          }}>
+            Error Loading Leaderboard
+          </h3>
+          <p style={{
+            color: '#6b7280',
+            marginBottom: '24px',
+            fontSize: '14px'
+          }}>
+            {error}
+          </p>
+          <button
             onClick={() => fetchLeaderboard(currentUser?.userId || '')}
-            className="retry-button"
+            style={{
+              background: 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              padding: '12px 24px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'transform 0.2s ease',
+              boxShadow: '0 4px 16px rgba(161, 129, 231, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+            }}
           >
-            Retry
+            🔄 Retry
           </button>
         </div>
       </div>
@@ -120,64 +196,348 @@ const SeasonalLeaderboard = ({ currentUser, onLoginClick }) => {
   }
 
   return (
-    <div className="seasonal-leaderboard">
-      {/* Top 10 Leaderboard - Left Side */}
-      <div className="top-leaderboard-section">
-        <h2>Top 10 Players</h2>
-        <div className="leaderboard-table">
-          <div className="table-header-leaderboard">
-            <div className="rank-col">Rank</div>
-            <div className="name-col">Player Name</div>
-            <div className="score-col">Score</div>
+    <div style={{
+      background: 'linear-gradient(135deg, #f1ecfa 0%, #ede6fa 50%, #dacdf6 100%)',
+      minHeight: '100vh',
+      padding: '24px'
+    }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: currentUser && leaderboardData?.user_rank ? '2fr 1fr' : '1fr',
+        gap: '24px',
+        maxWidth: '1200px',
+        margin: '0 auto'
+      }}>
+        {/* Top 10 Leaderboard - Left Side */}
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.95)',
+          borderRadius: '20px',
+          padding: '24px',
+          border: '1px solid rgba(161, 129, 231, 0.2)',
+          boxShadow: '0 8px 32px rgba(161, 129, 231, 0.15)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '24px',
+            paddingBottom: '16px',
+            borderBottom: '2px solid rgba(161, 129, 231, 0.1)'
+          }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #ecaf1a 0%, #e0bda9 100%)',
+              width: '40px',
+              height: '40px',
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px',
+              marginRight: '16px'
+            }}>
+              🏆
+            </div>
+            <h2 style={{
+              color: '#a181e7',
+              fontSize: '24px',
+              fontWeight: '700',
+              margin: 0,
+              letterSpacing: '-0.5px'
+            }}>
+              Top 10 Players
+            </h2>
           </div>
-          
-          <div className="table-body">
+
+          {/* Table Header */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '80px 1fr 100px',
+            padding: '12px 16px',
+            background: 'linear-gradient(135deg, rgba(161, 129, 231, 0.1) 0%, rgba(186, 162, 230, 0.05) 100%)',
+            borderRadius: '12px',
+            marginBottom: '12px',
+            border: '1px solid rgba(161, 129, 231, 0.15)'
+          }}>
+            <div style={{
+              color: '#a181e7',
+              fontSize: '14px',
+              fontWeight: '700'
+            }}>
+              Rank
+            </div>
+            <div style={{
+              color: '#a181e7',
+              fontSize: '14px',
+              fontWeight: '700'
+            }}>
+              Player Name
+            </div>
+            <div style={{
+              color: '#a181e7',
+              fontSize: '14px',
+              fontWeight: '700',
+              textAlign: 'right'
+            }}>
+              Score
+            </div>
+          </div>
+
+          {/* Table Body */}
+          <div style={{
+            maxHeight: '500px',
+            overflowY: 'auto'
+          }}>
             {leaderboardData?.top_10?.map((player, index) => (
-              <div 
-                key={player.user_id} 
-                className={`table-row-leaderboard ${index < 3 ? 'top-three' : ''} ${currentUser?.userId === player.user_id ? 'current-user' : ''}`}
+              <div
+                key={player.user_id}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '80px 1fr 100px',
+                  padding: '16px',
+                  marginBottom: '8px',
+                  borderRadius: '12px',
+                  background: currentUser?.userId === player.user_id
+                    ? 'linear-gradient(135deg, rgba(236, 175, 26, 0.1) 0%, rgba(224, 189, 169, 0.05) 100%)'
+                    : index < 3
+                      ? 'linear-gradient(135deg, rgba(161, 129, 231, 0.05) 0%, rgba(186, 162, 230, 0.02) 100%)'
+                      : 'rgba(248, 250, 252, 0.8)',
+                  border: currentUser?.userId === player.user_id
+                    ? '2px solid rgba(236, 175, 26, 0.3)'
+                    : index < 3
+                      ? '1px solid rgba(161, 129, 231, 0.1)'
+                      : '1px solid rgba(226, 232, 240, 0.8)',
+                  transition: 'all 0.2s ease',
+                  alignItems: 'center'
+                }}
+                onMouseEnter={(e) => {
+                  if (currentUser?.userId !== player.user_id) {
+                    e.currentTarget.style.background = 'rgba(161, 129, 231, 0.05)';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (currentUser?.userId !== player.user_id) {
+                    e.currentTarget.style.background = index < 3
+                      ? 'linear-gradient(135deg, rgba(161, 129, 231, 0.05) 0%, rgba(186, 162, 230, 0.02) 100%)'
+                      : 'rgba(248, 250, 252, 0.8)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }
+                }}
               >
-                <div className="rank-col">
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
                   {index < 3 ? (
-                    <span className="medal">
+                    <span style={{
+                      fontSize: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
                       {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
                     </span>
                   ) : (
-                    <span className="rank-number">#{player.rank}</span>
+                    <span style={{
+                      color: '#6b7280',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      background: 'rgba(107, 114, 128, 0.1)',
+                      padding: '4px 8px',
+                      borderRadius: '8px'
+                    }}>
+                      #{player.rank}
+                    </span>
                   )}
                 </div>
-                <div className="name-col">{player.name}</div>
-                <div className="score-col">{player.score}</div>
+                <div style={{
+                  color: currentUser?.userId === player.user_id ? '#ecaf1a' : '#1f2937',
+                  fontSize: '16px',
+                  fontWeight: currentUser?.userId === player.user_id ? '700' : '600'
+                }}>
+                  {player.name}
+                  {currentUser?.userId === player.user_id && (
+                    <span style={{
+                      color: '#ecaf1a',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      marginLeft: '8px'
+                    }}>
+                      (You)
+                    </span>
+                  )}
+                </div>
+                <div style={{
+                  color: index < 3 ? '#a181e7' : '#1f2937',
+                  fontSize: '16px',
+                  fontWeight: '700',
+                  textAlign: 'right'
+                }}>
+                  {player.score}
+                </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
 
-      {/* User Rank Section - Right Side */}
-      {currentUser && leaderboardData?.user_rank ? (
-        <div className="user-rank-section">
-          <h2>Your Ranking</h2>
-          <div className="user-rank-card">
-            <div className="rank-badge">#{leaderboardData.user_rank.rank}</div>
-            <div className="user-info">
-              <h3>{leaderboardData.user_rank.name}</h3>
-              <p>Score: {leaderboardData.user_rank.score}</p>
+        {/* User Rank Section - Right Side */}
+        {currentUser && leaderboardData?.user_rank ? (
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            borderRadius: '20px',
+            padding: '24px',
+            border: '1px solid rgba(161, 129, 231, 0.2)',
+            boxShadow: '0 8px 32px rgba(161, 129, 231, 0.15)',
+            height: 'fit-content'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginBottom: '24px',
+              paddingBottom: '16px',
+              borderBottom: '2px solid rgba(236, 175, 26, 0.1)'
+            }}>
+              <div style={{
+                background: 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)',
+                width: '40px',
+                height: '40px',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+                marginRight: '16px'
+              }}>
+                👤
+              </div>
+              <h2 style={{
+                color: '#a181e7',
+                fontSize: '20px',
+                fontWeight: '700',
+                margin: 0
+              }}>
+                Your Ranking
+              </h2>
+            </div>
+
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(236, 175, 26, 0.1) 0%, rgba(224, 189, 169, 0.05) 100%)',
+              padding: '24px',
+              borderRadius: '16px',
+              border: '2px solid rgba(236, 175, 26, 0.2)',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                background: 'linear-gradient(135deg, #ecaf1a 0%, #e0bda9 100%)',
+                color: 'white',
+                fontSize: '32px',
+                fontWeight: '800',
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px auto',
+                boxShadow: '0 8px 24px rgba(236, 175, 26, 0.3)'
+              }}>
+                #{leaderboardData.user_rank.rank}
+              </div>
+              <h3 style={{
+                color: '#1f2937',
+                fontSize: '18px',
+                fontWeight: '700',
+                margin: '0 0 8px 0'
+              }}>
+                {leaderboardData.user_rank.name}
+              </h3>
+              <p style={{
+                color: '#ecaf1a',
+                fontSize: '24px',
+                fontWeight: '700',
+                margin: 0
+              }}>
+                {leaderboardData.user_rank.score} Points
+              </p>
             </div>
           </div>
-        </div>
-      ) : (
-        <div className="login-prompt-section">
-          <h2>Know Your Ranking</h2>
-          <p>Login to see where you stand on the leaderboard!</p>
-          <button 
-            onClick={onLoginClick}
-            className="login-button"
-          >
-            🔐 Login to See Your Rank
-          </button>
-        </div>
-      )}
+        ) : (
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            borderRadius: '20px',
+            padding: '24px',
+            border: '1px solid rgba(161, 129, 231, 0.2)',
+            boxShadow: '0 8px 32px rgba(161, 129, 231, 0.15)',
+            height: 'fit-content',
+            textAlign: 'center'
+          }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)',
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '24px',
+              margin: '0 auto 20px auto',
+              boxShadow: '0 8px 24px rgba(161, 129, 231, 0.3)'
+            }}>
+              🔐
+            </div>
+            <h2 style={{
+              color: '#a181e7',
+              fontSize: '20px',
+              fontWeight: '700',
+              marginBottom: '12px'
+            }}>
+              Know Your Ranking
+            </h2>
+            <p style={{
+              color: '#6b7280',
+              fontSize: '14px',
+              marginBottom: '24px',
+              lineHeight: '1.5'
+            }}>
+              Login to see where you stand on the leaderboard and compete with other players!
+            </p>
+            <button
+              onClick={onLoginClick}
+              style={{
+                background: 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '12px 24px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'transform 0.2s ease',
+                boxShadow: '0 4px 16px rgba(161, 129, 231, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                margin: '0 auto'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+              }}
+            >
+              <span>🔐</span>
+              Login to See Your Rank
+            </button>
+          </div>
+        )}
+      </div>
+
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 };

@@ -5,10 +5,16 @@ const ScorecardTab = ({ matchDetail }) => {
 
   if (!matchDetail || !matchDetail.Innings) {
     return (
-      <div className="tab-panel">
-        <div style={{ textAlign: 'center' }}>
-          <div>No scorecard data available</div>
-        </div>
+      <div style={{
+        padding: '20px',
+        textAlign: 'center',
+        background: 'linear-gradient(135deg, rgba(161, 129, 231, 0.1) 0%, rgba(186, 162, 230, 0.05) 100%)',
+        borderRadius: '12px',
+        border: '1px solid rgba(161, 129, 231, 0.2)',
+        color: '#6b7280'
+      }}>
+        <div style={{ fontSize: '24px', marginBottom: '12px' }}>📊</div>
+        <div>No scorecard data available</div>
       </div>
     );
   }
@@ -57,25 +63,38 @@ const ScorecardTab = ({ matchDetail }) => {
   };
 
   return (
-    <div className="tab-panel">
+    <div style={{
+      padding: '20px',
+      background: 'linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(255, 255, 255, 0.9) 100%)',
+      borderRadius: '12px',
+      border: '1px solid rgba(226, 232, 240, 0.8)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '24px'
+    }}>
       {matchDetail.Innings && matchDetail.Innings.map((innings, inningsIndex) => (
-        <div key={inningsIndex} style={{ marginBottom: '40px' }}>
+        <div key={inningsIndex} style={{
+          background: 'rgba(248, 250, 252, 0.8)',
+          padding: '20px',
+          borderRadius: '12px',
+          border: '1px solid rgba(226, 232, 240, 0.8)'
+        }}>
           {/* Innings Header */}
           <div style={{
             textAlign: 'center', 
             marginBottom: '24px', 
-            padding: '16px',
-            backgroundColor: '#1f2937',
-            borderRadius: '8px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+            padding: '20px',
+            background: 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)',
+            borderRadius: '12px',
+            color: 'white'
           }}>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ffffff', marginBottom: '8px' }}>
+            <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>
               {innings.Number} Innings - {getTeamName(innings.Battingteam)}
             </div>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#fbbf24', marginBottom: '4px' }}>
+            <div style={{ fontSize: '24px', fontWeight: '700', marginBottom: '8px' }}>
               {innings.Total}/{innings.Wickets} ({innings.Overs} overs)
             </div>
-            <div style={{ fontSize: '14px', color: '#d1d5db' }}>
+            <div style={{ fontSize: '14px', opacity: 0.9 }}>
               Run Rate: {innings.Runrate} | Required Rate: {innings.Target ? ((innings.Target - parseInt(innings.Total)) / ((20 - parseFloat(innings.Overs)) || 1)).toFixed(2) : 'N/A'}
             </div>
           </div>
@@ -83,52 +102,155 @@ const ScorecardTab = ({ matchDetail }) => {
           {/* Batsmen Table */}
           <div style={{ marginBottom: '24px' }}>
             <h3 style={{ 
-              fontSize: '20px', 
-              fontWeight: 'bold', 
-              marginBottom: '12px', 
-              color: '#000000',
+              fontSize: '16px', 
+              fontWeight: '600', 
+              marginBottom: '16px', 
+              color: '#1f2937',
               padding: '12px 16px',
-              backgroundColor: '#f3f4f6',
+              background: 'linear-gradient(135deg, rgba(236, 175, 26, 0.1) 0%, rgba(224, 189, 169, 0.05) 100%)',
               borderRadius: '8px',
-              border: '2px solid #374151'
+              border: '1px solid rgba(236, 175, 26, 0.2)'
             }}>
               🏏 Batting Performance - {innings.Number} Innings
             </h3>
-            <div className="responsive-table-container">
-              <table className="stats-table" style={{ minWidth: '650px' }}>
+            <div style={{
+              overflowX: 'auto',
+              borderRadius: '8px',
+              border: '1px solid rgba(226, 232, 240, 0.8)'
+            }}>
+              <table style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                backgroundColor: 'white',
+                minWidth: '650px'
+              }}>
                 <thead>
-                  <tr>
-                    <th className="table-header" style={{ textAlign: 'left', minWidth: '180px' }}>Batsman</th>
-                    <th className="table-header" style={{ textAlign: 'center', minWidth: '60px' }}>Runs</th>
-                    <th className="table-header" style={{ textAlign: 'center', minWidth: '60px' }}>Balls</th>
-                    <th className="table-header" style={{ textAlign: 'center', minWidth: '80px' }}>Strike Rate</th>
-                    <th className="table-header" style={{ textAlign: 'center', minWidth: '50px' }}>4s</th>
-                    <th className="table-header" style={{ textAlign: 'center', minWidth: '50px' }}>6s</th>
-                    <th className="table-header" style={{ textAlign: 'left', minWidth: '140px' }}>Dismissal</th>
+                  <tr style={{
+                    background: 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)'
+                  }}>
+                    <th style={{ 
+                      padding: '12px 16px', 
+                      textAlign: 'left', 
+                      minWidth: '180px', 
+                      color: 'white', 
+                      fontSize: '14px', 
+                      fontWeight: '600' 
+                    }}>Batsman</th>
+                    <th style={{ 
+                      padding: '12px 16px', 
+                      textAlign: 'center', 
+                      minWidth: '60px', 
+                      color: 'white', 
+                      fontSize: '14px', 
+                      fontWeight: '600' 
+                    }}>Runs</th>
+                    <th style={{ 
+                      padding: '12px 16px', 
+                      textAlign: 'center', 
+                      minWidth: '60px', 
+                      color: 'white', 
+                      fontSize: '14px', 
+                      fontWeight: '600' 
+                    }}>Balls</th>
+                    <th style={{ 
+                      padding: '12px 16px', 
+                      textAlign: 'center', 
+                      minWidth: '80px', 
+                      color: 'white', 
+                      fontSize: '14px', 
+                      fontWeight: '600' 
+                    }}>Strike Rate</th>
+                    <th style={{ 
+                      padding: '12px 16px', 
+                      textAlign: 'center', 
+                      minWidth: '50px', 
+                      color: 'white', 
+                      fontSize: '14px', 
+                      fontWeight: '600' 
+                    }}>4s</th>
+                    <th style={{ 
+                      padding: '12px 16px', 
+                      textAlign: 'center', 
+                      minWidth: '50px', 
+                      color: 'white', 
+                      fontSize: '14px', 
+                      fontWeight: '600' 
+                    }}>6s</th>
+                    <th style={{ 
+                      padding: '12px 16px', 
+                      textAlign: 'left', 
+                      minWidth: '140px', 
+                      color: 'white', 
+                      fontSize: '14px', 
+                      fontWeight: '600' 
+                    }}>Dismissal</th>
                   </tr>
                 </thead>
                 <tbody>
                   {innings.Batsmen && innings.Batsmen.filter(batsman => batsman.Batsman && batsman.Runs !== "").map((batsman, index) => (
-                    <tr key={index} className="table-row">
-                      <td className="table-cell" style={{ fontWeight: 'bold', textAlign: 'left' }}>
+                    <tr key={index} style={{
+                      borderBottom: '1px solid rgba(226, 232, 240, 0.5)',
+                      backgroundColor: index % 2 === 0 ? 'rgba(248, 250, 252, 0.5)' : 'white'
+                    }}>
+                      <td style={{ 
+                        padding: '12px 16px', 
+                        fontWeight: '600', 
+                        textAlign: 'left', 
+                        color: '#1f2937', 
+                        fontSize: '14px' 
+                      }}>
                         {getPlayerName(batsman.Batsman, innings.Battingteam)}
                       </td>
-                      <td className="table-cell" style={{ textAlign: 'center', fontWeight: 'bold', backgroundColor: '#fef3c7' }}>
+                      <td style={{ 
+                        padding: '12px 16px', 
+                        textAlign: 'center', 
+                        fontWeight: '600', 
+                        background: 'linear-gradient(135deg, rgba(236, 175, 26, 0.1) 0%, rgba(224, 189, 169, 0.05) 100%)',
+                        color: '#1f2937',
+                        fontSize: '14px'
+                      }}>
                         {batsman.Runs}
                       </td>
-                      <td className="table-cell" style={{ textAlign: 'center' }}>
+                      <td style={{ 
+                        padding: '12px 16px', 
+                        textAlign: 'center', 
+                        color: '#374151', 
+                        fontSize: '14px' 
+                      }}>
                         {batsman.Balls}
                       </td>
-                      <td className="table-cell" style={{ textAlign: 'center' }}>
+                      <td style={{ 
+                        padding: '12px 16px', 
+                        textAlign: 'center', 
+                        color: '#374151', 
+                        fontSize: '14px' 
+                      }}>
                         {batsman.Strikerate}
                       </td>
-                      <td className="table-cell" style={{ textAlign: 'center', backgroundColor: '#d1fae5' }}>
+                      <td style={{ 
+                        padding: '12px 16px', 
+                        textAlign: 'center', 
+                        background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(134, 239, 172, 0.05) 100%)',
+                        color: '#374151', 
+                        fontSize: '14px' 
+                      }}>
                         {batsman.Fours}
                       </td>
-                      <td className="table-cell" style={{ textAlign: 'center', backgroundColor: '#e0e7ff' }}>
+                      <td style={{ 
+                        padding: '12px 16px', 
+                        textAlign: 'center', 
+                        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.05) 100%)',
+                        color: '#374151', 
+                        fontSize: '14px' 
+                      }}>
                         {batsman.Sixes}
                       </td>
-                      <td className="table-cell" style={{ fontSize: '13px', fontStyle: 'italic' }}>
+                      <td style={{ 
+                        padding: '12px 16px', 
+                        fontSize: '13px', 
+                        fontStyle: 'italic', 
+                        color: '#6b7280' 
+                      }}>
                         {batsman.Howout_short || batsman.Dismissal}
                       </td>
                     </tr>

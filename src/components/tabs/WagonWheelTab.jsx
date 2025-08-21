@@ -48,14 +48,14 @@ const WagonWheelDiagram = ({ zones = [], maxRuns = 100 }) => {
         cx={centerX} 
         cy={centerY} 
         r={radius} 
-        fill="#22c55e" 
-        stroke="#166534" 
+        fill="#a181e7" 
+        stroke="#7c3aed" 
         strokeWidth="3"
       />
       
       {/* Inner circles for distance markers */}
-      <circle cx={centerX} cy={centerY} r={radius * 0.7} fill="none" stroke="#166534" strokeWidth="2" strokeDasharray="5,5" />
-      <circle cx={centerX} cy={centerY} r={radius * 0.4} fill="none" stroke="#166534" strokeWidth="2" strokeDasharray="5,5" />
+      <circle cx={centerX} cy={centerY} r={radius * 0.7} fill="none" stroke="#7c3aed" strokeWidth="2" strokeDasharray="5,5" />
+      <circle cx={centerX} cy={centerY} r={radius * 0.4} fill="none" stroke="#7c3aed" strokeWidth="2" strokeDasharray="5,5" />
       
       {/* 8 radial lines for zones */}
       {[0, 45, 90, 135, 180, 225, 270, 315].map(angle => {
@@ -70,7 +70,7 @@ const WagonWheelDiagram = ({ zones = [], maxRuns = 100 }) => {
             y1={centerY}
             x2={x2}
             y2={y2}
-            stroke="#166534"
+            stroke="#7c3aed"
             strokeWidth="2"
             opacity={0.7}
           />
@@ -95,11 +95,11 @@ const WagonWheelDiagram = ({ zones = [], maxRuns = 100 }) => {
         
         // Color based on runs scored
         const getBubbleColor = (runs) => {
-          if (runs === 0) return '#9ca3af'; // Gray for no runs
-          if (runs <= 5) return '#10b981'; // Green for low runs
-          if (runs <= 15) return '#f59e0b'; // Amber for medium runs
-          if (runs <= 30) return '#ef4444'; // Red for high runs
-          return '#7c3aed'; // Purple for very high runs
+          if (runs === 0) return '#6b7280'; // Gray for no runs
+          if (runs <= 5) return '#a181e7'; // Purple for low runs
+          if (runs <= 15) return '#baa2e6'; // Light purple for medium runs
+          if (runs <= 30) return '#ecaf1a'; // Yellow for high runs
+          return '#e0bda9'; // Desert sand for very high runs
         };
         
         return (
@@ -157,7 +157,7 @@ const WagonWheelDiagram = ({ zones = [], maxRuns = 100 }) => {
       })}
       
       {/* Center dot */}
-      <circle cx={centerX} cy={centerY} r="4" fill="#8b5a2b" />
+      <circle cx={centerX} cy={centerY} r="4" fill="#ecaf1a" />
       
 
     </svg>
@@ -349,14 +349,14 @@ const WagonWheelTab = ({ matchDetail, match }) => {
             }}
           style={{
               padding: '12px 24px',
-              backgroundColor: activeTeamTab === 'team1' ? '#3b82f6' : 'transparent',
+              backgroundColor: activeTeamTab === 'team1' ? '#a181e7' : 'transparent',
               color: activeTeamTab === 'team1' ? 'white' : '#374151',
-              border: '2px solid #3b82f6',
-            borderRadius: '8px',
+              border: '2px solid #a181e7',
+            borderRadius: '12px',
             cursor: 'pointer',
-            fontWeight: 'bold',
-              fontSize: '16px',
-            transition: 'all 0.2s'
+            fontWeight: '600',
+              fontSize: '14px',
+            transition: 'all 0.2s ease'
           }}
         >
             {getTeamName(team1Id)}
@@ -369,14 +369,14 @@ const WagonWheelTab = ({ matchDetail, match }) => {
             }}
           style={{
               padding: '12px 24px',
-              backgroundColor: activeTeamTab === 'team2' ? '#3b82f6' : 'transparent',
+              backgroundColor: activeTeamTab === 'team2' ? '#a181e7' : 'transparent',
               color: activeTeamTab === 'team2' ? 'white' : '#374151',
-              border: '2px solid #3b82f6',
-            borderRadius: '8px',
+              border: '2px solid #a181e7',
+            borderRadius: '12px',
             cursor: 'pointer',
-            fontWeight: 'bold',
-              fontSize: '16px',
-            transition: 'all 0.2s'
+            fontWeight: '600',
+              fontSize: '14px',
+            transition: 'all 0.2s ease'
           }}
         >
             {getTeamName(team2Id)}
@@ -492,7 +492,7 @@ const WagonWheelTab = ({ matchDetail, match }) => {
                         width: '16px',
                         height: '16px',
                         borderRadius: '50%',
-                        backgroundColor: '#9ca3af'
+                        backgroundColor: '#6b7280'
                       }}></div>
                       <span style={{ fontSize: '14px', color: '#374151' }}>0 runs</span>
                     </div>
@@ -502,7 +502,7 @@ const WagonWheelTab = ({ matchDetail, match }) => {
                         width: '16px',
                         height: '16px',
                         borderRadius: '50%',
-                        backgroundColor: '#10b981'
+                        backgroundColor: '#a181e7'
                       }}></div>
                       <span style={{ fontSize: '14px', color: '#374151' }}>1-5 runs</span>
                     </div>
@@ -512,7 +512,7 @@ const WagonWheelTab = ({ matchDetail, match }) => {
                         width: '16px',
                         height: '16px',
                         borderRadius: '50%',
-                        backgroundColor: '#f59e0b'
+                        backgroundColor: '#baa2e6'
                       }}></div>
                       <span style={{ fontSize: '14px', color: '#374151' }}>6-15 runs</span>
                     </div>
@@ -522,7 +522,7 @@ const WagonWheelTab = ({ matchDetail, match }) => {
                         width: '16px',
                         height: '16px',
                         borderRadius: '50%',
-                        backgroundColor: '#ef4444'
+                        backgroundColor: '#ecaf1a'
                       }}></div>
                       <span style={{ fontSize: '14px', color: '#374151' }}>16-30 runs</span>
                     </div>
@@ -532,7 +532,7 @@ const WagonWheelTab = ({ matchDetail, match }) => {
                         width: '16px',
                         height: '16px',
                         borderRadius: '50%',
-                        backgroundColor: '#7c3aed'
+                        backgroundColor: '#e0bda9'
                       }}></div>
                       <span style={{ fontSize: '14px', color: '#374151' }}>30+ runs</span>
                     </div>

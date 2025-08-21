@@ -1,17 +1,43 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  
+  /* Modern Color Palette */
+  --tropical-indigo: #a181e7;
+  --tropical-indigo-light: #b59cec;
+  --tropical-indigo-dark: #7546dc;
+  --wisteria: #baa2e6;
+  --wisteria-light: #c8b5eb;
+  --xanthous: #ecaf1a;
+  --xanthous-light: #f0c046;
+  --desert-sand: #e0bda9;
+  --desert-sand-light: #e6caba;
+  --black: #000000;
+  --white: #ffffff;
+  
+  /* Background gradients */
+  --bg-primary: linear-gradient(135deg, #f1ecfa 0%, #ede6fa 50%, #dacdf6 100%);
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-glass: rgba(255, 255, 255, 0.1);
+  
+  /* Text colors */
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-accent: var(--tropical-indigo);
 
   color-scheme: light;
-  color: #000000;
-  background-color: #f9fafb;
+  color: var(--text-primary);
+  background: var(--bg-primary);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+  
+  /* Smooth transitions */
+  transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 * {
@@ -26,12 +52,15 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  overflow: hidden;
+  overflow: auto; /* Changed from 'hidden' to 'auto' to enable scrolling */
+  background: var(--bg-primary);
+  transition: background 0.3s ease;
 }
 
 #root {
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh; /* Changed from fixed height to min-height for proper scrolling */
+  overflow: auto; /* Ensure root can scroll */
 }
 
 .instructions {
@@ -84,41 +113,45 @@ body {
   letter-spacing: 1px;
 }
 
-/* Cricket App Scrollbar Styles */
+/* Modern Cricket App Scrollbar Styles */
 .cricket-app ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 .cricket-app ::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
+  background: rgba(161, 129, 231, 0.1);
+  border-radius: 4px;
 }
 
 .cricket-app ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
+  background: linear-gradient(135deg, var(--tropical-indigo) 0%, var(--wisteria) 100%);
+  border-radius: 4px;
+  transition: background 0.3s ease;
 }
 
 .cricket-app ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: linear-gradient(135deg, var(--tropical-indigo-dark) 0%, var(--tropical-indigo) 100%);
 }
 
 .cricket-app ::-webkit-scrollbar-corner {
-  background: #f1f1f1;
+  background: rgba(161, 129, 231, 0.1);
 }
 
-/* Smooth scrolling for the cricket app */
+/* Modern smooth scrolling and styling for the cricket app */
 .cricket-app {
   scroll-behavior: smooth;
   color-scheme: light !important;
-  color: #000000 !important;
+  color: var(--text-primary) !important;
+  background: var(--bg-primary);
+  transition: all 0.3s ease;
 }
 
 .cricket-app * {
   scrollbar-width: thin;
-  scrollbar-color: #c1c1c1 #f1f1f1;
+  scrollbar-color: var(--tropical-indigo) rgba(161, 129, 231, 0.1);
   color: inherit !important;
+  transition: color 0.3s ease, background-color 0.3s ease, transform 0.3s ease;
 }
 
 /* Force black text for cricket app tables */
@@ -131,7 +164,7 @@ body {
   color: #000000 !important;
 }
 
-/* Session Popup Animation */
+/* Modern animations and effects */
 @keyframes slideInFromRight {
   from {
     transform: translateX(100%);
@@ -141,4 +174,52 @@ body {
     transform: translateX(0);
     opacity: 1;
   }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Modern glass morphism effects */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+}
+
+/* Modern button hover effects */
+.modern-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(0);
+}
+
+.modern-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(161, 129, 231, 0.3);
 }

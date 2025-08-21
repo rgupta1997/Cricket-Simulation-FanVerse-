@@ -10,6 +10,7 @@ import CommentaryTab from './tabs/CommentaryTab.jsx';
 import ScorecardTab from './tabs/ScorecardTab.jsx';
 import PredictionTab from './tabs/PredictionTab.jsx';
 import MatchInfoTab from './tabs/MatchInfoTab.jsx';
+import LiveMatchDetailsTab from './tabs/LiveMatchDetailsTab.jsx';
 import WagonWheelTab from './tabs/WagonWheelTab.jsx';
 import PointsTableTab from './tabs/PointsTableTab.jsx';
 import MatchChat from './MatchChat.jsx';
@@ -121,27 +122,27 @@ const TeamLogo = ({ team, size = 40 }) => {
   );
 };
 
-// Modern Match Card Component
+// Optimized Modern Match Card Component
 const ModernMatchCard = ({ match, onClick }) => {
   const getStatusConfig = () => {
     switch (match.status) {
       case 'live':
         return {
-          badge: { text: 'LIVE', color: '#ffffff', backgroundColor: '#dc2626', icon: '🔴' },
-          borderColor: '#dc2626',
-          backgroundColor: '#ffffff'
+          badge: { text: 'LIVE', color: '#ffffff', backgroundColor: '#ecaf1a', icon: '🔴' },
+          borderColor: '#ecaf1a',
+          glowColor: 'rgba(236, 175, 26, 0.2)'
         };
       case 'completed':
         return {
-          badge: { text: 'COMPLETED', color: '#ffffff', backgroundColor: '#059669', icon: '✅' },
-          borderColor: '#059669',
-          backgroundColor: '#ffffff'
+          badge: { text: 'COMPLETED', color: '#ffffff', backgroundColor: '#e0bda9', icon: '✅' },
+          borderColor: '#e0bda9',
+          glowColor: 'rgba(224, 189, 169, 0.2)'
         };
       default:
         return {
-          badge: { text: 'UPCOMING', color: '#ffffff', backgroundColor: '#dc2626', icon: '⏰' },
-          borderColor: '#dc2626',
-          backgroundColor: '#ffffff'
+          badge: { text: 'UPCOMING', color: '#ffffff', backgroundColor: '#baa2e6', icon: '⏰' },
+          borderColor: '#baa2e6',
+          glowColor: 'rgba(186, 162, 230, 0.2)'
         };
     }
   };
@@ -152,57 +153,69 @@ const ModernMatchCard = ({ match, onClick }) => {
     <div 
       onClick={() => onClick(match.matchId, match)}
       style={{
-        backgroundColor: statusConfig.backgroundColor,
-        border: `2px solid ${statusConfig.borderColor}`,
-        borderRadius: '12px',
-        padding: '12px',
-        margin: '6px',
+        background: 'rgba(255, 255, 255, 0.95)',
+        borderRadius: '16px',
+        padding: '20px',
+        margin: '12px',
         cursor: 'pointer',
-        transition: 'all 0.3s ease',
+        transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
         position: 'relative',
         overflow: 'hidden',
         width: '100%',
-        height: '180px',
+        minHeight: '200px',
         float: 'left',
-        display: 'inline-block'
+        display: 'inline-block',
+        border: `2px solid ${statusConfig.borderColor}`,
+        boxShadow: '0 4px 12px rgba(161, 129, 231, 0.08)'
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = `0 8px 25px rgba(220, 38, 38, 0.15)`;
+        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.boxShadow = `0 8px 24px ${statusConfig.glowColor}`;
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = 'none';
+        e.currentTarget.style.boxShadow = '0 4px 12px rgba(161, 129, 231, 0.08)';
       }}
     >
+      {/* Simple Top Border */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '3px',
+        backgroundColor: statusConfig.borderColor,
+        borderRadius: '16px 16px 0 0'
+      }}></div>
+
       {/* Status Badge */}
       <div style={{
         position: 'absolute',
-        top: '12px',
-        right: '12px',
+        top: '16px',
+        right: '16px',
         backgroundColor: statusConfig.badge.backgroundColor,
         color: statusConfig.badge.color,
-        padding: '4px 8px',
+        padding: '6px 10px',
         borderRadius: '12px',
         fontSize: '10px',
-        fontWeight: '600',
+        fontWeight: '700',
         display: 'flex',
         alignItems: 'center',
-        gap: '4px'
+        gap: '4px',
+        zIndex: 3
       }}>
         <span>{statusConfig.badge.icon}</span>
         {statusConfig.badge.text}
       </div>
 
       {/* Centered Content */}
-      <div style={{ textAlign: 'center' }}>
+      <div style={{ textAlign: 'center', position: 'relative', zIndex: 2 }}>
         {/* Match Name - Primary Focus */}
-        <div>
-          <br />
+        <div style={{ marginTop: '20px' }}>
           <h3 style={{
-            margin: '0 0 6px 0',
+            margin: '0 0 8px 0',
             color: '#1f2937',
-            fontSize: '16px',
+            fontSize: '18px',
             fontWeight: '700',
             lineHeight: '1.3'
           }}>
@@ -210,9 +223,9 @@ const ModernMatchCard = ({ match, onClick }) => {
           </h3>
           {match.matchFullName && match.matchFullName !== match.matchName && (
             <p style={{
-              margin: '0',
+              margin: '0 0 12px 0',
               color: '#6b7280',
-              fontSize: '12px',
+              fontSize: '13px',
               lineHeight: '1.4'
             }}>
               {match.matchFullName}
@@ -221,23 +234,23 @@ const ModernMatchCard = ({ match, onClick }) => {
         </div>
 
         {/* Match Status */}
-        <div>
+        <div style={{ marginBottom: '12px' }}>
           <div style={{
-            color: '#dc2626',
-            fontSize: '12px',
-            fontWeight: '500',
+            color: statusConfig.borderColor,
+            fontSize: '13px',
+            fontWeight: '600',
             display: 'inline-flex',
             alignItems: 'center',
             gap: '6px',
-            backgroundColor: '#fef2f2',
-            padding: '6px 12px',
+            backgroundColor: `${statusConfig.borderColor}15`,
+            padding: '8px 16px',
             borderRadius: '16px',
-            border: '1px solid #fecaca'
+            border: `1px solid ${statusConfig.borderColor}30`
           }}>
             <span style={{
               width: '6px',
               height: '6px',
-              backgroundColor: '#dc2626',
+              backgroundColor: statusConfig.borderColor,
               borderRadius: '50%'
             }}></span>
             {match.matchStatus || 'Match Status'}
@@ -246,10 +259,10 @@ const ModernMatchCard = ({ match, onClick }) => {
         
         {/* Match Start Time */}
         <div style={{
-          padding: '8px 12px',
-          backgroundColor: '#fef2f2',
-          borderRadius: '6px',
-          border: '1px solid #fecaca',
+          padding: '8px 14px',
+          backgroundColor: 'rgba(161, 129, 231, 0.1)',
+          borderRadius: '10px',
+          border: '1px solid rgba(161, 129, 231, 0.2)',
           display: 'inline-block'
         }}>
           <div style={{
@@ -257,14 +270,11 @@ const ModernMatchCard = ({ match, onClick }) => {
             alignItems: 'center',
             gap: '6px'
           }}>
+            <span style={{ fontSize: '14px' }}>🕐</span>
             <span style={{
-              color: '#dc2626',
-              fontSize: '14px'
-            }}>🕐</span>
-            <span style={{
-              color: '#991b1b',
-              fontSize: '12px',
-              fontWeight: '500'
+              color: '#a181e7',
+              fontSize: '13px',
+              fontWeight: '600'
             }}>
               {match.time || 'Time not specified'}
             </span>
@@ -275,21 +285,259 @@ const ModernMatchCard = ({ match, onClick }) => {
       {/* Series Name - Left Aligned */}
       <div style={{ 
         position: 'absolute', 
-        top: '12px', 
-        left: '12px'
+        top: '16px', 
+        left: '16px',
+        zIndex: 3
       }}>
         <span style={{
-          backgroundColor: '#fef2f2',
-          color: '#dc2626',
-          padding: '4px 8px',
+          backgroundColor: 'rgba(161, 129, 231, 0.1)',
+          color: '#a181e7',
+          padding: '6px 10px',
           borderRadius: '12px',
           fontSize: '10px',
-          fontWeight: '500',
-          border: '1px solid #fecaca'
+          fontWeight: '600',
+          border: '1px solid rgba(161, 129, 231, 0.25)'
         }}>
           {match.seriesName || 'Cricket Series'}
         </span>
       </div>
+    </div>
+  );
+};
+
+// Collapsible User Profile Header Component - Optimized for performance
+const UserProfileHeader = ({ currentUser, onLogout, onSessionRefresh, authService }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div style={{
+      position: 'relative',
+      flex: '0 0 auto'
+    }}>
+      {/* Profile Avatar Button - Simplified */}
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        style={{
+          width: '44px',
+          height: '44px',
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)',
+          border: '2px solid rgba(255, 255, 255, 0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          fontSize: '16px',
+          fontWeight: '700',
+          cursor: 'pointer',
+          transition: 'transform 0.2s ease',
+          boxShadow: '0 2px 8px rgba(161, 129, 231, 0.3)',
+          position: 'relative',
+          zIndex: 10
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.transform = 'scale(1.05)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.transform = 'scale(1)';
+        }}
+      >
+        {currentUser.firstName.charAt(0).toUpperCase()}
+        {/* Session warning dot */}
+        {authService.getRemainingSessionTime() < 10 && (
+          <div style={{
+            position: 'absolute',
+            top: '-2px',
+            right: '-2px',
+            width: '12px',
+            height: '12px',
+            borderRadius: '50%',
+            background: '#ecaf1a',
+            border: '2px solid white'
+          }}></div>
+        )}
+      </button>
+
+      {/* Expandable Profile Panel - Simplified */}
+      {isExpanded && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          right: '0',
+          marginTop: '8px',
+          background: 'rgba(255, 255, 255, 0.95)',
+          padding: '16px',
+          borderRadius: '12px',
+          boxShadow: '0 4px 16px rgba(161, 129, 231, 0.2)',
+          border: '1px solid rgba(161, 129, 231, 0.2)',
+          minWidth: '280px',
+          animation: 'slideInFromTop 0.2s ease',
+          zIndex: 9999
+        }}>
+          {/* Simple gradient line */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '3px',
+            background: 'linear-gradient(90deg, #a181e7 0%, #baa2e6 50%, #ecaf1a 100%)'
+          }}></div>
+          
+          {/* User Info */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            marginBottom: '16px',
+            marginTop: '4px'
+          }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '18px',
+              fontWeight: '700'
+            }}>
+              {currentUser.firstName.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div style={{ 
+                fontWeight: '700', 
+                color: '#1f2937',
+                fontSize: '16px'
+              }}>
+                {currentUser.firstName} {currentUser.lastName}
+              </div>
+              <div style={{ 
+                fontSize: '12px', 
+                color: '#6b7280'
+              }}>
+                {currentUser.email}
+              </div>
+            </div>
+          </div>
+
+          {/* Session Info - Simplified */}
+          <div style={{
+            background: 'rgba(161, 129, 231, 0.1)',
+            padding: '12px',
+            borderRadius: '8px',
+            marginBottom: '16px'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '8px'
+            }}>
+              <span style={{
+                fontSize: '12px',
+                color: '#6b7280',
+                fontWeight: '600'
+              }}>
+                Session Time
+              </span>
+              <span style={{
+                fontSize: '14px',
+                color: authService.getRemainingSessionTime() < 10 ? '#ecaf1a' : '#a181e7',
+                fontWeight: '700'
+              }}>
+                {authService.getRemainingSessionTime()}m remaining
+              </span>
+            </div>
+            {authService.getRemainingSessionTime() < 10 && (
+              <div style={{
+                fontSize: '11px',
+                color: '#ecaf1a',
+                fontWeight: '500'
+              }}>
+                ⚠️ Session expiring soon
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons - Simplified */}
+          <div style={{
+            display: 'flex',
+            gap: '8px'
+          }}>
+            <button
+              onClick={() => {
+                onSessionRefresh();
+                setIsExpanded(false);
+              }}
+              style={{
+                flex: 1,
+                padding: '10px 16px',
+                background: '#a181e7',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '12px',
+                fontWeight: '600',
+                transition: 'background-color 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#9575e3';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#a181e7';
+              }}
+            >
+              🔄 Extend Session
+            </button>
+            
+            <button
+              onClick={() => {
+                onLogout();
+                setIsExpanded(false);
+              }}
+              style={{
+                flex: 1,
+                padding: '10px 16px',
+                background: '#ecaf1a',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '12px',
+                fontWeight: '600',
+                transition: 'background-color 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#e09e0d';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#ecaf1a';
+              }}
+            >
+              🚪 Logout
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Click outside to close */}
+      {isExpanded && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9998
+          }}
+          onClick={() => setIsExpanded(false)}
+        />
+      )}
     </div>
   );
 };
@@ -418,19 +666,37 @@ const FixturesPage = ({ onMatchClick }) => {
 
   if (loading) {
   return (
-      <div className="cricket-app" style={{ backgroundColor: '#fef2f2', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center', padding: '20px' }}>
+      <div className="cricket-app" style={{ 
+        background: 'linear-gradient(135deg, #f1ecfa 0%, #ede6fa 50%, #dacdf6 100%)', 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center' 
+      }}>
+        <div style={{ textAlign: 'center', padding: '40px' }}>
           <div style={{ 
-            width: '60px', 
-            height: '60px', 
-            border: '4px solid #fecaca',
-            borderTop: '4px solid #dc2626',
+            width: '80px', 
+            height: '80px', 
+            border: '4px solid rgba(161, 129, 231, 0.2)',
+            borderTop: '4px solid #a181e7',
             borderRadius: '50%',
             animation: 'spin 1s linear infinite',
-            margin: '0 auto 20px auto'
+            margin: '0 auto 30px auto'
           }}></div>
-          <div style={{ color: '#dc2626', fontSize: '18px', fontWeight: '500' }}>
+          <div style={{ 
+            color: '#a181e7', 
+            fontSize: '20px', 
+            fontWeight: '600',
+            marginBottom: '10px'
+          }}>
             Loading fixtures...
+          </div>
+          <div style={{ 
+            color: '#baa2e6', 
+            fontSize: '14px',
+            fontWeight: '400'
+          }}>
+            Please wait while we fetch the latest matches
           </div>
         </div>
       </div>
@@ -439,24 +705,68 @@ const FixturesPage = ({ onMatchClick }) => {
 
   if (error) {
     return (
-      <div className="cricket-app" style={{ backgroundColor: '#fef2f2', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center', padding: '20px' }}>
-          <div style={{ fontSize: '48px', marginBottom: '20px', color: '#dc2626' }}>⚠️</div>
-          <div style={{ color: '#dc2626', marginBottom: '20px', fontSize: '18px' }}>Error: {error}</div>
+      <div className="cricket-app" style={{ 
+        background: 'linear-gradient(135deg, #f1ecfa 0%, #ede6fa 50%, #dacdf6 100%)', 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center' 
+      }}>
+        <div style={{ 
+          textAlign: 'center', 
+          padding: '40px',
+          background: 'rgba(255, 255, 255, 0.9)',
+          borderRadius: '20px',
+          boxShadow: '0 8px 32px rgba(161, 129, 231, 0.15)',
+          maxWidth: '400px',
+          margin: '20px'
+        }}>
+          <div style={{ 
+            fontSize: '60px', 
+            marginBottom: '20px', 
+            color: '#e0bda9',
+            filter: 'drop-shadow(0 4px 8px rgba(224, 189, 169, 0.3))'
+          }}>⚠️</div>
+          <div style={{ 
+            color: '#a181e7', 
+            marginBottom: '20px', 
+            fontSize: '20px',
+            fontWeight: '600'
+          }}>
+            Oops! Something went wrong
+          </div>
+          <div style={{ 
+            color: '#6b7280', 
+            marginBottom: '30px', 
+            fontSize: '14px',
+            lineHeight: '1.5'
+          }}>
+            {error}
+          </div>
           <button 
             onClick={fetchFixtures}
             style={{
               padding: '12px 24px',
-              backgroundColor: '#dc2626',
+              background: 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)',
               color: 'white',
               border: 'none',
-              borderRadius: '8px',
+              borderRadius: '12px',
               cursor: 'pointer',
               fontSize: '16px',
-              fontWeight: '500'
+              fontWeight: '600',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 4px 16px rgba(161, 129, 231, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 6px 20px rgba(161, 129, 231, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 4px 16px rgba(161, 129, 231, 0.3)';
             }}
           >
-            Retry
+            🔄 Try Again
           </button>
         </div>
       </div>
@@ -464,84 +774,125 @@ const FixturesPage = ({ onMatchClick }) => {
   }
 
   return (
-    <div className="cricket-app" style={{ backgroundColor: '#fef2f2', minHeight: '100vh', maxHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="cricket-app" style={{ 
+      background: 'linear-gradient(135deg, #f1ecfa 0%, #ede6fa 50%, #dacdf6 100%)', 
+      minHeight: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column',
+      position: 'relative'
+    }}>
 
 
-      {/* Date Range Filter */}
+      {/* Optimized Date Range Filter */}
       <div style={{
-        margin: '12px 24px 0',
-        padding: '12px',
-        backgroundColor: '#ffffff',
+        margin: '20px 24px 0',
+        padding: '14px 18px',
+        background: 'rgba(255, 255, 255, 0.95)',
         borderRadius: '12px',
-        border: '1px solid #fecaca',
-        boxShadow: '0 2px 8px rgba(220, 38, 38, 0.1)'
+        border: '1px solid rgba(161, 129, 231, 0.2)',
+        boxShadow: '0 2px 8px rgba(161, 129, 231, 0.08)',
+        position: 'relative',
+        zIndex: 1
       }}>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <label style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500', whiteSpace: 'nowrap' }}>Start Date:</label>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <label style={{ 
+              fontSize: '13px', 
+              color: '#a181e7', 
+              fontWeight: '600', 
+              whiteSpace: 'nowrap' 
+            }}>
+              Start Date:
+            </label>
             <input
               type="date"
               value={tempDateRange.startDate}
               onChange={(e) => handleDateChange('startDate', e.target.value)}
               style={{
-                padding: '4px 8px',
-                border: '1px solid #d1d5db',
+                padding: '6px 10px',
+                border: '1px solid rgba(161, 129, 231, 0.3)',
                 borderRadius: '6px',
-                fontSize: '12px',
+                fontSize: '13px',
                 outline: 'none',
-                borderColor: '#fecaca'
+                transition: 'border-color 0.2s ease',
+                background: 'white'
               }}
             />
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <label style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500', whiteSpace: 'nowrap' }}>End Date:</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <label style={{ 
+              fontSize: '13px', 
+              color: '#a181e7', 
+              fontWeight: '600', 
+              whiteSpace: 'nowrap' 
+            }}>
+              End Date:
+            </label>
             <input
               type="date"
               value={tempDateRange.endDate}
               onChange={(e) => handleDateChange('endDate', e.target.value)}
               style={{
-                padding: '4px 8px',
-                border: '1px solid #d1d5db',
+                padding: '6px 10px',
+                border: '1px solid rgba(161, 129, 231, 0.3)',
                 borderRadius: '6px',
-                fontSize: '12px',
+                fontSize: '13px',
                 outline: 'none',
-                borderColor: '#fecaca'
+                transition: 'border-color 0.2s ease',
+                background: 'white'
               }}
             />
           </div>
           <button
             onClick={handleApplyDateFilter}
             style={{
-              padding: '4px 12px',
-              backgroundColor: '#dc2626',
+              padding: '7px 16px',
+              backgroundColor: '#a181e7',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
-              fontSize: '12px',
-              fontWeight: '500'
+              fontSize: '13px',
+              fontWeight: '600',
+              transition: 'background-color 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#7546dc';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#a181e7';
             }}
           >
-            Apply Filter
+            🔍 Apply Filter
           </button>
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div style={{ display: 'flex', margin: '12px 24px 0', backgroundColor: '#ffffff', borderRadius: '12px', padding: '3px', border: '1px solid #fecaca', boxShadow: '0 2px 8px rgba(220, 38, 38, 0.1)' }}>
+      {/* Optimized Tab Navigation */}
+      <div style={{ 
+        display: 'flex', 
+        margin: '16px 24px 0', 
+        background: 'rgba(255, 255, 255, 0.95)', 
+        borderRadius: '12px', 
+        padding: '4px', 
+        border: '1px solid rgba(161, 129, 231, 0.2)', 
+        boxShadow: '0 2px 8px rgba(161, 129, 231, 0.08)',
+        position: 'relative',
+        zIndex: 1
+      }}>
         <button
           onClick={() => setActiveTab('all')}
           style={{
             flex: 1,
-            padding: '8px 12px',
-            backgroundColor: activeTab === 'all' ? '#dc2626' : 'transparent',
+            padding: '10px 14px',
+            backgroundColor: activeTab === 'all' ? '#a181e7' : 'transparent',
             color: activeTab === 'all' ? 'white' : '#6b7280',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
-            fontSize: '12px',
+            fontSize: '13px',
             fontWeight: '600',
-            transition: 'all 0.2s ease'
+            transition: 'background-color 0.2s ease, color 0.2s ease'
           }}
         >
           All ({matches.length})
@@ -550,52 +901,52 @@ const FixturesPage = ({ onMatchClick }) => {
           onClick={() => setActiveTab('live')}
           style={{
             flex: 1,
-            padding: '8px 12px',
-            backgroundColor: activeTab === 'live' ? '#dc2626' : 'transparent',
+            padding: '10px 14px',
+            backgroundColor: activeTab === 'live' ? '#ecaf1a' : 'transparent',
             color: activeTab === 'live' ? 'white' : '#6b7280',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
-            fontSize: '12px',
+            fontSize: '13px',
             fontWeight: '600',
-            transition: 'all 0.2s ease'
+            transition: 'background-color 0.2s ease, color 0.2s ease'
           }}
         >
-          Live ({matches.filter(m => m.status === 'live').length})
+          🔴 Live ({matches.filter(m => m.status === 'live').length})
         </button>
         <button
           onClick={() => setActiveTab('upcoming')}
           style={{
             flex: 1,
-            padding: '8px 12px',
-            backgroundColor: activeTab === 'upcoming' ? '#dc2626' : 'transparent',
+            padding: '10px 14px',
+            backgroundColor: activeTab === 'upcoming' ? '#baa2e6' : 'transparent',
             color: activeTab === 'upcoming' ? 'white' : '#6b7280',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
-            fontSize: '12px',
+            fontSize: '13px',
             fontWeight: '600',
-            transition: 'all 0.2s ease'
+            transition: 'background-color 0.2s ease, color 0.2s ease'
           }}
         >
-          Upcoming ({matches.filter(m => m.status === 'upcoming').length})
+          ⏰ Upcoming ({matches.filter(m => m.status === 'upcoming').length})
         </button>
         <button
           onClick={() => setActiveTab('completed')}
           style={{
             flex: 1,
-            padding: '8px 12px',
-            backgroundColor: activeTab === 'completed' ? '#dc2626' : 'transparent',
+            padding: '10px 14px',
+            backgroundColor: activeTab === 'completed' ? '#e0bda9' : 'transparent',
             color: activeTab === 'completed' ? 'white' : '#6b7280',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
-            fontSize: '12px',
+            fontSize: '13px',
             fontWeight: '600',
-            transition: 'all 0.2s ease'
+            transition: 'background-color 0.2s ease, color 0.2s ease'
           }}
         >
-          Completed ({matches.filter(m => m.status === 'completed').length})
+          ✅ Completed ({matches.filter(m => m.status === 'completed').length})
         </button>
       </div>
 
@@ -802,8 +1153,7 @@ const FixturesPage = ({ onMatchClick }) => {
 
 // Match Detail Page Component  
 const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetails, setCurrentView,currentUser,onLoginClick,latestBallEvent }) => {
-  console.log('selectedMatchDetails', selectedMatchDetails)
-  const [activeTab, setActiveTab] = useState('commentary');
+  const [activeTab, setActiveTab] = useState('liveMatchDetails');
   const [match, setMatch] = useState(selectedMatchDetails);
   const [matchDetail, setMatchDetail] = useState(null);
   const [error, setError] = useState(null);
@@ -1002,11 +1352,11 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetai
   if (match.status === 'upcoming') {
     return (
       <div className="cricket-app match-detail-page">
-        <div className="back-navigation">
+        {/* <div className="back-navigation">
           <button onClick={onBackClick} className="back-button">
             ← Back
           </button>
-        </div>
+        </div> */}
         
         <div className="match-summary">
           <div className="match-summary-header">
@@ -1063,22 +1413,34 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetai
 
   // For completed/live matches, show full details
   return (
-    <div className="cricket-app match-detail-page">
-      <div className="back-navigation">
-        <button onClick={onBackClick} className="back-button">
-          ← Back
-        </button>
-      </div>
-
-      {/* Match Summary */}
-      <div className="match-summary">
+    <div style={{
+      height: '150vh',
+      display: 'flex',
+      flexDirection: 'column',
+      background: 'linear-gradient(135deg, #f1ecfa 0%, #ede6fa 50%, #dacdf6 100%)',
+      overflow: 'hidden' // Changed to hidden to allow sticky header
+    }}>
+      {/* Fixed Header Section */}
+      <div style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 200,
+        background: 'linear-gradient(135deg, #f1ecfa 0%, #ede6fa 50%, #dacdf6 100%)',
+        paddingBottom: '8px',
+        borderBottom: '1px solid rgba(161, 129, 231, 0.2)',
+        boxShadow: '0 2px 8px rgba(161, 129, 231, 0.1)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        flexShrink: 0 // Prevent header from shrinking
+      }}>
+        {/* Loading and Error Messages */}
         {isLoadingData && (
           <div style={{ 
-            padding: '10px 20px', 
-            backgroundColor: '#f0f9ff', 
+            padding: '12px 20px', 
+            backgroundColor: 'rgba(59, 130, 246, 0.1)', 
             borderRadius: '8px', 
-            marginBottom: '20px',
-            border: '1px solid #0ea5e9',
+            margin: '12px 20px 0',
+            border: '1px solid rgba(59, 130, 246, 0.2)',
             display: 'flex',
             alignItems: 'center',
             gap: '10px'
@@ -1086,160 +1448,114 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetai
             <div style={{ 
               width: '16px', 
               height: '16px', 
-              border: '2px solid #0ea5e9',
+              border: '2px solid #3b82f6',
               borderTop: '2px solid transparent',
               borderRadius: '50%',
               animation: 'spin 1s linear infinite'
             }}></div>
-            <span style={{ color: '#0c4a6e', fontSize: '14px' }}>
+            <span style={{ color: '#1e40af', fontSize: '14px', fontWeight: '600' }}>
               Fetching match details...
             </span>
           </div>
         )}
+        
         {!matchDetail && !isLoadingData && (
           <div style={{ 
-            padding: '20px', 
-            backgroundColor: '#fef3c7', 
+            padding: '16px 20px', 
+            backgroundColor: 'rgba(236, 175, 26, 0.1)', 
             borderRadius: '8px', 
-            marginBottom: '20px',
-            border: '1px solid #f59e0b'
+            margin: '12px 20px 0',
+            border: '1px solid rgba(236, 175, 26, 0.3)'
           }}>
-            <div style={{ color: '#92400e', fontWeight: 'bold', marginBottom: '10px' }}>
-              ⚠️ Limited Data Available
+            <div style={{ color: '#92400e', fontWeight: '600', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>⚠️</span>
+              <span>Limited Data Available</span>
             </div>
             <div style={{ color: '#92400e', fontSize: '14px' }}>
               Detailed match information is not available for this match. Only basic match details are shown.
             </div>
           </div>
         )}
-        <div className="match-summary-header">
-          <div style={{display:"flex", justifyContent:"space-between"}}>
-            <div className="match-date">
-              {formatDate(match.date).shortDate}
-            </div>
-            <div className="match-type">
-              {match.matchName} • {match.matchType} Match
-            </div>
-          </div>
-          {match.result && (
-            <div className="match-winner">
-              {match.result.resultText}
-            </div>
-          )}
-          {match.status === 'live' && (
-            <div className="match-winner" style={{ color: '#ef4444' }}>
-              🔴 LIVE NOW
-            </div>
-          )}
+
+        {/* Embedded Simulator Section */}
+        <div style={{ margin: '0 20px' }}>
+          <EmbeddedSimulator 
+            matchId={matchId} 
+            onExpand={() => setCurrentView('simulator')}
+          />
         </div>
-        
-        <div className="match-teams-summary">
-          <div className="team-summary">
-            <TeamLogo team={match.team1} size={50} />
-            <div>
-              {matchDetail?.scores?.team1 ? (
-                <>
-                  <div className="team-score-large">
-                    {matchDetail.scores.team1.runs}/{matchDetail.scores.team1.wickets}
-                  </div>
-                  <div className="team-overs-info">{matchDetail.scores.team1.overs} overs</div>
-                </>
-              ) : (
-                <>
-                  <div className="team-name-large">{match.team1.name}</div>
-                  <div className="team-shortname">{match.team1.shortName}</div>
-                </>
-              )}
-            </div>
-          </div>
-          
-          <div className="match-vs">vs</div>
-          
-          <div className="team-summary right">
-            <div style={{ textAlign: 'right' }}>
-              {matchDetail?.scores?.team2 ? (
-                <>
-                  <div className="team-score-large">
-                    {matchDetail.scores.team2.runs}/{matchDetail.scores.team2.wickets}
-                  </div>
-                  <div className="team-overs-info">{matchDetail.scores.team2.overs} overs</div>
-                </>
-              ) : (
-                <>
-                  <div className="team-name-large">{match.team2.name}</div>
-                  <div className="team-shortname">{match.team2.shortName}</div>
-                </>
-              )}
-            </div>
-            <TeamLogo team={match.team2} size={50} />
-          </div>
+
+        {/* Tab Navigation - Now sticky and part of header */}
+        <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      </div>
+
+      {/* Scrollable Tab Content */}
+      <div style={{
+        flex: 1,
+        overflowY: 'auto',
+        padding: '20px',
+        paddingBottom: '120px', // Extra bottom padding for chat button
+        background: 'transparent'
+      }}>
+        {/* Tab Content - scrollable area */}
+        <div style={{
+          minHeight: '100px', // Ensure content takes minimum height
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          {activeTab === 'liveMatchDetails' && <LiveMatchDetailsTab matchDetail={matchDetail} match={match} TeamLogo={TeamLogo} formatDate={formatDate} />}
+          {activeTab === 'commentary' && <CommentaryTab matchDetail={matchDetail} matchId={matchId} commentary={commentary} />}
+          {activeTab === 'prediction' && <PredictionTab matchId={matchId} currentUser={currentUser} onLoginClick={onLoginClick} latestBallEvent={latestBallEvent} />}
+          {activeTab === 'scorecard' && <ScorecardTab matchDetail={matchDetail} matchId={matchId} />}
+          {activeTab === 'matchInfo' && <MatchInfoTab matchDetail={matchDetail} match={match} matchName={match?.matchName } />}
+          {activeTab === 'wagonWheel' && <WagonWheelTab matchDetail={matchDetail} match={match} />}
+          {activeTab === 'pointsTable' && <PointsTableTab matchDetail={matchDetail} seriesId={match.tournamentId || '9924'} />}
         </div>
       </div>
 
-      {/* Embedded Simulator Section */}
-      <div style={{ width: '100%', marginBottom: '20px' }}>
-        <EmbeddedSimulator 
-          matchId={matchId} 
-          onExpand={() => setCurrentView('simulator')}
-        />
+      {/* Chat Button - Fixed Bottom Right */}
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        zIndex: 1000
+      }}>
+        <button
+          onClick={() => onChatClick(matchId, match?.matchName || 'Cricket Match')}
+          style={{
+            backgroundColor: '#3b82f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '12px',
+            padding: '12px 20px',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            transition: 'background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease', // Optimized transitions
+            boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)',
+            minWidth: '100px',
+            justifyContent: 'center'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#2563eb';
+            e.target.style.transform = 'translateY(-1px)'; // Reduced from -2px to -1px
+            e.target.style.boxShadow = '0 6px 20px rgba(59, 130, 246, 0.6)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = '#3b82f6';
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 4px 15px rgba(59, 130, 246, 0.4)';
+          }}
+        >
+          <span>💬</span>
+          <span>Chat</span>
+        </button>
       </div>
-
-      {/* Tab Navigation */}
-      <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
-
-             {/* Tab Content - Scrollable */}
-       <div className="tab-content">
-         {activeTab === 'commentary' && <CommentaryTab matchDetail={matchDetail} matchId={matchId} commentary={commentary} />}
-         {activeTab === 'prediction' && <PredictionTab matchId={matchId} currentUser={currentUser} onLoginClick={onLoginClick} latestBallEvent={latestBallEvent} />}
-         {activeTab === 'scorecard' && <ScorecardTab matchDetail={matchDetail} matchId={matchId} />}
-         {activeTab === 'matchInfo' && <MatchInfoTab matchDetail={matchDetail} match={match} matchName={match?.matchName } />}
-         {activeTab === 'wagonWheel' && <WagonWheelTab matchDetail={matchDetail} match={match} />}
-         {activeTab === 'pointsTable' && <PointsTableTab matchDetail={matchDetail} seriesId={match.tournamentId || '9924'} />}
-       </div>
-
-       {/* Chat Button - Fixed Bottom Right */}
-       <div style={{
-         position: 'fixed',
-         bottom: '20px',
-         right: '20px',
-         zIndex: 1000
-       }}>
-         <button
-           onClick={() => onChatClick(matchId, match?.matchName || 'Cricket Match')}
-           style={{
-             backgroundColor: '#3b82f6',
-             color: 'white',
-             border: 'none',
-             borderRadius: '12px',
-             padding: '12px 20px',
-             fontSize: '14px',
-             fontWeight: '600',
-             cursor: 'pointer',
-             display: 'flex',
-             alignItems: 'center',
-             gap: '8px',
-             transition: 'all 0.3s ease',
-             boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)',
-             minWidth: '100px',
-             justifyContent: 'center'
-           }}
-           onMouseEnter={(e) => {
-             e.target.style.backgroundColor = '#2563eb';
-             e.target.style.transform = 'translateY(-2px)';
-             e.target.style.boxShadow = '0 6px 20px rgba(59, 130, 246, 0.6)';
-           }}
-           onMouseLeave={(e) => {
-             e.target.style.backgroundColor = '#3b82f6';
-             e.target.style.transform = 'translateY(0)';
-             e.target.style.boxShadow = '0 4px 15px rgba(59, 130, 246, 0.4)';
-           }}
-         >
-           <span>💬</span>
-           <span>Chat</span>
-         </button>
-       </div>
-     </div>
-   );
+    </div>
+  );
 };
 
 const WebApp = () => {
@@ -1545,155 +1861,151 @@ const WebApp = () => {
 
         return (
       <div className="cricket-app">
-        {/* Navigation Header - Shared across all views */}
+        {/* Optimized Navigation Header - Shared across all views */}
         <div style={{
-          background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
-          padding: '16px 32px',
-          borderBottom: '1px solid #b91c1c',
-          boxShadow: '0 2px 10px rgba(220, 38, 38, 0.2)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-            {/* Navigation Tabs */}
-            <div style={{ display: 'flex', gap: '4px' }}>
-
-              <button
-                onClick={() => handleNavClick('fixtures')}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: activeNav === 'fixtures' ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
-                  color: 'white',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  transition: 'all 0.3s ease',
-                  backdropFilter: 'blur(10px)'
-                }}
-                onMouseEnter={(e) => {
-                  if (activeNav !== 'fixtures') {
-                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (activeNav !== 'fixtures') {
-                    e.target.style.backgroundColor = 'transparent';
-                  }
-                }}
-              >
-                📅 Fixtures
-              </button>
-              <button
-                onClick={() => handleNavClick('leaderboard')}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: activeNav === 'leaderboard' ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
-                  color: 'white',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  transition: 'all 0.3s ease',
-                  backdropFilter: 'blur(10px)'
-                }}
-                onMouseEnter={(e) => {
-                  if (activeNav !== 'leaderboard') {
-                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (activeNav !== 'leaderboard') {
-                    e.target.style.backgroundColor = 'transparent';
-                  }
-                }}
-              >
-                🏆 Seasonal Leaderboard
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Floating Session Popup - Top Right Corner */}
-        {currentUser && (
-        <div style={{
-          position: 'fixed',
-          top: '8px',
-          right: '20px',
-          background: 'rgba(255, 255, 255, 0.98)',
-          padding: '6px 12px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
-          zIndex: 9999,
-          fontSize: '11px',
-          border: '1px solid #e5e7eb',
-          minWidth: '280px',
-          backdropFilter: 'blur(8px)',
-          animation: 'slideInFromRight 0.3s ease-out'
+          background: 'linear-gradient(135deg, #a181e7 0%, #baa2e6 50%, #e0bda9 100%)',
+          padding: '20px 32px',
+          borderBottom: '1px solid rgba(161, 129, 231, 0.3)',
+          boxShadow: '0 4px 16px rgba(161, 129, 231, 0.1)',
+          position: 'relative',
+          // overflow: 'hidden'
         }}>
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'space-between',
-            gap: '8px'
+            position: 'relative',
+            zIndex: 2,
+            gap: '20px'
           }}>
-            <div style={{ fontWeight: '600', color: '#1f2937', fontSize: '12px', flex: '1' }}>
-              👤 {currentUser.firstName} {currentUser.lastName}
-            </div>
-            <div style={{ 
-              fontSize: '9px', 
-              color: '#6b7280',
-              backgroundColor: '#f3f4f6',
-              padding: '2px 6px',
-              borderRadius: '4px',
-              fontWeight: '500',
-              whiteSpace: 'nowrap'
+            {/* Brand Logo/Title */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              flex: '0 0 auto'
             }}>
-              ⏰ {authService.getRemainingSessionTime()}m
+              <div style={{
+                background: 'linear-gradient(135deg, #ecaf1a 0%, #e0bda9 100%)',
+                width: '40px',
+                height: '40px',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+                boxShadow: '0 2px 8px rgba(236, 175, 26, 0.3)'
+              }}>
+                🏏
+              </div>
+              <div>
+                <h1 style={{
+                  color: 'white',
+                  fontSize: '24px',
+                  fontWeight: '700',
+                  margin: 0,
+                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                  letterSpacing: '-0.5px'
+                }}>
+                  Cricket FanVerse
+                </h1>
+                <p style={{
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  fontSize: '12px',
+                  margin: 0,
+                  fontWeight: '400'
+                }}>
+                  Live Cricket Experience
+                </p>
+              </div>
             </div>
-            <button
-              onClick={handleSessionRefresh}
-              style={{
-                backgroundColor: '#3b82f6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                padding: '4px 8px',
-                fontSize: '9px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                fontWeight: '600',
-                whiteSpace: 'nowrap'
-              }}
-              title="Extend session by 60 minutes"
-              onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
-              onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
-            >
-              🔄 Extend
-            </button>
-            <button
-              onClick={handleLogout}
-              style={{
-                backgroundColor: '#dc2626',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                padding: '4px 8px',
-                fontSize: '9px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                fontWeight: '600',
-                whiteSpace: 'nowrap'
-              }}
-              title="Logout"
-              onMouseEnter={(e) => e.target.style.backgroundColor = '#b91c1c'}
-              onMouseLeave={(e) => e.target.style.backgroundColor = '#dc2626'}
-            >
-              🚪 Logout
-            </button>
+
+            {/* Center - Navigation Tabs */}
+            <div style={{ 
+              display: 'flex', 
+              gap: '6px',
+              background: 'rgba(255, 255, 255, 0.15)',
+              padding: '4px',
+              borderRadius: '12px',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              flex: '0 0 auto'
+            }}>
+              <button
+                onClick={() => handleNavClick('fixtures')}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: activeNav === 'fixtures' 
+                    ? 'rgba(255, 255, 255, 0.9)' 
+                    : 'transparent',
+                  color: activeNav === 'fixtures' ? '#a181e7' : 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  transition: 'background-color 0.2s ease, color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (activeNav !== 'fixtures') {
+                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (activeNav !== 'fixtures') {
+                    e.target.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                <span style={{ marginRight: '8px' }}>📅</span>
+                Fixtures
+              </button>
+              <button
+                onClick={() => handleNavClick('leaderboard')}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: activeNav === 'leaderboard' 
+                    ? 'rgba(255, 255, 255, 0.9)' 
+                    : 'transparent',
+                  color: activeNav === 'leaderboard' ? '#a181e7' : 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  transition: 'background-color 0.2s ease, color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (activeNav !== 'leaderboard') {
+                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (activeNav !== 'leaderboard') {
+                    e.target.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                <span style={{ marginRight: '8px' }}>🏆</span>
+                Leaderboard
+              </button>
+            </div>
+
+            {/* Right - User Profile (Collapsible) */}
+            {currentUser ? (
+              <UserProfileHeader 
+                currentUser={currentUser}
+                onLogout={handleLogout}
+                onSessionRefresh={handleSessionRefresh}
+                authService={authService}
+              />
+            ) : (
+              <div style={{ width: '50px', flex: '0 0 auto' }}></div>
+            )}
           </div>
         </div>
-      )}
+
+        {/* Modern Floating Session Popup - Top Right Corner */}
+        {/* Removed - Profile is now integrated in header */}
 
 
       {currentView === 'fixtures' && (
@@ -1849,18 +2161,52 @@ const WebApp = () => {
          @keyframes pulse {
            0% {
              opacity: 1;
+             transform: scale(1);
            }
            50% {
-             opacity: 0.5;
+             opacity: 0.8;
+             transform: scale(1.05);
            }
            100% {
              opacity: 1;
+             transform: scale(1);
            }
          }
          
          @keyframes spin {
            0% { transform: rotate(0deg); }
            100% { transform: rotate(360deg); }
+         }
+         
+         @keyframes float {
+           0%, 100% {
+             transform: translateY(0px);
+           }
+           50% {
+             transform: translateY(-20px);
+           }
+         }
+         
+         @keyframes slideInFromRight {
+           from {
+             transform: translateX(100%);
+             opacity: 0;
+           }
+           to {
+             transform: translateX(0);
+             opacity: 1;
+           }
+         }
+         
+         @keyframes slideInFromTop {
+           from {
+             transform: translateY(-10px);
+             opacity: 0;
+           }
+           to {
+             transform: translateY(0);
+             opacity: 1;
+           }
          }
          
          .cricket-app .match-detail-page .loading-spinner {

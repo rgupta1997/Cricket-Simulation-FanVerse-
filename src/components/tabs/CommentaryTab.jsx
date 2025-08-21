@@ -92,52 +92,161 @@ const CommentaryTab = ({ matchDetail, matchId, commentary }) => {
   
   if (!matchDetail) {
     return (
-      <div className="tab-panel">
-        <div style={{ textAlign: 'center' }}>
-          <div>Loading commentary data...</div>
-        </div>
+      <div style={{
+        padding: '20px',
+        textAlign: 'center',
+        background: 'linear-gradient(135deg, rgba(161, 129, 231, 0.1) 0%, rgba(186, 162, 230, 0.05) 100%)',
+        borderRadius: '12px',
+        border: '1px solid rgba(161, 129, 231, 0.2)',
+        color: '#6b7280'
+      }}>
+        <div style={{ fontSize: '24px', marginBottom: '12px' }}>⏳</div>
+        <div>Loading commentary data...</div>
       </div>
     );
   }
   
   return (
-    <div className="tab-panel commentary-container">
-      {/* <div style={{ marginBottom: '20px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-          <span style={{ fontSize: '18px', fontWeight: 'bold' }}>🔴</span>
-          <span style={{ fontSize: '18px', fontWeight: 'bold' }}>🔵</span>
-        </div>
-      </div> */}
+    <div style={{
+      padding: '20px',
+      background: 'linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(255, 255, 255, 0.9) 100%)',
+      borderRadius: '12px',
+      border: '1px solid rgba(226, 232, 240, 0.8)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '20px'
+    }}>
 
-      <div className="commentary-section">
-        <h3 className="commentary-title" style={{marginTop:"10px"}}>
-          Batsmen
+      <div style={{
+        background: 'rgba(248, 250, 252, 0.8)',
+        padding: '20px',
+        borderRadius: '12px',
+        border: '1px solid rgba(226, 232, 240, 0.8)'
+      }}>
+        <h3 style={{
+          margin: '0 0 16px 0',
+          color: '#1f2937',
+          fontSize: '16px',
+          fontWeight: '600'
+        }}>
+          ⚾ Batsmen
         </h3>
-        <div className="responsive-table-container batsmen-table">
-          <table className="stats-table">
+        <div style={{
+          overflowX: 'auto',
+          borderRadius: '8px',
+          border: '1px solid rgba(226, 232, 240, 0.8)'
+        }}>
+          <table style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            backgroundColor: 'white'
+          }}>
             <thead>
-              <tr>
-                <th className="table-header" style={{ textAlign: 'left', minWidth: '150px' }}>Name</th>
-                <th className="table-header" style={{ textAlign: 'center', minWidth: '60px' }}>Runs</th>
-                <th className="table-header" style={{ textAlign: 'center', minWidth: '60px' }}>Balls</th>
-                <th className="table-header" style={{ textAlign: 'center', minWidth: '70px' }}>SR</th>
-                <th className="table-header" style={{ textAlign: 'center', minWidth: '50px' }}>4S</th>
-                <th className="table-header" style={{ textAlign: 'center', minWidth: '50px' }}>6S</th>
+              <tr style={{
+                background: 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)'
+              }}>
+                <th style={{ 
+                  padding: '12px 16px', 
+                  textAlign: 'left', 
+                  minWidth: '150px', 
+                  color: 'white', 
+                  fontSize: '14px', 
+                  fontWeight: '600' 
+                }}>Name</th>
+                <th style={{ 
+                  padding: '12px 16px', 
+                  textAlign: 'center', 
+                  minWidth: '60px', 
+                  color: 'white', 
+                  fontSize: '14px', 
+                  fontWeight: '600' 
+                }}>Runs</th>
+                <th style={{ 
+                  padding: '12px 16px', 
+                  textAlign: 'center', 
+                  minWidth: '60px', 
+                  color: 'white', 
+                  fontSize: '14px', 
+                  fontWeight: '600' 
+                }}>Balls</th>
+                <th style={{ 
+                  padding: '12px 16px', 
+                  textAlign: 'center', 
+                  minWidth: '70px', 
+                  color: 'white', 
+                  fontSize: '14px', 
+                  fontWeight: '600' 
+                }}>SR</th>
+                <th style={{ 
+                  padding: '12px 16px', 
+                  textAlign: 'center', 
+                  minWidth: '50px', 
+                  color: 'white', 
+                  fontSize: '14px', 
+                  fontWeight: '600' 
+                }}>4S</th>
+                <th style={{ 
+                  padding: '12px 16px', 
+                  textAlign: 'center', 
+                  minWidth: '50px', 
+                  color: 'white', 
+                  fontSize: '14px', 
+                  fontWeight: '600' 
+                }}>6S</th>
               </tr>
             </thead>
             <tbody>
               {batsmenRows.length > 0 ? batsmenRows.map((player, index) => (
-                <tr key={index} className="table-row">
-                  <td className="table-cell" style={{ textAlign: 'left' }}>{player.name}</td>
-                  <td className="table-cell" style={{ textAlign: 'center' }}>{player.runs}</td>
-                  <td className="table-cell" style={{ textAlign: 'center' }}>{player.balls}</td>
-                  <td className="table-cell" style={{ textAlign: 'center' }}>{player.strikeRate}</td>
-                  <td className="table-cell" style={{ textAlign: 'center' }}>{player.fours}</td>
-                  <td className="table-cell" style={{ textAlign: 'center' }}>{player.sixes}</td>
+                <tr key={index} style={{
+                  borderBottom: '1px solid rgba(226, 232, 240, 0.5)',
+                  backgroundColor: index % 2 === 0 ? 'rgba(248, 250, 252, 0.5)' : 'white'
+                }}>
+                  <td style={{ 
+                    padding: '12px 16px', 
+                    textAlign: 'left', 
+                    color: '#1f2937', 
+                    fontSize: '14px', 
+                    fontWeight: '500' 
+                  }}>{player.name}</td>
+                  <td style={{ 
+                    padding: '12px 16px', 
+                    textAlign: 'center', 
+                    color: '#374151', 
+                    fontSize: '14px' 
+                  }}>{player.runs}</td>
+                  <td style={{ 
+                    padding: '12px 16px', 
+                    textAlign: 'center', 
+                    color: '#374151', 
+                    fontSize: '14px' 
+                  }}>{player.balls}</td>
+                  <td style={{ 
+                    padding: '12px 16px', 
+                    textAlign: 'center', 
+                    color: '#374151', 
+                    fontSize: '14px' 
+                  }}>{player.strikeRate}</td>
+                  <td style={{ 
+                    padding: '12px 16px', 
+                    textAlign: 'center', 
+                    color: '#374151', 
+                    fontSize: '14px' 
+                  }}>{player.fours}</td>
+                  <td style={{ 
+                    padding: '12px 16px', 
+                    textAlign: 'center', 
+                    color: '#374151', 
+                    fontSize: '14px' 
+                  }}>{player.sixes}</td>
                 </tr>
               )) : (
-                <tr className="table-row">
-                  <td className="table-cell" colSpan="6" style={{ textAlign: 'center', color: '#6b7280' }}>
+                <tr>
+                  <td colSpan="6" style={{ 
+                    padding: '20px', 
+                    textAlign: 'center', 
+                    color: '#6b7280', 
+                    fontSize: '14px' 
+                  }}>
                     No batting data available for this inning
                   </td>
                 </tr>
@@ -147,35 +256,136 @@ const CommentaryTab = ({ matchDetail, matchId, commentary }) => {
         </div>
       </div>
 
-      <div className="commentary-section">
-        <h3 className="commentary-title">
-          Bowler
+      <div style={{
+        background: 'rgba(248, 250, 252, 0.8)',
+        padding: '20px',
+        borderRadius: '12px',
+        border: '1px solid rgba(226, 232, 240, 0.8)'
+      }}>
+        <h3 style={{
+          margin: '0 0 16px 0',
+          color: '#1f2937',
+          fontSize: '16px',
+          fontWeight: '600'
+        }}>
+          🎾 Bowler
         </h3>
-        <div className="responsive-table-container bowler-table">
-          <table className="stats-table" style={{ minWidth: '400px' }}>
+        <div style={{
+          overflowX: 'auto',
+          borderRadius: '8px',
+          border: '1px solid rgba(226, 232, 240, 0.8)'
+        }}>
+          <table style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            backgroundColor: 'white',
+            minWidth: '400px'
+          }}>
             <thead>
-              <tr>
-                <th className="table-header" style={{ textAlign: 'left', minWidth: '150px' }}>Name</th>
-                <th className="table-header" style={{ textAlign: 'center', minWidth: '40px' }}>O</th>
-                <th className="table-header" style={{ textAlign: 'center', minWidth: '40px' }}>R</th>
-                <th className="table-header" style={{ textAlign: 'center', minWidth: '40px' }}>W</th>
-                <th className="table-header" style={{ textAlign: 'center', minWidth: '60px' }}>Econ</th>
-                <th className="table-header" style={{ textAlign: 'center', minWidth: '50px' }}>Dots</th>
+              <tr style={{
+                background: 'linear-gradient(135deg, #ecaf1a 0%, #e0bda9 100%)'
+              }}>
+                <th style={{ 
+                  padding: '12px 16px', 
+                  textAlign: 'left', 
+                  minWidth: '150px', 
+                  color: 'white', 
+                  fontSize: '14px', 
+                  fontWeight: '600' 
+                }}>Name</th>
+                <th style={{ 
+                  padding: '12px 16px', 
+                  textAlign: 'center', 
+                  minWidth: '40px', 
+                  color: 'white', 
+                  fontSize: '14px', 
+                  fontWeight: '600' 
+                }}>O</th>
+                <th style={{ 
+                  padding: '12px 16px', 
+                  textAlign: 'center', 
+                  minWidth: '40px', 
+                  color: 'white', 
+                  fontSize: '14px', 
+                  fontWeight: '600' 
+                }}>R</th>
+                <th style={{ 
+                  padding: '12px 16px', 
+                  textAlign: 'center', 
+                  minWidth: '40px', 
+                  color: 'white', 
+                  fontSize: '14px', 
+                  fontWeight: '600' 
+                }}>W</th>
+                <th style={{ 
+                  padding: '12px 16px', 
+                  textAlign: 'center', 
+                  minWidth: '60px', 
+                  color: 'white', 
+                  fontSize: '14px', 
+                  fontWeight: '600' 
+                }}>Econ</th>
+                <th style={{ 
+                  padding: '12px 16px', 
+                  textAlign: 'center', 
+                  minWidth: '50px', 
+                  color: 'white', 
+                  fontSize: '14px', 
+                  fontWeight: '600' 
+                }}>Dots</th>
               </tr>
             </thead>
             <tbody>
               {bowlerRow ? (
-                <tr className="table-row">
-                  <td className="table-cell" style={{ textAlign: 'left' }}>{bowlerRow.name}</td>
-                  <td className="table-cell" style={{ textAlign: 'center' }}>{bowlerRow.overs}</td>
-                  <td className="table-cell" style={{ textAlign: 'center' }}>{bowlerRow.runs}</td>
-                  <td className="table-cell" style={{ textAlign: 'center' }}>{bowlerRow.wickets}</td>
-                  <td className="table-cell" style={{ textAlign: 'center' }}>{bowlerRow.economy}</td>
-                  <td className="table-cell" style={{ textAlign: 'center' }}>{bowlerRow.dots}</td>
+                <tr style={{
+                  backgroundColor: 'rgba(248, 250, 252, 0.5)'
+                }}>
+                  <td style={{ 
+                    padding: '12px 16px', 
+                    textAlign: 'left', 
+                    color: '#1f2937', 
+                    fontSize: '14px', 
+                    fontWeight: '500' 
+                  }}>{bowlerRow.name}</td>
+                  <td style={{ 
+                    padding: '12px 16px', 
+                    textAlign: 'center', 
+                    color: '#374151', 
+                    fontSize: '14px' 
+                  }}>{bowlerRow.overs}</td>
+                  <td style={{ 
+                    padding: '12px 16px', 
+                    textAlign: 'center', 
+                    color: '#374151', 
+                    fontSize: '14px' 
+                  }}>{bowlerRow.runs}</td>
+                  <td style={{ 
+                    padding: '12px 16px', 
+                    textAlign: 'center', 
+                    color: '#374151', 
+                    fontSize: '14px' 
+                  }}>{bowlerRow.wickets}</td>
+                  <td style={{ 
+                    padding: '12px 16px', 
+                    textAlign: 'center', 
+                    color: '#374151', 
+                    fontSize: '14px' 
+                  }}>{bowlerRow.economy}</td>
+                  <td style={{ 
+                    padding: '12px 16px', 
+                    textAlign: 'center', 
+                    color: '#374151', 
+                    fontSize: '14px' 
+                  }}>{bowlerRow.dots}</td>
                 </tr>
               ) : (
-                <tr className="table-row">
-                  <td className="table-cell" colSpan="6" style={{ textAlign: 'center', color: '#6b7280' }}>
+                <tr>
+                  <td colSpan="6" style={{ 
+                    padding: '20px', 
+                    textAlign: 'center', 
+                    color: '#6b7280', 
+                    fontSize: '14px' 
+                  }}>
                     No bowling data available for this inning
                   </td>
                 </tr>
@@ -185,49 +395,135 @@ const CommentaryTab = ({ matchDetail, matchId, commentary }) => {
         </div>
       </div>
 
-      <div className="commentary-section">
-        <h3 className="commentary-title">
-          Key Facts
+      <div style={{
+        background: 'rgba(248, 250, 252, 0.8)',
+        padding: '20px',
+        borderRadius: '12px',
+        border: '1px solid rgba(226, 232, 240, 0.8)'
+      }}>
+        <h3 style={{
+          margin: '0 0 16px 0',
+          color: '#1f2937',
+          fontSize: '16px',
+          fontWeight: '600'
+        }}>
+          📊 Key Facts
         </h3>
-        <div style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.6' }}>
-          <div>Partnership: {keyFacts.partnership}</div>
-          <div>Last Wkt: {playersInfo.fallOfWickets[playersInfo.fallOfWickets.length - 1]?.batsman || keyFacts.lastWicket || "N/A"}</div>
-          <div>{keyFacts.tossInfo}</div>
+        <div style={{ 
+          fontSize: '14px', 
+          color: '#6b7280', 
+          lineHeight: '1.6',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}>
+          <div style={{
+            padding: '8px 12px',
+            background: 'linear-gradient(135deg, rgba(161, 129, 231, 0.1) 0%, rgba(186, 162, 230, 0.05) 100%)',
+            borderRadius: '6px',
+            border: '1px solid rgba(161, 129, 231, 0.2)'
+          }}>
+            <strong>Partnership:</strong> {keyFacts.partnership}
+          </div>
+          <div style={{
+            padding: '8px 12px',
+            background: 'linear-gradient(135deg, rgba(236, 175, 26, 0.1) 0%, rgba(224, 189, 169, 0.05) 100%)',
+            borderRadius: '6px',
+            border: '1px solid rgba(236, 175, 26, 0.2)'
+          }}>
+            <strong>Last Wkt:</strong> {playersInfo.fallOfWickets[playersInfo.fallOfWickets.length - 1]?.batsman || keyFacts.lastWicket || "N/A"}
+          </div>
+          <div style={{
+            padding: '8px 12px',
+            background: 'linear-gradient(135deg, rgba(186, 162, 230, 0.1) 0%, rgba(224, 189, 169, 0.05) 100%)',
+            borderRadius: '6px',
+            border: '1px solid rgba(186, 162, 230, 0.2)'
+          }}>
+            <strong>Toss:</strong> {keyFacts.tossInfo}
+          </div>
         </div>
       </div>
 
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-          <h3 className="commentary-title">
-            Ball by Ball Commentary
+      <div style={{
+        background: 'rgba(248, 250, 252, 0.8)',
+        padding: '20px',
+        borderRadius: '12px',
+        border: '1px solid rgba(226, 232, 240, 0.8)'
+      }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          marginBottom: '16px',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <h3 style={{
+            margin: 0,
+            color: '#1f2937',
+            fontSize: '16px',
+            fontWeight: '600'
+          }}>
+            🎙️ Ball by Ball Commentary
           </h3>
           {/* Inning Selector */}
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {availableInnings.map(inning => (
               <button 
                 key={inning}
                 onClick={() => setSelectedInning(inning)}
                 style={{
                   padding: '8px 16px',
-                  backgroundColor: selectedInning === inning ? '#3b82f6' : '#f3f4f6',
+                  background: selectedInning === inning 
+                    ? 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)' 
+                    : 'rgba(248, 250, 252, 0.8)',
                   color: selectedInning === inning ? 'white' : '#374151',
-                  border: 'none',
-                  borderRadius: '6px',
+                  border: `1px solid ${selectedInning === inning ? '#a181e7' : 'rgba(226, 232, 240, 0.8)'}`,
+                  borderRadius: '8px',
                   cursor: 'pointer',
-                  fontSize: '14px'
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedInning !== inning) {
+                    e.target.style.backgroundColor = 'rgba(161, 129, 231, 0.1)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedInning !== inning) {
+                    e.target.style.backgroundColor = 'rgba(248, 250, 252, 0.8)';
+                  }
                 }}
               >
                 {inning === 1 ? '1st Innings' : inning === 2 ? '2nd Innings' : `${inning}rd Innings`}
               </button>
             ))}
             {availableInnings.length === 0 && (
-              <div style={{ color: '#6b7280', fontSize: '14px', padding: '8px' }}>
+              <div style={{ 
+                color: '#6b7280', 
+                fontSize: '14px', 
+                padding: '8px 12px',
+                background: 'rgba(239, 68, 68, 0.1)',
+                borderRadius: '6px',
+                border: '1px solid rgba(239, 68, 68, 0.2)'
+              }}>
                 No commentary data available
               </div>
             )}
           </div>
         </div>
-        <div className="ball-commentary">
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          maxHeight: '400px',
+          overflowY: 'auto',
+          padding: '12px',
+          background: 'white',
+          borderRadius: '8px',
+          border: '1px solid rgba(226, 232, 240, 0.8)'
+        }}>
           {currentInningCommentary.length > 0 ? currentInningCommentary.map((ball, index) => {
             // Handle different data structures - check if it's new API format or old format
             const runs = ball.Runs || ball.runs || 0;
@@ -243,29 +539,67 @@ const CommentaryTab = ({ matchDetail, matchId, commentary }) => {
             if (!isball && !ball.Commentary) return null;
             
             return (
-              <div key={index} className="ball-item">
-                <div className={`ball-runs-badge ${
-                  runs == 6 ? 'ball-runs-six' : 
-                  runs == 4 ? 'ball-runs-four' : 
-                  'ball-runs-other'
-                }`}>
+              <div key={index} style={{
+                display: 'flex',
+                gap: '12px',
+                padding: '12px',
+                background: index % 2 === 0 ? 'rgba(248, 250, 252, 0.5)' : 'white',
+                borderRadius: '8px',
+                border: '1px solid rgba(226, 232, 240, 0.5)'
+              }}>
+                <div style={{
+                  minWidth: '32px',
+                  height: '32px',
+                  borderRadius: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: 'white',
+                  background: runs == 6 ? 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)' : 
+                             runs == 4 ? 'linear-gradient(135deg, #ecaf1a 0%, #f59e0b 100%)' : 
+                             'linear-gradient(135deg, #6b7280 0%, #9ca3af 100%)'
+                }}>
                   {runs || (ball.Detail === 'W' ? 'W' : '•')}
                 </div>
-                <div className="ball-content">
-                  <div className="ball-meta">
-                    {over && ballNumber ? `Over ${over} • ${batsman} vs ${bowler}` : ''}
-                  </div>
-                  <div className="ball-commentary-text">
+                <div style={{ flex: 1 }}>
+                  {over && ballNumber ? (
+                    <div style={{
+                      fontSize: '12px',
+                      color: '#6b7280',
+                      marginBottom: '4px'
+                    }}>
+                      Over {over} • {batsman} vs {bowler}
+                    </div>
+                  ) : null}
+                  <div style={{
+                    fontSize: '14px',
+                    color: '#1f2937',
+                    lineHeight: '1.5',
+                    marginBottom: '4px'
+                  }}>
                     {commentary}
                   </div>
-                  <div className="ball-score">
+                  <div style={{
+                    fontSize: '12px',
+                    color: '#6b7280'
+                  }}>
                     Score: {score}
                   </div>
                 </div>
               </div>
             );
           }) : (
-            <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>
+            <div style={{ 
+              textAlign: 'center', 
+              padding: '40px 20px', 
+              color: '#6b7280',
+              background: 'linear-gradient(135deg, rgba(236, 175, 26, 0.1) 0%, rgba(224, 189, 169, 0.05) 100%)',
+              borderRadius: '8px',
+              border: '1px solid rgba(236, 175, 26, 0.2)'
+            }}>
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}>📝</div>
               No commentary available for this inning
             </div>
           )}

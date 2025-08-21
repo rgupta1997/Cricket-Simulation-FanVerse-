@@ -120,10 +120,10 @@ const EmbeddedSimulator = ({ matchId, onExpand }) => {
     <div style={{
       position: 'relative',
       width: '100%',
-      height: '40vh',
+      height: '50vh',
       minHeight: '300px',
       backgroundColor: '#000',
-      marginBottom: '20px'
+      // marginBottom: '20px'
     }}>
       {/* Simulator Container */}
       <div style={{

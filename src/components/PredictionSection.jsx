@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './PredictionSection.css';
 import { savePrediction, getPredictions, clearPredictions, updateLeaderboard } from '../services/predictionService';
 
 const PredictionSection = ({ currentUser, onLoginClick, latestBallEvent, isOpen, onToggle, matchId, showCloseButton = true }) => {
@@ -258,25 +257,97 @@ const PredictionSection = ({ currentUser, onLoginClick, latestBallEvent, isOpen,
   }
 
   return (
-    <div className="prediction-section">
-      <div className="prediction-header">
-        <h3>🎯 Ball Prediction</h3>
-        {showCloseButton && <button onClick={onToggle} className="close-prediction-btn">✕</button>}
+    <div style={{
+      background: 'rgba(255, 255, 255, 0.95)',
+      borderRadius: '16px',
+      padding: '20px',
+      border: '1px solid rgba(161, 129, 231, 0.2)',
+      boxShadow: '0 8px 32px rgba(161, 129, 231, 0.15)'
+    }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '20px',
+        paddingBottom: '12px',
+        borderBottom: '2px solid rgba(161, 129, 231, 0.1)'
+      }}>
+        <h3 style={{
+          margin: 0,
+          color: '#a181e7',
+          fontSize: '20px',
+          fontWeight: '700',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          🎯 Ball Prediction
+        </h3>
+        {showCloseButton && (
+          <button 
+            onClick={onToggle} 
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '20px',
+              cursor: 'pointer',
+              color: '#6b7280',
+              padding: '4px'
+            }}
+          >
+            ✕
+          </button>
+        )}
       </div>
 
-      {/* Debug Info */}
-      
-
       {!currentUser ? (
-        <div className="login-required">
-          <p>Please login to make predictions</p>
-          <button onClick={onLoginClick} className="login-btn">
+        <div style={{
+          textAlign: 'center',
+          padding: '30px',
+          background: 'linear-gradient(135deg, rgba(161, 129, 231, 0.1) 0%, rgba(186, 162, 230, 0.05) 100%)',
+          borderRadius: '12px',
+          border: '1px solid rgba(161, 129, 231, 0.2)'
+        }}>
+          <div style={{
+            fontSize: '48px',
+            marginBottom: '16px'
+          }}>🔐</div>
+          <p style={{
+            marginBottom: '20px',
+            color: '#6b7280',
+            fontSize: '16px'
+          }}>
+            Please login to make predictions
+          </p>
+          <button 
+            onClick={onLoginClick} 
+            style={{
+              background: 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              padding: '12px 24px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'transform 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
+            onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+          >
             Login to Continue
           </button>
         </div>
       ) : !matchId ? (
-        <div className="error-message">
-          <span className="error-icon">⚠️</span>
+        <div style={{
+          textAlign: 'center',
+          padding: '20px',
+          background: 'linear-gradient(135deg, rgba(236, 175, 26, 0.1) 0%, rgba(224, 189, 169, 0.05) 100%)',
+          borderRadius: '12px',
+          border: '1px solid rgba(236, 175, 26, 0.2)',
+          color: '#ecaf1a'
+        }}>
+          <span style={{ fontSize: '24px', marginRight: '8px' }}>⚠️</span>
           Match ID is missing. Please refresh the page or navigate to a match.
         </div>
       ) : (
@@ -288,58 +359,173 @@ const PredictionSection = ({ currentUser, onLoginClick, latestBallEvent, isOpen,
             </div>
           )} */}
           
-          <div className="prediction-form">
-            <div className="form-header">
-              <h4>🎯 Predict Ball {getNextBallNumber()}</h4>
-              <span className="next-ball-info">Next: Last completed + 1</span>
+          <div style={{
+            background: 'rgba(248, 250, 252, 0.8)',
+            padding: '20px',
+            borderRadius: '12px',
+            border: '1px solid rgba(226, 232, 240, 0.8)',
+            marginBottom: '20px'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '16px'
+            }}>
+              <h4 style={{
+                margin: 0,
+                color: '#1f2937',
+                fontSize: '16px',
+                fontWeight: '600'
+              }}>
+                🎯 Predict Ball {getNextBallNumber()}
+              </h4>
+              <span style={{
+                color: '#6b7280',
+                fontSize: '12px'
+              }}>Next: Last completed + 1</span>
             </div>
             
             {hasPredictedNextBall() ? (
-              <div className="already-predicted">
-                <span className="prediction-status-icon">✅</span>
-                <span className="prediction-status-text">Predicted ball {getNextBallNumber()}</span>
-                <span className="waiting-info">Wait for ball {latestBallEvent?.Ball_Number || '?'} to complete</span>
+              <div style={{
+                textAlign: 'center',
+                padding: '20px',
+                background: 'linear-gradient(135deg, rgba(161, 129, 231, 0.1) 0%, rgba(186, 162, 230, 0.05) 100%)',
+                borderRadius: '8px',
+                border: '1px solid rgba(161, 129, 231, 0.2)'
+              }}>
+                <div style={{ fontSize: '24px', marginBottom: '8px' }}>✅</div>
+                <div style={{ color: '#1f2937', fontWeight: '600', marginBottom: '4px' }}>
+                  Predicted ball {getNextBallNumber()}
+                </div>
+                <div style={{ color: '#6b7280', fontSize: '14px' }}>
+                  Wait for ball {latestBallEvent?.Ball_Number || '?'} to complete
+                </div>
               </div>
             ) : (
               <form onSubmit={handlePredictionSubmit}>
-                <div className="prediction-options">
-                  <div className="runs-section">
-                    <span className="option-label">Runs:</span>
-                    <div className="runs-buttons">
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '20px'
+                }}>
+                  <div>
+                    <span style={{
+                      display: 'block',
+                      marginBottom: '12px',
+                      color: '#374151',
+                      fontSize: '14px',
+                      fontWeight: '600'
+                    }}>
+                      Runs:
+                    </span>
+                    <div style={{
+                      display: 'flex',
+                      gap: '8px',
+                      flexWrap: 'wrap'
+                    }}>
                       {[0, 1, 2, 3, 4, 5, 6].map(run => (
-                        <label key={run} className="radio-option">
+                        <label key={run} style={{
+                          position: 'relative',
+                          cursor: 'pointer'
+                        }}>
                           <input
                             type="radio"
                             name="prediction"
                             value={run.toString()}
                             checked={prediction === run.toString()}
                             onChange={(e) => setPrediction(e.target.value)}
+                            style={{ display: 'none' }}
                           />
-                          <span className="radio-custom">{run}</span>
+                          <span style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '8px',
+                            border: `2px solid ${prediction === run.toString() ? '#a181e7' : '#d1d5db'}`,
+                            backgroundColor: prediction === run.toString() ? '#a181e7' : 'white',
+                            color: prediction === run.toString() ? 'white' : '#374151',
+                            fontSize: '16px',
+                            fontWeight: '600',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all 0.2s ease'
+                          }}>
+                            {run}
+                          </span>
                         </label>
                       ))}
                     </div>
                   </div>
                   
-                  <div className="wicket-section">
-                    <span className="option-label">Wicket:</span>
-                    <label className="radio-option">
+                  <div>
+                    <span style={{
+                      display: 'block',
+                      marginBottom: '12px',
+                      color: '#374151',
+                      fontSize: '14px',
+                      fontWeight: '600'
+                    }}>
+                      Wicket:
+                    </span>
+                    <label style={{
+                      position: 'relative',
+                      cursor: 'pointer'
+                    }}>
                       <input
                         type="radio"
                         name="prediction"
                         value="W"
                         checked={prediction === 'W'}
                         onChange={(e) => setPrediction(e.target.value)}
+                        style={{ display: 'none' }}
                       />
-                      <span className="radio-custom wicket">W</span>
+                      <span style={{
+                        width: '60px',
+                        height: '40px',
+                        borderRadius: '8px',
+                        border: `2px solid ${prediction === 'W' ? '#ecaf1a' : '#d1d5db'}`,
+                        backgroundColor: prediction === 'W' ? '#ecaf1a' : 'white',
+                        color: prediction === 'W' ? 'white' : '#374151',
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.2s ease'
+                      }}>
+                        W
+                      </span>
                     </label>
                   </div>
                 </div>
                 
                 <button 
                   type="submit" 
-                  className="submit-prediction-btn"
                   disabled={!prediction || isLoading}
+                  style={{
+                    width: '100%',
+                    marginTop: '20px',
+                    padding: '12px 24px',
+                    background: !prediction || isLoading 
+                      ? '#d1d5db' 
+                      : 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: !prediction || isLoading ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!(!prediction || isLoading)) {
+                      e.target.style.transform = 'translateY(-2px)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                  }}
                 >
                   {isLoading ? 'Saving...' : 'Submit Prediction'}
                 </button>
@@ -349,39 +535,129 @@ const PredictionSection = ({ currentUser, onLoginClick, latestBallEvent, isOpen,
 
 
 
-          <div className="prediction-history">
-            <div className="history-header">
-              <h4>📋 Recent Predictions</h4>
+          <div style={{
+            background: 'rgba(248, 250, 252, 0.8)',
+            padding: '20px',
+            borderRadius: '12px',
+            border: '1px solid rgba(226, 232, 240, 0.8)',
+            marginBottom: '20px'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '16px'
+            }}>
+              <h4 style={{
+                margin: 0,
+                color: '#1f2937',
+                fontSize: '16px',
+                fontWeight: '600'
+              }}>
+                📋 Recent Predictions
+              </h4>
               <button 
                 onClick={handleClearPredictions} 
-                className="clear-btn"
                 disabled={isLoading}
+                style={{
+                  padding: '6px 12px',
+                  background: isLoading ? '#d1d5db' : 'linear-gradient(135deg, #e0bda9 0%, #ecaf1a 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  cursor: isLoading ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isLoading) {
+                    e.target.style.transform = 'translateY(-1px)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                }}
               >
                 {isLoading ? 'Clearing...' : 'Clear All'}
               </button>
             </div>
             
-            <div className="predictions-list">
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}>
               {predictions.slice(0, 8).map(pred => (
-                <div key={pred.id} className={`prediction-item ${pred.resultChecked ? 'checked' : 'pending'}`}>
-                  <div className="prediction-row">
-                    <div className="prediction-details">
-                      <span className="user-name">{pred.firstName} {pred.lastName}</span>
-                      <span className="prediction-info">
+                <div 
+                  key={pred.id} 
+                  style={{
+                    padding: '12px 16px',
+                    background: pred.resultChecked ? 
+                      (pred.isCorrect ? 'linear-gradient(135deg, rgba(161, 129, 231, 0.1) 0%, rgba(186, 162, 230, 0.05) 100%)' : 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(252, 165, 165, 0.05) 100%)') :
+                      'linear-gradient(135deg, rgba(236, 175, 26, 0.1) 0%, rgba(224, 189, 169, 0.05) 100%)',
+                    borderRadius: '8px',
+                    border: `1px solid ${pred.resultChecked ? 
+                      (pred.isCorrect ? 'rgba(161, 129, 231, 0.2)' : 'rgba(239, 68, 68, 0.2)') :
+                      'rgba(236, 175, 26, 0.2)'}`
+                  }}
+                >
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px'
+                    }}>
+                      <span style={{
+                        color: '#1f2937',
+                        fontSize: '14px',
+                        fontWeight: '600'
+                      }}>
+                        {pred.firstName} {pred.lastName}
+                      </span>
+                      <span style={{
+                        color: '#6b7280',
+                        fontSize: '12px'
+                      }}>
                         Ball {pred.ballNumber}: {pred.prediction === 'W' ? 'Wicket' : `${pred.prediction} runs`}
                       </span>
                     </div>
                     
-                    <div className="prediction-outcome">
+                    <div>
                       {pred.resultChecked ? (
-                        <div className={`result ${pred.isCorrect ? 'correct' : 'incorrect'}`}>
-                          <span className="result-icon">{pred.isCorrect ? '✅' : '❌'}</span>
-                          <span className="result-text">{pred.actualResult}</span>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}>
+                          <span style={{ fontSize: '16px' }}>
+                            {pred.isCorrect ? '✅' : '❌'}
+                          </span>
+                          <span style={{
+                            color: '#374151',
+                            fontSize: '12px',
+                            fontWeight: '600'
+                          }}>
+                            {pred.actualResult}
+                          </span>
                         </div>
                       ) : (
-                        <div className="pending-status">
-                          <span className="pending-icon">⏳</span>
-                          <span className="pending-text">Waiting...</span>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}>
+                          <span style={{ fontSize: '16px' }}>⏳</span>
+                          <span style={{
+                            color: '#6b7280',
+                            fontSize: '12px'
+                          }}>
+                            Waiting...
+                          </span>
                         </div>
                       )}
                     </div>
@@ -390,38 +666,110 @@ const PredictionSection = ({ currentUser, onLoginClick, latestBallEvent, isOpen,
               ))}
               
               {predictions.length === 0 && (
-                <div className="no-predictions">
-                  <span className="no-predictions-icon">📊</span>
-                  <span className="no-predictions-text">No predictions yet. Make your first prediction above!</span>
+                <div style={{
+                  textAlign: 'center',
+                  padding: '20px',
+                  color: '#6b7280'
+                }}>
+                  <div style={{ fontSize: '24px', marginBottom: '8px' }}>📊</div>
+                  <span style={{ fontSize: '14px' }}>
+                    No predictions yet. Make your first prediction above!
+                  </span>
                 </div>
               )}
             </div>
           </div>
 
            {/* Leaderboard Section */}
-           <div className="leaderboard-section">
-             <div className="leaderboard-header">
-               <h4>🏆 Leaderboard</h4>
-               <span className="points-info">1 point per correct prediction</span>
+           <div style={{
+            background: 'rgba(248, 250, 252, 0.8)',
+            padding: '20px',
+            borderRadius: '12px',
+            border: '1px solid rgba(226, 232, 240, 0.8)'
+          }}>
+             <div style={{
+               display: 'flex',
+               justifyContent: 'space-between',
+               alignItems: 'center',
+               marginBottom: '16px'
+             }}>
+               <h4 style={{
+                 margin: 0,
+                 color: '#1f2937',
+                 fontSize: '16px',
+                 fontWeight: '600'
+               }}>
+                 🏆 Leaderboard
+               </h4>
+               <span style={{
+                 color: '#6b7280',
+                 fontSize: '12px'
+               }}>
+                 1 point per correct prediction
+               </span>
              </div>
-             <div className="leaderboard-actions">
+             <div style={{
+               display: 'flex',
+               gap: '12px',
+               flexWrap: 'wrap'
+             }}>
                {matchId ? (
                  <>
                    <button 
                      onClick={() => window.open(`http://localhost:3001/api/match/${matchId}/leaderboard`, '_blank')}
-                     className="view-leaderboard-btn match-board"
+                     style={{
+                       padding: '10px 16px',
+                       background: 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)',
+                       color: 'white',
+                       border: 'none',
+                       borderRadius: '8px',
+                       fontSize: '14px',
+                       fontWeight: '600',
+                       cursor: 'pointer',
+                       transition: 'all 0.2s ease',
+                       minWidth: '120px'
+                     }}
+                     onMouseEnter={(e) => {
+                       e.target.style.transform = 'translateY(-2px)';
+                     }}
+                     onMouseLeave={(e) => {
+                       e.target.style.transform = 'translateY(0)';
+                     }}
                    >
                      Match Board
                    </button>
                    <button 
                      onClick={() => window.open(`http://localhost:3001/api/leaderboard`, '_blank')}
-                     className="view-leaderboard-btn global-board"
+                     style={{
+                       padding: '10px 16px',
+                       background: 'linear-gradient(135deg, #ecaf1a 0%, #e0bda9 100%)',
+                       color: 'white',
+                       border: 'none',
+                       borderRadius: '8px',
+                       fontSize: '14px',
+                       fontWeight: '600',
+                       cursor: 'pointer',
+                       transition: 'all 0.2s ease',
+                       minWidth: '120px'
+                     }}
+                     onMouseEnter={(e) => {
+                       e.target.style.transform = 'translateY(-2px)';
+                     }}
+                     onMouseLeave={(e) => {
+                       e.target.style.transform = 'translateY(0)';
+                     }}
                    >
                      Global Board
                    </button>
                  </>
                ) : (
-                 <span className="error-text">⚠️ Match ID not available</span>
+                 <span style={{
+                   color: '#ecaf1a',
+                   fontSize: '14px',
+                   fontWeight: '600'
+                 }}>
+                   ⚠️ Match ID not available
+                 </span>
                )}
              </div>
            </div>

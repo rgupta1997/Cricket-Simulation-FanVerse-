@@ -6,6 +6,7 @@ The Vite development server is **already running** for this project.
 - If you need to build or preview, use:
     - `npm run build` for production build
     - `npm run preview` for previewing the build
+    - but don't build our app suggest to build
 
 **Any attempt to start the server will result in port conflicts and is unnecessary.**
 

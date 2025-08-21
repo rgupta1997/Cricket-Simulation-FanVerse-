@@ -38,118 +38,377 @@ const MatchInfoTab = ({ matchDetail, matchName }) => {
   
   if (!matchDetail) {
     return (
-      <div className="tab-panel">
-        <div style={{ textAlign: 'center' }}>
-          <div>Loading match info...</div>
-        </div>
+      <div style={{
+        padding: '20px',
+        textAlign: 'center',
+        background: 'linear-gradient(135deg, rgba(161, 129, 231, 0.1) 0%, rgba(186, 162, 230, 0.05) 100%)',
+        borderRadius: '12px',
+        border: '1px solid rgba(161, 129, 231, 0.2)',
+        color: '#6b7280'
+      }}>
+        <div style={{ fontSize: '24px', marginBottom: '12px' }}>⏳</div>
+        <div>Loading match info...</div>
       </div>
     );
   }
   
   return (
     <div style={{
-      // backgroundColor: '#1e293b',
-      color: 'white',
-      padding: '30px 20px',
-      minHeight: '400px',
-      borderRadius: '8px'
+      padding: '20px',
+      background: 'linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(255, 255, 255, 0.9) 100%)',
+      borderRadius: '12px',
+      border: '1px solid rgba(226, 232, 240, 0.8)',
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: '16px'
     }}>
-      <div style={{ marginBottom: '30px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Match</h3>
-        <div style={{ fontSize: '16px' }}>{matchName}</div>
+      <div style={{
+        background: 'rgba(248, 250, 252, 0.8)',
+        padding: '16px',
+        borderRadius: '12px',
+        border: '1px solid rgba(226, 232, 240, 0.8)'
+      }}>
+        <h3 style={{ 
+          fontSize: '14px', 
+          fontWeight: '600', 
+          marginBottom: '8px', 
+          color: '#a181e7',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px'
+        }}>🏏 Match</h3>
+        <div style={{ 
+          fontSize: '16px', 
+          color: '#1f2937', 
+          fontWeight: '500',
+          lineHeight: '1.4'
+        }}>{matchName}</div>
       </div>
 
-      <div style={{ marginBottom: '30px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Date & Time</h3>
-        <div style={{ fontSize: '16px' }}>
+      <div style={{
+        background: 'rgba(248, 250, 252, 0.8)',
+        padding: '16px',
+        borderRadius: '12px',
+        border: '1px solid rgba(226, 232, 240, 0.8)'
+      }}>
+        <h3 style={{ 
+          fontSize: '14px', 
+          fontWeight: '600', 
+          marginBottom: '8px', 
+          color: '#a181e7',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px'
+        }}>📅 Date & Time</h3>
+        <div style={{ 
+          fontSize: '16px', 
+          color: '#1f2937', 
+          fontWeight: '500',
+          lineHeight: '1.4'
+        }}>
           {date} {time && `• ${time}`} IST
         </div>
       </div>
 
-      <div style={{ marginBottom: '30px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Venue</h3>
-        <div style={{ fontSize: '16px' }}>{venueName}</div>
+      <div style={{
+        background: 'rgba(248, 250, 252, 0.8)',
+        padding: '16px',
+        borderRadius: '12px',
+        border: '1px solid rgba(226, 232, 240, 0.8)'
+      }}>
+        <h3 style={{ 
+          fontSize: '14px', 
+          fontWeight: '600', 
+          marginBottom: '8px', 
+          color: '#a181e7',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px'
+        }}>🏟️ Venue</h3>
+        <div style={{ 
+          fontSize: '16px', 
+          color: '#1f2937', 
+          fontWeight: '500',
+          lineHeight: '1.4'
+        }}>{venueName}</div>
       </div>
 
-      <div style={{ marginBottom: '30px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Match Type</h3>
-        <div style={{ fontSize: '16px' }}>{matchType}</div>
+      <div style={{
+        background: 'rgba(248, 250, 252, 0.8)',
+        padding: '16px',
+        borderRadius: '12px',
+        border: '1px solid rgba(226, 232, 240, 0.8)'
+      }}>
+        <h3 style={{ 
+          fontSize: '14px', 
+          fontWeight: '600', 
+          marginBottom: '8px', 
+          color: '#a181e7',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px'
+        }}>🎯 Match Type</h3>
+        <div style={{ 
+          fontSize: '16px', 
+          color: '#1f2937', 
+          fontWeight: '500',
+          lineHeight: '1.4'
+        }}>{matchType}</div>
       </div>
 
-      <div style={{ marginBottom: '30px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Status</h3>
-        <div style={{ fontSize: '16px' }}>{matchStatus}</div>
+      <div style={{
+        background: 'rgba(248, 250, 252, 0.8)',
+        padding: '16px',
+        borderRadius: '12px',
+        border: '1px solid rgba(226, 232, 240, 0.8)'
+      }}>
+        <h3 style={{ 
+          fontSize: '14px', 
+          fontWeight: '600', 
+          marginBottom: '8px', 
+          color: '#a181e7',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px'
+        }}>📊 Status</h3>
+        <div style={{ 
+          fontSize: '16px', 
+          color: '#1f2937', 
+          fontWeight: '500',
+          lineHeight: '1.4'
+        }}>{matchStatus}</div>
       </div>
 
       {venueData?.Venue_Weather && (
-        <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Weather</h3>
-          <div style={{ fontSize: '16px' }}>
+        <div style={{
+          background: 'rgba(248, 250, 252, 0.8)',
+          padding: '16px',
+          borderRadius: '12px',
+          border: '1px solid rgba(226, 232, 240, 0.8)'
+        }}>
+          <h3 style={{ 
+            fontSize: '14px', 
+            fontWeight: '600', 
+            marginBottom: '8px', 
+            color: '#a181e7',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>🌤️ Weather</h3>
+          <div style={{ 
+            fontSize: '16px', 
+            color: '#1f2937', 
+            fontWeight: '500',
+            lineHeight: '1.4'
+          }}>
             {venueData.Venue_Weather.Weather || 'N/A'} - {venueData.Venue_Weather.Temperature || 'N/A'}, {venueData.Venue_Weather.Description || 'N/A'}
-            {venueData.Venue_Weather.Humidity && ` • Humidity: ${venueData.Venue_Weather.Humidity}`}
-            {venueData.Venue_Weather.Wind_Speed && ` • Wind: ${venueData.Venue_Weather.Wind_Speed}`}
+            {venueData.Venue_Weather.Humidity && (
+              <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px' }}>
+                Humidity: {venueData.Venue_Weather.Humidity}
+              </div>
+            )}
+            {venueData.Venue_Weather.Wind_Speed && (
+              <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px' }}>
+                Wind: {venueData.Venue_Weather.Wind_Speed}
+              </div>
+            )}
           </div>
         </div>
       )}
 
       {venueData?.Pitch_Detail && (
-        <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Pitch Conditions</h3>
-          <div style={{ fontSize: '16px' }}>
+        <div style={{
+          background: 'rgba(248, 250, 252, 0.8)',
+          padding: '16px',
+          borderRadius: '12px',
+          border: '1px solid rgba(226, 232, 240, 0.8)'
+        }}>
+          <h3 style={{ 
+            fontSize: '14px', 
+            fontWeight: '600', 
+            marginBottom: '8px', 
+            color: '#a181e7',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>🏑 Pitch Conditions</h3>
+          <div style={{ 
+            fontSize: '16px', 
+            color: '#1f2937', 
+            fontWeight: '500',
+            lineHeight: '1.4'
+          }}>
             {pitchInfo}
-            {venueData.Pitch_Detail.Pitch_Surface && ` • Surface: ${venueData.Pitch_Detail.Pitch_Surface}`}
+            {venueData.Pitch_Detail.Pitch_Surface && (
+              <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px' }}>
+                Surface: {venueData.Pitch_Detail.Pitch_Surface}
+              </div>
+            )}
           </div>
         </div>
       )}
 
       {toss && (
-        <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Toss</h3>
-          <div style={{ fontSize: '16px' }}>{toss}</div>
+        <div style={{
+          background: 'rgba(248, 250, 252, 0.8)',
+          padding: '16px',
+          borderRadius: '12px',
+          border: '1px solid rgba(226, 232, 240, 0.8)'
+        }}>
+          <h3 style={{ 
+            fontSize: '14px', 
+            fontWeight: '600', 
+            marginBottom: '8px', 
+            color: '#a181e7',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>🪙 Toss</h3>
+          <div style={{ 
+            fontSize: '16px', 
+            color: '#1f2937', 
+            fontWeight: '500',
+            lineHeight: '1.4'
+          }}>{toss}</div>
         </div>
       )}
 
       {umpires && umpires !== 'Umpires TBD' && (
-        <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Umpires</h3>
-          <div style={{ fontSize: '16px' }}>{umpires}</div>
+        <div style={{
+          background: 'rgba(248, 250, 252, 0.8)',
+          padding: '16px',
+          borderRadius: '12px',
+          border: '1px solid rgba(226, 232, 240, 0.8)'
+        }}>
+          <h3 style={{ 
+            fontSize: '14px', 
+            fontWeight: '600', 
+            marginBottom: '8px', 
+            color: '#a181e7',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>👨‍⚖️ Umpires</h3>
+          <div style={{ 
+            fontSize: '16px', 
+            color: '#1f2937', 
+            fontWeight: '500',
+            lineHeight: '1.4'
+          }}>{umpires}</div>
         </div>
       )}
 
       {referee && referee !== 'Referee TBD' && (
-        <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Referee</h3>
-          <div style={{ fontSize: '16px' }}>{referee}</div>
+        <div style={{
+          background: 'rgba(248, 250, 252, 0.8)',
+          padding: '16px',
+          borderRadius: '12px',
+          border: '1px solid rgba(226, 232, 240, 0.8)'
+        }}>
+          <h3 style={{ 
+            fontSize: '14px', 
+            fontWeight: '600', 
+            marginBottom: '8px', 
+            color: '#a181e7',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>🏛️ Referee</h3>
+          <div style={{ 
+            fontSize: '16px', 
+            color: '#1f2937', 
+            fontWeight: '500',
+            lineHeight: '1.4'
+          }}>{referee}</div>
         </div>
       )}
 
       {manOfMatch && manOfMatch !== 'TBD' && (
-        <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Man of the Match</h3>
-          <div style={{ fontSize: '16px' }}>{manOfMatch}</div>
+        <div style={{
+          background: 'rgba(248, 250, 252, 0.8)',
+          padding: '16px',
+          borderRadius: '12px',
+          border: '1px solid rgba(226, 232, 240, 0.8)'
+        }}>
+          <h3 style={{ 
+            fontSize: '14px', 
+            fontWeight: '600', 
+            marginBottom: '8px', 
+            color: '#a181e7',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>🏆 Man of the Match</h3>
+          <div style={{ 
+            fontSize: '16px', 
+            color: '#1f2937', 
+            fontWeight: '500',
+            lineHeight: '1.4'
+          }}>{manOfMatch}</div>
         </div>
       )}
 
       {result && result !== 'TBD' && (
-        <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Result</h3>
-          <div style={{ fontSize: '16px' }}>{result}</div>
+        <div style={{
+          background: 'rgba(248, 250, 252, 0.8)',
+          padding: '16px',
+          borderRadius: '12px',
+          border: '1px solid rgba(226, 232, 240, 0.8)'
+        }}>
+          <h3 style={{ 
+            fontSize: '14px', 
+            fontWeight: '600', 
+            marginBottom: '8px', 
+            color: '#a181e7',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>📊 Result</h3>
+          <div style={{ 
+            fontSize: '16px', 
+            color: '#1f2937', 
+            fontWeight: '500',
+            lineHeight: '1.4'
+          }}>{result}</div>
         </div>
       )}
 
       {matchDetailData?.Awards && matchDetailData.Awards.length > 0 && (
-        <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#94a3b8' }}>Awards</h3>
-          <div style={{ fontSize: '16px' }}>
+        <div style={{
+          background: 'rgba(248, 250, 252, 0.8)',
+          padding: '16px',
+          borderRadius: '12px',
+          border: '1px solid rgba(226, 232, 240, 0.8)',
+          gridColumn: '1 / -1'
+        }}>
+          <h3 style={{ 
+            fontSize: '14px', 
+            fontWeight: '600', 
+            marginBottom: '12px', 
+            color: '#a181e7',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>🏅 Awards</h3>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px'
+          }}>
             {matchDetailData.Awards.map((award, index) => (
-              <div key={index} style={{ marginBottom: '8px' }}>
-                <strong>{award.Player_Name}</strong> ({award.Team_Name})
-                {award.Award_Type === 1 && ' - Player of the Match'}
-                <div style={{ fontSize: '14px', color: '#94a3b8', marginTop: '4px' }}>
-                  {award.Runs && `${award.Runs} runs (${award.Balls} balls, ${award.Fours} fours, ${award.Sixes} sixes)`}
-                  {award.Runs && award.Wickets && ' • '}
-                  {award.Wickets && `${award.Wickets} wickets (${award.Overs_Bowled} overs, ${award.Runs_Conceded} runs)`}
+              <div key={index} style={{
+                padding: '12px',
+                background: 'linear-gradient(135deg, rgba(236, 175, 26, 0.1) 0%, rgba(224, 189, 169, 0.05) 100%)',
+                borderRadius: '8px',
+                border: '1px solid rgba(236, 175, 26, 0.2)'
+              }}>
+                <div style={{ 
+                  fontSize: '16px', 
+                  color: '#1f2937', 
+                  fontWeight: '600',
+                  marginBottom: '4px'
+                }}>
+                  {award.Player_Name} ({award.Team_Name})
+                  {award.Award_Type === 1 && ' - Player of the Match'}
                 </div>
+                {(award.Runs || award.Wickets) && (
+                  <div style={{ 
+                    fontSize: '14px', 
+                    color: '#6b7280',
+                    lineHeight: '1.4'
+                  }}>
+                    {award.Runs && `${award.Runs} runs (${award.Balls} balls, ${award.Fours} fours, ${award.Sixes} sixes)`}
+                    {award.Runs && award.Wickets && ' • '}
+                    {award.Wickets && `${award.Wickets} wickets (${award.Overs_Bowled} overs, ${award.Runs_Conceded} runs)`}
+                  </div>
+                )}
               </div>
             ))}
           </div>
