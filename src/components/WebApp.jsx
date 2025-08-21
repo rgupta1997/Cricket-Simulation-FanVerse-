@@ -1744,16 +1744,16 @@ const WebApp = () => {
           
           // Using the same Socket.IO connection as test-user-types.html
           const socket = io('http://localhost:3001', {
-            transports: ['polling', 'websocket'],
-            upgrade: true,
-            rememberUpgrade: true,
+            transports: ['websocket'],
+            upgrade: false,
+            rememberUpgrade: false,
             timeout: 20000,
             forceNew: true,
-            reconnection: true,
-            reconnectionAttempts: 5,
-            reconnectionDelay: 1000,
-            reconnectionDelayMax: 5000,
-            maxReconnectionAttempts: 5
+            reconnection: false,
+            reconnectionAttempts: 0,
+            reconnectionDelay: 0,
+            reconnectionDelayMax: 0,
+            maxReconnectionAttempts: 0
           });
           
           socket.on('connect', () => {
@@ -1816,10 +1816,6 @@ const WebApp = () => {
             }
           }); */
           
-          socket.on('disconnect', () => {
-            console.log('Socket.IO connection disconnected');
-          });
-          
           socket.on('connect_error', (error) => {
             console.error('🚨 Socket.IO connection error:', error);
             console.error('Error details:', {
@@ -1828,18 +1824,17 @@ const WebApp = () => {
               context: error.context,
               message: error.message
             });
+            console.log('❌ Socket connection failed. Please refresh the page to reconnect.');
           });
           
           socket.on('connect_timeout', () => {
             console.error('⏰ Socket.IO connection timeout');
+            console.log('❌ Socket connection timed out. Please refresh the page to reconnect.');
           });
           
-          socket.on('reconnect_attempt', (attemptNumber) => {
-            console.log(`🔄 Socket.IO reconnection attempt: ${attemptNumber}`);
-          });
-          
-          socket.on('reconnect_failed', () => {
-            console.error('❌ Socket.IO reconnection failed');
+          socket.on('disconnect', (reason) => {
+            console.log('� Socket.IO connection disconnected:', reason);
+            console.log('❌ Socket disconnected. Please refresh the page to reconnect.');
           });
           
           // Listen for successful match join confirmation
@@ -1857,15 +1852,18 @@ const WebApp = () => {
       };
       
       connectToSocketIO();
-      
-      // Cleanup on unmount
-      return () => {
-        if (socket) {
-          socket.disconnect();
-        }
-      };
     }
   }, [selectedMatchId]);
+
+  // Cleanup socket connection when component unmounts
+  useEffect(() => {
+    return () => {
+      if (socket) {
+        console.log('🔌 Cleaning up socket connection');
+        socket.disconnect();
+      }
+    };
+  }, [socket]);
 
   // Error boundary - only show for critical errors, not MatchDetailPage errors
   if (error && currentView === 'fixtures') {
