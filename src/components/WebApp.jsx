@@ -1424,13 +1424,11 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetai
       <div style={{
         position: 'sticky',
         top: 0,
-        zIndex: 200,
+        // zIndex: 200,
         background: 'linear-gradient(135deg, #f1ecfa 0%, #ede6fa 50%, #dacdf6 100%)',
         paddingBottom: '8px',
         borderBottom: '1px solid rgba(161, 129, 231, 0.2)',
         boxShadow: '0 2px 8px rgba(161, 129, 231, 0.1)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
         flexShrink: 0 // Prevent header from shrinking
       }}>
         {/* Loading and Error Messages */}
@@ -1523,36 +1521,63 @@ const MatchDetailPage = ({ matchId, onBackClick, onChatClick, selectedMatchDetai
         <button
           onClick={() => onChatClick(matchId, match?.matchName || 'Cricket Match')}
           style={{
-            backgroundColor: '#3b82f6',
+            background: 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)',
             color: 'white',
-            border: 'none',
-            borderRadius: '12px',
-            padding: '12px 20px',
-            fontSize: '14px',
-            fontWeight: '600',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: '16px',
+            padding: '16px 24px',
+            fontSize: '15px',
+            fontWeight: '700',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            transition: 'background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease', // Optimized transitions
-            boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)',
-            minWidth: '100px',
-            justifyContent: 'center'
+            gap: '10px',
+            transition: 'all 0.15s ease',
+            boxShadow: '0 4px 16px rgba(161, 129, 231, 0.3)',
+            minWidth: '120px',
+            justifyContent: 'center',
+            position: 'relative',
+            overflow: 'hidden'
           }}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#2563eb';
-            e.target.style.transform = 'translateY(-1px)'; // Reduced from -2px to -1px
-            e.target.style.boxShadow = '0 6px 20px rgba(59, 130, 246, 0.6)';
+            e.target.style.background = 'linear-gradient(135deg, #9575e3 0%, #a891e0 100%)';
+            e.target.style.transform = 'translateY(-1px) scale(1.01)';
+            e.target.style.boxShadow = '0 6px 24px rgba(161, 129, 231, 0.4)';
           }}
           onMouseLeave={(e) => {
-            e.target.style.backgroundColor = '#3b82f6';
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = '0 4px 15px rgba(59, 130, 246, 0.4)';
+            e.target.style.background = 'linear-gradient(135deg, #a181e7 0%, #baa2e6 100%)';
+            e.target.style.transform = 'translateY(0) scale(1)';
+            e.target.style.boxShadow = '0 4px 16px rgba(161, 129, 231, 0.3)';
           }}
         >
-          <span>💬</span>
-          <span>Chat</span>
+          {/* Animated gradient overlay */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: '-100%',
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)',
+            animation: 'shimmer 6s infinite'
+          }}></div>
+          
+          <span style={{ 
+            fontSize: '18px',
+            filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
+          }}>💬</span>
+          <span style={{
+            letterSpacing: '0.5px',
+            textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
+          }}>Chat</span>
         </button>
+        
+        {/* Add simplified shimmer animation */}
+        <style>{`
+          @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+          }
+        `}</style>
       </div>
     </div>
   );

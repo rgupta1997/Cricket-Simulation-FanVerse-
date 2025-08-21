@@ -1,9 +1,9 @@
 {
   "matchId": "stbovl08182025256492",
-  "lastUpdated": "2025-08-20T19:59:49.235Z",
+  "lastUpdated": "2025-08-21T06:32:26.577Z",
   "apiUrl": "https://demo.sportz.io/sifeeds/repo/cricket/live/json/stbovl08182025256492.json",
   "data": {
-    "Timestamp": "08/20/2025T21:55:25.628+05:30",
+    "Timestamp": "08/21/2025T10:19:02.563+05:30",
     "Matchdetail": {
       "Awards": [
         {
@@ -1741,12 +1741,12 @@
             "Skill_Name": "Wicket Keeper",
             "Role": "Wicket Keeper",
             "Confirm_XI": true,
-            "Matches": "43",
+            "Matches": "44",
             "Batting": {
               "Style": "RHB",
-              "Average": "19.75",
-              "Strikerate": "151.09",
-              "Runs": "553"
+              "Average": "19.34",
+              "Strikerate": "149.60",
+              "Runs": "561"
             },
             "Bowling": {
               "Style": "OB",
@@ -1768,12 +1768,12 @@
             "Skill_Name": "Batsman",
             "Role": "Batter",
             "Confirm_XI": true,
-            "Matches": "41",
+            "Matches": "42",
             "Batting": {
               "Style": "RHB",
-              "Average": "30.79",
-              "Strikerate": "138.49",
-              "Runs": "1047"
+              "Average": "30.74",
+              "Strikerate": "137.59",
+              "Runs": "1076"
             },
             "Bowling": {
               "Style": "RM",
@@ -1794,12 +1794,12 @@
             "Skill_Name": "Batsman",
             "Role": "Batter",
             "Confirm_XI": true,
-            "Matches": "28",
+            "Matches": "29",
             "Batting": {
               "Style": "RHB",
-              "Average": "19.91",
-              "Strikerate": "128.15",
-              "Runs": "478"
+              "Average": "19.28",
+              "Strikerate": "125.19",
+              "Runs": "482"
             },
             "Bowling": {
               "Style": "RMF",
@@ -1820,18 +1820,18 @@
             "Skill_Name": "Bowler",
             "Role": "Bowler",
             "Confirm_XI": true,
-            "Matches": "23",
+            "Matches": "24",
             "Batting": {
               "Style": "RHB",
-              "Average": "64",
-              "Strikerate": "145.45",
-              "Runs": "64"
+              "Average": "32.50",
+              "Strikerate": "141.30",
+              "Runs": "65"
             },
             "Bowling": {
               "Style": "RMF",
-              "Average": "20.19",
-              "Economyrate": "7.27",
-              "Wickets": "26"
+              "Average": "19.85",
+              "Economyrate": "7.36",
+              "Wickets": "28"
             },
             "status_id": 12,
             "status": "Available",
@@ -1872,17 +1872,17 @@
             "Skill_Name": "All-Rounder",
             "Role": "All-Rounder",
             "Confirm_XI": true,
-            "Matches": "5",
+            "Matches": "6",
             "Batting": {
               "Style": "LHB",
-              "Average": "15",
-              "Strikerate": "136.36",
-              "Runs": "45"
+              "Average": "13.25",
+              "Strikerate": "117.77",
+              "Runs": "53"
             },
             "Bowling": {
               "Style": "OB",
-              "Average": "21.75",
-              "Economyrate": "8.03",
+              "Average": "24",
+              "Economyrate": "7.68",
               "Wickets": "4"
             },
             "status_id": 12,
@@ -1898,12 +1898,12 @@
             "Skill_Name": "Batsman",
             "Role": "Batter",
             "Confirm_XI": true,
-            "Matches": "10",
+            "Matches": "11",
             "Batting": {
               "Style": "RHB",
-              "Average": "19",
-              "Strikerate": "128.09",
-              "Runs": "114"
+              "Average": "27.50",
+              "Strikerate": "152.77",
+              "Runs": "165"
             },
             "Bowling": {
               "Style": "RM",
@@ -1924,18 +1924,18 @@
             "Skill_Name": "Bowler",
             "Role": "Bowler",
             "Confirm_XI": true,
-            "Matches": "12",
+            "Matches": "13",
             "Batting": {
               "Style": "RHB",
-              "Average": "6.75",
-              "Strikerate": "112.50",
-              "Runs": "27"
+              "Average": "7",
+              "Strikerate": "112",
+              "Runs": "28"
             },
             "Bowling": {
               "Style": "RF",
-              "Average": "22.92",
-              "Economyrate": "7.45",
-              "Wickets": "13"
+              "Average": "19.87",
+              "Economyrate": "7.33",
+              "Wickets": "16"
             },
             "status_id": 12,
             "status": "Available",
@@ -1950,12 +1950,12 @@
             "Skill_Name": "Batsman",
             "Role": "Batter",
             "Confirm_XI": true,
-            "Matches": "34",
+            "Matches": "35",
             "Batting": {
               "Style": "LHB",
-              "Average": "23.48",
-              "Strikerate": "128.34",
-              "Runs": "634"
+              "Average": "22.71",
+              "Strikerate": "127.20",
+              "Runs": "636"
             },
             "Bowling": {
               "Style": "SLO",
@@ -2002,18 +2002,18 @@
             "Skill_Name": "All-Rounder",
             "Role": "All-Rounder",
             "Confirm_XI": true,
-            "Matches": "13",
+            "Matches": "14",
             "Batting": {
               "Style": "RHB",
-              "Average": "25.80",
-              "Strikerate": "130.30",
-              "Runs": "129"
+              "Average": "23.83",
+              "Strikerate": "131.19",
+              "Runs": "143"
             },
             "Bowling": {
               "Style": "SLO",
-              "Average": "54",
-              "Economyrate": "7.20",
-              "Wickets": "2"
+              "Average": "29.50",
+              "Economyrate": "7.08",
+              "Wickets": "4"
             },
             "status_id": 12,
             "status": "Available",
